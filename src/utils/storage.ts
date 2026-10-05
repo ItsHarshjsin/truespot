@@ -55,10 +55,64 @@ class HybridStore {
     try {
       const { error } = await this.supabase.from('bounties').select('id').limit(1);
       this.isConnectedToSupabase = !error;
+      if (!error) {
+        this.setupRealtimeChannel();
+      }
       return !error;
     } catch (e) {
       this.isConnectedToSupabase = false;
       return false;
+    }
+  }
+
+  private realtimeListeners: (() => void)[] = [];
+
+  public subscribeToChanges(callback: () => void): () => void {
+    this.realtimeListeners.push(callback);
+    return () => {
+      this.realtimeListeners = this.realtimeListeners.filter((cb) => cb !== callback);
+    };
+  }
+
+  public notifyListeners() {
+    this.realtimeListeners.forEach((cb) => {
+      try {
+        cb();
+      } catch (err) {
+        console.warn('Realtime callback error:', err);
+      }
+    });
+  }
+
+  public setupRealtimeChannel() {
+    if (!this.supabase) return;
+    try {
+      this.supabase
+        .channel('public-oracle-realtime')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'bounties' },
+          () => {
+            this.notifyListeners();
+          }
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'reports' },
+          () => {
+            this.notifyListeners();
+          }
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'verifications' },
+          () => {
+            this.notifyListeners();
+          }
+        )
+        .subscribe();
+    } catch (e) {
+      console.warn('Realtime channel subscription error:', e);
     }
   }
 
@@ -309,6 +363,7 @@ class HybridStore {
 
     this.bounties.unshift(newBounty);
     this.persist();
+    this.notifyListeners();
 
     if (this.supabase) {
       try {
@@ -358,6 +413,7 @@ class HybridStore {
     }
 
     this.persist();
+    this.notifyListeners();
 
     if (this.supabase) {
       try {
@@ -410,6 +466,7 @@ class HybridStore {
 
     this.verifications.unshift(newVer);
     this.persist();
+    this.notifyListeners();
 
     if (this.supabase) {
       try {
@@ -432,6 +489,7 @@ class HybridStore {
       target.status = 'PAID';
       target.payout_tx = payoutTx;
       this.persist();
+      this.notifyListeners();
 
       if (this.supabase) {
         try {

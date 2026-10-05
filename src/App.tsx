@@ -111,6 +111,11 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     fetchDeviceGps();
+    hybridStore.setupRealtimeChannel();
+    const unsubscribe = hybridStore.subscribeToChanges(() => {
+      refreshData();
+    });
+    return () => unsubscribe();
   }, []);
 
   const fetchDeviceGps = async () => {
