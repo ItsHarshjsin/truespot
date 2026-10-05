@@ -353,35 +353,35 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
         className="hidden"
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         
         {/* Left Column (5 cols on desktop): Spot Details & Observed Truth Input */}
-        <div className="lg:col-span-5 space-y-5">
+        <div className="lg:col-span-5 space-y-4">
           {/* 1. Target Bounty Header Card */}
-          <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-6 space-y-3 shadow-xl shadow-black/40">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold px-3 py-0.5 rounded-full bg-lime-400/10 text-lime-400 border border-lime-400/30">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-3 shadow-xl">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#A8FF00]/10 text-[#A8FF00] border border-[#A8FF00]/30">
                 Target Spot
               </span>
-              <span className="text-xs font-bold font-mono text-lime-400 bg-lime-400/10 border border-lime-400/30 px-3 py-0.5 rounded-full">
+              <span className="text-xs font-bold font-mono text-[#A8FF00] bg-[#101010] border border-white/[0.07] px-2.5 py-0.5 rounded-full">
                 Reward: {bounty.amount_sol} SOL
               </span>
             </div>
 
-            <h2 className="text-lg font-bold text-white tracking-tight">
+            <h2 className="text-[16px] font-bold text-[#F5F5F5] tracking-tight">
               {bounty.place_name}
             </h2>
-            <p className="text-sm text-zinc-400 mt-0.5 leading-snug">
+            <p className="text-xs text-[#858585] mt-0.5 leading-snug">
               "{bounty.question}"
             </p>
 
             {bountiesList.length > 1 && (
-              <div className="mt-3 pt-3 border-t border-zinc-800 flex items-center space-x-2">
-                <span className="text-xs text-zinc-400">Switch:</span>
+              <div className="mt-2.5 pt-2.5 border-t border-white/[0.06] flex items-center space-x-2">
+                <span className="text-xs text-[#858585]">Switch:</span>
                 <select
                   value={selectedBountyId}
                   onChange={(e) => handleSelectBounty(e.target.value)}
-                  className="bg-[#18181b] text-xs text-white font-medium border border-zinc-800 rounded-full px-3 py-1 outline-none focus:border-lime-400/50"
+                  className="bg-[#101010] text-xs text-[#F5F5F5] font-medium border border-white/[0.08] rounded-full px-3 py-1 outline-none focus:border-[#A8FF00] cursor-pointer"
                 >
                   {bountiesList.map((b) => (
                     <option key={b.id} value={b.id} className="bg-zinc-900 text-white">
@@ -394,12 +394,12 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
           </div>
 
           {/* 2. Observed Answer Selection */}
-          <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-6 shadow-xl shadow-black/40">
-            <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2.5">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-3 shadow-xl">
+            <label className="block text-[10px] font-bold text-[#858585] uppercase tracking-wider">
               Observed Place Truth
             </label>
 
-            <div className="grid grid-cols-2 gap-2 mb-3">
+            <div className="grid grid-cols-2 gap-2">
               {[
                 'YES / OPEN',
                 'NO / CLOSED',
@@ -410,10 +410,10 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                   type="button"
                   key={preset}
                   onClick={() => setAnswerText(preset)}
-                  className={`py-2.5 px-3 rounded-2xl text-xs font-semibold border transition-all text-center ${
+                  className={`py-2 px-3 rounded-xl text-xs font-semibold border transition-all text-center cursor-pointer ${
                     answerText === preset
-                      ? 'bg-lime-400 text-black font-bold border-lime-400 shadow-md'
-                      : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
+                      ? 'bg-[#A8FF00] text-black font-extrabold border-[#A8FF00] shadow-sm'
+                      : 'bg-[#101010] border-white/[0.07] text-[#858585] hover:text-white'
                   }`}
                 >
                   {preset}
@@ -426,24 +426,24 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
               value={answerText}
               onChange={(e) => setAnswerText(e.target.value)}
               placeholder="Observation details..."
-              className="w-full bg-[#18181b] border border-zinc-800 focus:border-lime-400/60 rounded-2xl px-4 py-2.5 text-xs text-white placeholder-zinc-500 outline-none transition-all"
+              className="w-full bg-[#101010] border border-white/[0.08] focus:border-[#A8FF00] rounded-xl px-3.5 py-2 text-xs text-[#F5F5F5] placeholder-[#555555] outline-none transition-all"
               required
             />
           </div>
 
           {/* 3. Hardware Telemetry Card */}
           {telemetry && fingerprint && (
-            <div className="p-4 bg-[#121212] rounded-3xl border border-lime-400/30 text-xs text-lime-400 space-y-2 shadow-inner">
+            <div className="p-4 bg-[#0B0B0B] rounded-[20px] border border-[#A8FF00]/30 text-xs text-[#A8FF00] space-y-2 shadow-inner">
               <div className="flex items-center justify-between font-bold">
                 <span className="flex items-center space-x-1.5">
-                  <ShieldCheck className="w-4 h-4 text-lime-400" />
-                  <span className="text-white">Hardware Stamped Evidence</span>
+                  <ShieldCheck className="w-4 h-4 text-[#A8FF00]" />
+                  <span className="text-[#F5F5F5]">Hardware Stamped Evidence</span>
                 </span>
-                <span className="text-[10px] bg-lime-400/10 px-2.5 py-0.5 rounded-full font-mono text-lime-400 border border-lime-400/30">
+                <span className="text-[10px] bg-[#A8FF00]/10 px-2 py-0.5 rounded-full font-mono text-[#A8FF00] border border-[#A8FF00]/30">
                   SHA-256 Valid
                 </span>
               </div>
-              <div className="text-[11px] font-mono text-zinc-300 space-y-0.5">
+              <div className="text-[11px] font-mono text-[#858585] space-y-0.5">
                 <div>• Gyroscope Human Tremor: {telemetry.gyroVariance}g</div>
                 <div>• Devnet Blockhash: {telemetry.blockhash.slice(0, 16)}...</div>
                 <div>• GPS Fix: {telemetry.lat.toFixed(4)}, {telemetry.lng.toFixed(4)}</div>
@@ -453,20 +453,20 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
         </div>
 
         {/* Right Column (7 cols on desktop): Camera Viewfinder & Submission */}
-        <div className="lg:col-span-7 bg-[#121212] border border-zinc-800 rounded-3xl p-6 space-y-4 shadow-xl shadow-black/40">
-          <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider">
+        <div className="lg:col-span-7 bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-4 shadow-xl">
+          <label className="block text-[10px] font-bold text-[#858585] uppercase tracking-wider">
             Physical Camera Verification
           </label>
 
           {photoDataUrl ? (
-            <div className="relative rounded-2xl overflow-hidden border-2 border-lime-400/50 bg-black aspect-video flex items-center justify-center shadow-lg">
+            <div className="relative rounded-xl overflow-hidden border border-[#A8FF00]/50 bg-black aspect-video flex items-center justify-center shadow-lg">
               <img
                 src={photoDataUrl}
                 alt="Captured Evidence"
                 className="w-full h-full object-contain"
               />
-              <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-white flex items-center space-x-1.5 border border-zinc-800 shadow-sm">
-                <CheckCircle2 className="w-3.5 h-3.5 text-lime-400" />
+              <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-white flex items-center space-x-1.5 border border-white/10 shadow-sm">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#A8FF00]" />
                 <span>Hardware Verified Frame</span>
               </div>
               <button
@@ -475,13 +475,13 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                   setFingerprint(null);
                   setTelemetry(null);
                 }}
-                className="absolute top-3 right-3 bg-zinc-800 hover:bg-zinc-700 text-white text-xs px-3 py-1 rounded-full font-semibold border border-zinc-700 backdrop-blur-md transition-colors"
+                className="absolute top-3 right-3 bg-[#101010] hover:bg-zinc-800 text-white text-xs px-3 py-1 rounded-full font-semibold border border-white/15 backdrop-blur-md transition-colors cursor-pointer"
               >
                 Retake
               </button>
             </div>
           ) : isStreaming ? (
-            <div className="relative rounded-2xl overflow-hidden border-2 border-lime-400/60 bg-black aspect-video flex flex-col items-center justify-center shadow-2xl">
+            <div className="relative rounded-xl overflow-hidden border border-[#A8FF00]/60 bg-black aspect-video flex flex-col items-center justify-center shadow-2xl">
               <video
                 ref={videoRef}
                 autoPlay
@@ -490,14 +490,8 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                 className="w-full h-full object-cover"
               />
 
-              {/* Tactical HUD Corner Marks */}
-              <div className="absolute top-3 left-3 border-t-2 border-l-2 border-lime-400 w-6 h-6 pointer-events-none" />
-              <div className="absolute top-3 right-3 border-t-2 border-r-2 border-lime-400 w-6 h-6 pointer-events-none" />
-              <div className="absolute bottom-16 left-3 border-b-2 border-l-2 border-lime-400 w-6 h-6 pointer-events-none" />
-              <div className="absolute bottom-16 right-3 border-b-2 border-r-2 border-lime-400 w-6 h-6 pointer-events-none" />
-
               {/* Viewfinder Target Label */}
-              <div className="absolute top-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-mono text-lime-400 border border-lime-400/40">
+              <div className="absolute top-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-mono text-[#A8FF00] border border-[#A8FF00]/40">
                 LIVE SENSOR STREAM • {bounty.place_name}
               </div>
 
@@ -506,7 +500,7 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                 <button
                   type="button"
                   onClick={toggleFacingMode}
-                  className="bg-black/80 hover:bg-zinc-900 text-white text-xs px-3.5 py-1.5 rounded-full backdrop-blur-md border border-zinc-700 transition-all font-semibold"
+                  className="bg-[#101010]/90 hover:bg-zinc-900 text-white text-xs px-3.5 py-1.5 rounded-full backdrop-blur-md border border-white/10 transition-all font-semibold cursor-pointer"
                 >
                   Flip ({facingMode === 'environment' ? 'Rear' : 'Front'})
                 </button>
@@ -515,47 +509,47 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                 <button
                   type="button"
                   onClick={captureLiveFrame}
-                  className="w-14 h-14 rounded-full bg-lime-400 border-4 border-lime-200 shadow-[0_0_25px_rgba(163,230,53,0.5)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-black font-bold"
+                  className="w-12 h-12 rounded-full bg-[#A8FF00] hover:bg-[#bef264] border-2 border-white shadow-[0_0_20px_rgba(168,255,0,0.5)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-black font-bold cursor-pointer"
                   title="Snap Evidence Photo"
                 >
-                  <Camera className="w-6 h-6 text-black" />
+                  <Camera className="w-5 h-5 text-black" />
                 </button>
 
                 <button
                   type="button"
                   onClick={stopCameraStream}
-                  className="bg-black/80 hover:bg-zinc-900 text-rose-300 text-xs px-3.5 py-1.5 rounded-full backdrop-blur-md border border-zinc-700 transition-all font-semibold"
+                  className="bg-[#101010]/90 hover:bg-zinc-900 text-rose-300 text-xs px-3.5 py-1.5 rounded-full backdrop-blur-md border border-white/10 transition-all font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
               </div>
             </div>
           ) : (
-            <div className="border-2 border-dashed border-zinc-800 rounded-2xl p-8 text-center bg-[#18181b]/40">
-              <div className="w-14 h-14 mx-auto rounded-full bg-lime-400/10 border border-lime-400/25 flex items-center justify-center mb-3 text-lime-400">
-                <Camera className="w-7 h-7" />
+            <div className="border border-dashed border-white/[0.08] rounded-xl p-8 text-center bg-[#101010]">
+              <div className="w-12 h-12 mx-auto rounded-full bg-[#0B0B0B] border border-white/[0.08] flex items-center justify-center mb-3 text-[#A8FF00]">
+                <Camera className="w-6 h-6" />
               </div>
-              <h3 className="text-base font-bold text-white mb-1">
+              <h3 className="text-sm font-bold text-[#F5F5F5] mb-1">
                 Live Evidence Capture
               </h3>
-              <p className="text-xs text-zinc-400 max-w-sm mx-auto mb-5 leading-relaxed">
+              <p className="text-xs text-[#858585] max-w-sm mx-auto mb-4 leading-relaxed">
                 Requires real camera with involuntary hand-tremor biometric verification and Solana blockhash nonce.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+              <div className="flex flex-col sm:flex-row gap-2.5 max-w-md mx-auto">
                 <button
                   type="button"
                   onClick={startCameraStream}
-                  className="flex-1 py-3 px-5 rounded-full bg-lime-400 hover:bg-lime-300 text-black text-xs font-bold flex items-center justify-center space-x-2 transition-all shadow-md shadow-lime-400/20"
+                  className="flex-1 py-2.5 px-4 rounded-full bg-gradient-to-r from-[#A8FF00] to-[#34D399] hover:brightness-105 text-black text-xs font-extrabold flex items-center justify-center space-x-1.5 transition-all shadow-md shadow-[#A8FF00]/15 cursor-pointer"
                 >
-                  <Camera className="w-4 h-4 text-black" />
+                  <Camera className="w-3.5 h-3.5 text-black" />
                   <span>Start Viewfinder</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex-1 py-3 px-5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all"
+                  className="flex-1 py-2.5 px-4 rounded-full bg-[#18181b] hover:bg-zinc-800 text-[#858585] hover:text-white border border-white/[0.07] text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all cursor-pointer"
                 >
                   <span>Upload File</span>
                 </button>
@@ -563,9 +557,9 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                 <button
                   type="button"
                   onClick={handleGenerateFrame}
-                  className="flex-1 py-3 px-5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-lime-400 text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all"
+                  className="flex-1 py-2.5 px-4 rounded-full bg-[#18181b] hover:bg-zinc-800 text-[#A8FF00] text-xs font-semibold border border-white/[0.07] flex items-center justify-center space-x-1.5 transition-all cursor-pointer"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-lime-400" />
+                  <Sparkles className="w-3.5 h-3.5 text-[#A8FF00]" />
                   <span>Simulate Frame</span>
                 </button>
               </div>
@@ -574,7 +568,7 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
 
           {/* Telemetry Indicator */}
           {measuringSensors && (
-            <p className="text-xs font-semibold text-lime-400 text-center animate-pulse">
+            <p className="text-xs font-semibold text-[#A8FF00] text-center animate-pulse">
               Analyzing accelerometer tremor & stamping live Solana blockhash...
             </p>
           )}
@@ -582,15 +576,17 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
           {errorMsg && <p className="text-xs text-rose-400 font-medium px-2">{errorMsg}</p>}
 
           {/* Primary Submit Button */}
-          <button
-            onClick={handleSubmitReport}
-            disabled={!photoDataUrl || submitting}
-            className="w-full py-4 px-6 rounded-full bg-lime-400 hover:bg-lime-300 text-black font-bold text-sm tracking-wide shadow-lg shadow-lime-400/20 flex items-center justify-center space-x-2 transition-all active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <ShieldCheck className="w-5 h-5 text-black" />
-            <span>{submitting ? 'Submitting to Solana...' : 'Submit Evidence & Claim Bounty'}</span>
-            <span className="font-mono text-xs bg-black/10 px-2 py-0.5 rounded-full ml-1">↗</span>
-          </button>
+          <div className="pt-1">
+            <button
+              onClick={handleSubmitReport}
+              disabled={!photoDataUrl || submitting}
+              className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-[#A8FF00] to-[#34D399] hover:brightness-105 text-black font-extrabold text-xs tracking-wide shadow-xl shadow-[#A8FF00]/25 flex items-center justify-center space-x-2 transition-all active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <ShieldCheck className="w-4 h-4 text-black" />
+              <span>{submitting ? 'Submitting to Solana...' : 'Submit Evidence & Claim Bounty'}</span>
+              <span className="font-mono text-xs">↗</span>
+            </button>
+          </div>
         </div>
 
       </div>

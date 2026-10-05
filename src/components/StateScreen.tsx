@@ -162,19 +162,19 @@ export const StateScreen: React.FC<StateScreenProps> = ({
   return (
     <div className="space-y-6 pb-6 max-w-5xl mx-auto">
       {/* 1. Header Card with Live Ticker & Quick Bounty Switcher */}
-      <div className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-2xl border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[24px] p-6 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center space-x-2 mb-1">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+            <span className="text-[10px] font-bold text-[#858585] uppercase tracking-wider">
               Physical Oracle Settlement
             </span>
-            <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full inline-flex items-center space-x-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[10px] font-mono text-[#A8FF00] bg-[#A8FF00]/10 border border-[#A8FF00]/30 px-2 py-0.5 rounded-full inline-flex items-center space-x-1 font-bold">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00] animate-pulse" />
               <span>LIVE CLOCK: {minutesAge}m {secondsAge}s ago</span>
             </span>
           </div>
 
-          <h2 className="text-xl font-bold text-white tracking-tight">
+          <h2 className="text-xl font-extrabold text-[#F5F5F5] tracking-tight">
             {selectedBounty ? selectedBounty.place_name : 'Oracle State'}
           </h2>
         </div>
@@ -184,10 +184,10 @@ export const StateScreen: React.FC<StateScreenProps> = ({
             <select
               value={selectedBounty?.id || ''}
               onChange={(e) => handleSelectBounty(e.target.value)}
-              className="bg-black/40 text-xs text-white font-medium border border-white/10 rounded-full px-3 py-1.5 outline-none max-w-[200px] truncate"
+              className="bg-[#101010] text-xs text-[#F5F5F5] font-medium border border-white/[0.08] focus:border-[#A8FF00] rounded-full px-3 py-1.5 outline-none max-w-[200px] truncate transition-colors"
             >
               {bounties.map((b) => (
-                <option key={b.id} value={b.id} className="bg-slate-900 text-white">
+                <option key={b.id} value={b.id} className="bg-[#101010] text-white">
                   {b.place_name} ({b.status})
                 </option>
               ))}
@@ -196,12 +196,12 @@ export const StateScreen: React.FC<StateScreenProps> = ({
 
           {selectedBounty && (
             <span
-              className={`text-xs px-3.5 py-1.5 rounded-full font-bold ${
+              className={`text-xs px-3.5 py-1.5 rounded-full font-bold font-mono ${
                 selectedBounty.status === 'PAID'
-                  ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                  ? 'bg-[#A8FF00]/10 text-[#A8FF00] border border-[#A8FF00]/30'
                   : selectedBounty.status === 'ANSWERED'
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                  ? 'bg-amber-400/10 text-amber-300 border border-amber-400/30'
+                  : 'bg-[#101010] text-[#858585] border border-white/[0.08]'
               }`}
             >
               {selectedBounty.status}
@@ -212,11 +212,11 @@ export const StateScreen: React.FC<StateScreenProps> = ({
 
       {selectedBounty && (
         <>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           {/* Left Column (6 cols on desktop): Tactile Skeuomorphic Truth & Freshness Gauges */}
-          <div className="lg:col-span-6 space-y-5">
-            {/* Tactile Spectrum Truth Gauge Card (Reference Screen 3) */}
-            <div className="bento-card p-6">
+          <div className="lg:col-span-6 space-y-4">
+            {/* Tactile Spectrum Truth Gauge Card */}
+            <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[24px] p-6 shadow-xl">
               <SpectrumTruthMeter
                 confidencePercent={confidenceScore}
                 agreeCount={agreeCount}
@@ -224,7 +224,7 @@ export const StateScreen: React.FC<StateScreenProps> = ({
               />
             </div>
 
-            {/* Tactile Vertical Freshness Ruler (Reference Screen 2) */}
+            {/* Tactile Vertical Freshness Ruler */}
             {report && (
               <VerticalFreshnessRuler
                 minutesAge={minutesAge}
@@ -234,20 +234,20 @@ export const StateScreen: React.FC<StateScreenProps> = ({
           </div>
 
           {/* Right Column (6 cols on desktop): Observation Evidence & Settlement Execution */}
-          <div className="lg:col-span-6 space-y-5">
+          <div className="lg:col-span-6 space-y-4">
             {/* Evidence Thumbnail Card */}
             {report && (
-              <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-6 space-y-4 shadow-xl shadow-black/40">
+              <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[24px] p-6 space-y-4 shadow-xl">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-zinc-400 uppercase">
+                  <span className="text-[10px] font-bold text-[#858585] uppercase tracking-wider">
                     Verified Observation
                   </span>
-                  <span className="text-xs font-bold font-mono text-lime-400 bg-lime-400/10 border border-lime-400/30 px-3 py-0.5 rounded-full">
+                  <span className="text-xs font-bold font-mono text-[#A8FF00] bg-[#101010] border border-white/[0.08] px-3 py-0.5 rounded-full">
                     {selectedBounty.amount_sol} SOL Escrowed
                   </span>
                 </div>
 
-                <div className="rounded-2xl overflow-hidden border border-zinc-800 bg-black aspect-video flex items-center justify-center">
+                <div className="rounded-2xl overflow-hidden border border-white/[0.08] bg-black aspect-video flex items-center justify-center">
                   <img
                     src={report.photo_url}
                     alt="Physical Evidence"
@@ -255,9 +255,9 @@ export const StateScreen: React.FC<StateScreenProps> = ({
                   />
                 </div>
 
-                <div className="p-3.5 bg-[#18181b] border border-zinc-800 rounded-2xl flex items-center justify-between">
-                  <span className="text-xs font-semibold text-zinc-400">Confirmed Claim:</span>
-                  <span className="text-xs font-bold text-lime-400 bg-lime-400/10 px-3 py-1 rounded-full border border-lime-400/30">
+                <div className="p-3.5 bg-[#101010] border border-white/[0.06] rounded-2xl flex items-center justify-between">
+                  <span className="text-xs font-semibold text-[#858585]">Confirmed Claim:</span>
+                  <span className="text-xs font-bold text-[#A8FF00] bg-[#0B0B0B] px-3 py-1 rounded-full border border-white/[0.08] font-mono">
                     {report.answer_text}
                   </span>
                 </div>
@@ -266,17 +266,17 @@ export const StateScreen: React.FC<StateScreenProps> = ({
 
             {/* Payout Receipt */}
             {payoutSig && (
-              <div className="p-5 bg-[#121212] rounded-3xl border border-lime-400/30 text-xs text-lime-400 space-y-3 shadow-inner">
+              <div className="p-5 bg-[#101010] rounded-[24px] border border-[#A8FF00]/30 text-xs text-[#A8FF00] space-y-3 shadow-inner">
                 <div className="flex items-center justify-between font-bold">
                   <span className="flex items-center space-x-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-lime-400" />
-                    <span className="text-sm text-white">Solana Devnet Escrow Settled</span>
+                    <CheckCircle2 className="w-4 h-4 text-[#A8FF00]" />
+                    <span className="text-sm text-[#F5F5F5]">Solana Devnet Escrow Settled</span>
                   </span>
                   <a
                     href={`https://solscan.io/tx/${payoutSig}?cluster=devnet`}
                     target="_blank"
                     rel="noreferrer"
-                    className="underline flex items-center space-x-1 text-lime-400 hover:text-lime-300 font-semibold"
+                    className="underline flex items-center space-x-1 text-[#A8FF00] hover:text-[#b8ff24] font-semibold"
                   >
                     <span>Solscan</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -294,31 +294,31 @@ export const StateScreen: React.FC<StateScreenProps> = ({
               <button
                 onClick={handleExecutePayout}
                 disabled={isPayingOut}
-                className="w-full py-4 px-6 rounded-full bg-lime-400 hover:bg-lime-300 text-black font-bold text-sm tracking-wide shadow-lg shadow-lime-400/20 flex items-center justify-center space-x-2 transition-all active:scale-[0.99] disabled:opacity-40"
+                className="w-full py-3.5 px-6 rounded-full bg-[#A8FF00] hover:bg-[#b8ff24] text-black font-black text-sm shadow-xl shadow-[#A8FF00]/30 flex items-center justify-center space-x-2 transition-all active:scale-[0.99] disabled:opacity-40 cursor-pointer"
               >
-                <Send className="w-4 h-4 text-black" />
+                <Send className="w-4 h-4 text-black stroke-[2.5]" />
                 <span>{isPayingOut ? 'Settling on Solana Devnet...' : `Execute Payout (${selectedBounty.amount_sol} SOL)`}</span>
-                <span className="font-mono text-xs bg-black/10 px-2 py-0.5 rounded-full ml-1">↗</span>
+                <span className="font-mono text-xs bg-black/15 px-2 py-0.5 rounded-full ml-1 font-black">↗</span>
               </button>
             )}
           </div>
         </div>
 
         {/* Physical Oracle Consumer API & Solana CPI Integration Panel */}
-        <div className="mt-8 bg-[#121212] border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-black/40">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-zinc-800 gap-4">
+        <div className="mt-8 bg-[#0B0B0B] border border-white/[0.07] rounded-[24px] p-6 sm:p-7 shadow-xl">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-white/[0.06] gap-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-2xl bg-lime-400/10 border border-lime-400/30 flex items-center justify-center text-lime-400">
-                <Cpu className="w-5 h-5 text-lime-400" />
+              <div className="w-10 h-10 rounded-full bg-[#101010] border border-white/[0.08] flex items-center justify-center text-[#A8FF00]">
+                <Cpu className="w-5 h-5 text-[#A8FF00]" />
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <h3 className="text-base font-bold text-white">Physical Oracle Consumer Gateway</h3>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-lime-400/10 text-lime-400 border border-lime-400/30">
+                  <h3 className="text-base font-bold text-[#F5F5F5]">Physical Oracle Consumer Gateway</h3>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-[#A8FF00]/10 text-[#A8FF00] border border-[#A8FF00]/30 font-mono">
                     Anchor CPI Ready
                   </span>
                 </div>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-[#858585]">
                   Query verified real-world ground truth directly from Solana smart contracts, AI agents, or REST API.
                 </p>
               </div>
@@ -326,7 +326,7 @@ export const StateScreen: React.FC<StateScreenProps> = ({
 
             <button
               onClick={() => setIsOracleDrawerOpen(!isOracleDrawerOpen)}
-              className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full border border-white/15 text-xs font-semibold text-sky-300 hover:bg-white/5 transition-colors self-start sm:self-auto"
+              className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-[#101010] border border-white/[0.08] text-xs font-semibold text-[#858585] hover:text-white hover:border-white/20 transition-all self-start sm:self-auto cursor-pointer"
             >
               <span>{isOracleDrawerOpen ? 'Collapse Integration' : 'View Code & Payload'}</span>
               {isOracleDrawerOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -336,59 +336,35 @@ export const StateScreen: React.FC<StateScreenProps> = ({
           {isOracleDrawerOpen && (
             <div className="mt-5 space-y-4">
               {/* Navigation Tabs */}
-              <div className="flex flex-wrap gap-2 border-b border-white/10 pb-3">
-                <button
-                  onClick={() => setOracleTab('rust')}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all ${
-                    oracleTab === 'rust'
-                      ? 'tactile-keycap-active text-sky-200'
-                      : 'tactile-keycap text-slate-400'
-                  }`}
-                >
-                  <Cpu className="w-3.5 h-3.5" />
-                  <span>Solana Anchor CPI (Rust)</span>
-                </button>
-
-                <button
-                  onClick={() => setOracleTab('ts')}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all ${
-                    oracleTab === 'ts'
-                      ? 'tactile-keycap-active text-sky-200'
-                      : 'tactile-keycap text-slate-400'
-                  }`}
-                >
-                  <Code2 className="w-3.5 h-3.5" />
-                  <span>TypeScript Web3 SDK</span>
-                </button>
-
-                <button
-                  onClick={() => setOracleTab('rest')}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all ${
-                    oracleTab === 'rest'
-                      ? 'tactile-keycap-active text-sky-200'
-                      : 'tactile-keycap text-slate-400'
-                  }`}
-                >
-                  <Database className="w-3.5 h-3.5" />
-                  <span>Supabase REST & PostGIS</span>
-                </button>
-
-                <button
-                  onClick={() => setOracleTab('payload')}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all ${
-                    oracleTab === 'payload'
-                      ? 'tactile-keycap-active text-sky-200'
-                      : 'tactile-keycap text-slate-400'
-                  }`}
-                >
-                  <Radio className="w-3.5 h-3.5" />
-                  <span>Live Oracle Feed (JSON)</span>
-                </button>
+              <div className="flex flex-wrap gap-2 border-b border-white/[0.06] pb-3">
+                {[
+                  { id: 'rust', label: 'Solana Anchor CPI (Rust)', icon: Cpu },
+                  { id: 'ts', label: 'TypeScript Web3 SDK', icon: Code2 },
+                  { id: 'rest', label: 'Supabase REST & PostGIS', icon: Database },
+                  { id: 'payload', label: 'Live Oracle Feed (JSON)', icon: Radio },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isActive = oracleTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setOracleTab(item.id as any)}
+                      className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1.5 transition-all cursor-pointer ${
+                        isActive
+                          ? 'bg-[#101010] text-[#A8FF00] border border-[#A8FF00]/40 shadow-sm'
+                          : 'bg-[#0B0B0B] text-[#858585] border border-white/[0.06] hover:text-white'
+                      }`}
+                    >
+                      <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Code Snippet Box */}
-              <div className="relative rounded-2xl bg-[#060911] p-4 font-mono text-xs text-sky-100 overflow-x-auto shadow-inner border border-white/10">
-                <div className="flex items-center justify-between pb-3 mb-2 border-b border-white/10 text-[11px] text-sky-300">
+              <div className="relative rounded-2xl bg-[#050505] p-4 font-mono text-xs text-[#F5F5F5] overflow-x-auto shadow-inner border border-white/[0.08]">
+                <div className="flex items-center justify-between pb-3 mb-2 border-b border-white/[0.06] text-[11px] text-[#858585]">
                   <span>
                     {oracleTab === 'rust' && 'programs/client/src/consume_oracle.rs'}
                     {oracleTab === 'ts' && 'src/services/oracleClient.ts'}
@@ -430,11 +406,11 @@ export const StateScreen: React.FC<StateScreenProps> = ({
                       if (onShowToast) onShowToast('Copied to Clipboard', 'Integration snippet copied successfully', 'info');
                       setTimeout(() => setCopiedSnippet(null), 2500);
                     }}
-                    className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-emerald-900/50 hover:bg-emerald-900/80 text-emerald-300 transition-colors"
+                    className="flex items-center space-x-1 px-3 py-1 rounded-full bg-[#101010] hover:bg-[#181818] border border-white/[0.08] text-[#A8FF00] font-semibold text-xs transition-colors cursor-pointer"
                   >
                     {copiedSnippet === oracleTab ? (
                       <>
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <Check className="w-3.5 h-3.5 text-[#A8FF00]" />
                         <span>Copied</span>
                       </>
                     ) : (
@@ -446,7 +422,7 @@ export const StateScreen: React.FC<StateScreenProps> = ({
                   </button>
                 </div>
 
-                <pre className="text-emerald-200 leading-relaxed overflow-x-auto text-[11px]">
+                <pre className="text-[#A8FF00]/90 leading-relaxed overflow-x-auto text-[11px]">
                   {oracleTab === 'rust' && CONSUMER_INTEGRATION_CODE.rustCpi}
                   {oracleTab === 'ts' && CONSUMER_INTEGRATION_CODE.typeScriptSdk}
                   {oracleTab === 'rest' && CONSUMER_INTEGRATION_CODE.restApi}

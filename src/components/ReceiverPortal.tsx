@@ -9,11 +9,7 @@ import {
   Camera,
   Coins,
   CheckCircle2,
-  ExternalLink,
   ShieldCheck,
-  TrendingUp,
-  MapPin,
-  Clock,
 } from 'lucide-react';
 
 interface ReceiverPortalProps {
@@ -58,31 +54,25 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
     .reduce((sum, b) => sum + b.amount_sol, 0);
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
-      {/* CoinVex Style Subheader: Large Title + Sub-navigation Pills */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-1 pb-2">
-        <div>
-          <div className="flex items-center space-x-3">
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">
-              Field Earner Radar
-            </h1>
-            <span className="text-[11px] px-3 py-0.5 rounded-full bg-lime-400/10 text-lime-400 font-bold border border-lime-400/30">
-              Worker Portal
-            </span>
-          </div>
-          <p className="text-xs text-zinc-400 mt-1 font-medium">
-            Physical Truth Hunter • Wallet: <span className="font-mono text-zinc-300 font-bold">{activeAccount.address}</span> • Available: <strong className="text-lime-400 font-mono">{activeAccount.balanceSol.toFixed(2)} SOL</strong>
-          </p>
+    <div className="space-y-5 max-w-7xl mx-auto">
+      {/* Compact Mode Switcher Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-white/[0.06]">
+        <div className="flex items-center space-x-2 text-xs text-[#858585] flex-wrap">
+          <span className="text-[#F5F5F5] font-semibold">Field Earner Radar</span>
+          <span>•</span>
+          <span>Wallet: <strong className="font-mono text-zinc-300">{activeAccount.address}</strong></span>
+          <span>•</span>
+          <span>Available: <strong className="text-[#A8FF00] font-mono">{activeAccount.balanceSol.toFixed(2)} SOL</strong></span>
         </div>
 
-        {/* Sub-navigation Switcher Pills (CoinVex Style) */}
-        <div className="flex items-center bg-[#141414] p-1.5 rounded-full border border-zinc-800 shadow-inner self-start sm:self-auto space-x-1.5 shrink-0">
+        {/* Sub-navigation Switcher Pills */}
+        <div className="flex items-center bg-[#0D0D0D] p-1 rounded-full border border-white/[0.08] shadow-inner space-x-1 shrink-0 self-start sm:self-auto">
           <button
             onClick={() => setSubTab('radar')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
               subTab === 'radar'
-                ? 'bg-lime-400 text-black shadow-md shadow-lime-400/20'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-[#A8FF00] text-black shadow-sm'
+                : 'text-[#858585] hover:text-white'
             }`}
           >
             <Compass className="w-3.5 h-3.5" />
@@ -90,10 +80,10 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
           </button>
           <button
             onClick={() => setSubTab('report')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
               subTab === 'report'
-                ? 'bg-lime-400 text-black shadow-md shadow-lime-400/20'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-[#A8FF00] text-black shadow-sm'
+                : 'text-[#858585] hover:text-white'
             }`}
           >
             <Camera className="w-3.5 h-3.5" />
@@ -101,10 +91,10 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
           </button>
           <button
             onClick={() => setSubTab('earnings')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
               subTab === 'earnings'
-                ? 'bg-lime-400 text-black shadow-md shadow-lime-400/20'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-[#A8FF00] text-black shadow-sm'
+                : 'text-[#858585] hover:text-white'
             }`}
           >
             <Coins className="w-3.5 h-3.5" />
@@ -149,46 +139,52 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
 
       {/* Sub-tab 3: Receiver Earnings & Submitted Proofs */}
       {subTab === 'earnings' && (
-        <div className="space-y-6">
+        <div className="space-y-5">
           {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-5 text-center shadow-lg shadow-black/30">
-              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Total Settled SOL</span>
-              <span className="text-2xl font-extrabold text-lime-400 font-mono">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[18px] p-4 text-center shadow-lg">
+              <span className="text-[10px] font-semibold text-[#858585] uppercase tracking-wider block">Total Settled SOL</span>
+              <span className="text-xl font-extrabold text-[#A8FF00] font-mono">
                 {totalSettledEarnings.toFixed(2)} SOL
               </span>
             </div>
-            <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-5 text-center shadow-lg shadow-black/30">
-              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Submitted Attestations</span>
-              <span className="text-2xl font-extrabold text-white font-mono">
+            <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[18px] p-4 text-center shadow-lg">
+              <span className="text-[10px] font-semibold text-[#858585] uppercase tracking-wider block">Submitted Attestations</span>
+              <span className="text-xl font-extrabold text-[#F5F5F5] font-mono">
                 {reports.length}
               </span>
             </div>
-            <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-5 text-center shadow-lg shadow-black/30">
-              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Pending Review</span>
-              <span className="text-2xl font-extrabold text-purple-400 font-mono">
+            <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[18px] p-4 text-center shadow-lg">
+              <span className="text-[10px] font-semibold text-[#858585] uppercase tracking-wider block">Pending Review</span>
+              <span className="text-xl font-extrabold text-amber-400 font-mono">
                 {bounties.filter((b) => b.status === 'ANSWERED').length}
               </span>
             </div>
           </div>
 
           {/* Submitted Evidence Gallery & Proofs */}
-          <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl shadow-black/40">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 sm:p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
               <div className="flex items-center space-x-2">
-                <ShieldCheck className="w-5 h-5 text-lime-400" />
-                <h2 className="text-base font-bold text-white tracking-tight">
+                <ShieldCheck className="w-4 h-4 text-[#A8FF00]" />
+                <h2 className="text-[15px] font-bold text-[#F5F5F5] tracking-tight">
                   My Submitted Field Proofs & Hardware Stamps ({reports.length})
                 </h2>
               </div>
-              <span className="text-xs text-lime-400 font-mono">Cryptographic Verification</span>
+              <span className="text-xs text-[#A8FF00] font-mono">Cryptographic Verification</span>
             </div>
 
             {reports.length === 0 ? (
-              <div className="p-8 text-center bg-[#18181b]/50 rounded-2xl border border-dashed border-zinc-800">
-                <p className="text-xs text-zinc-400">
-                  No reports submitted yet. Switch to the 200m Radar tab, walk into geofence range, and snap photo evidence to earn SOL!
+              <div className="p-8 text-center bg-[#101010] rounded-2xl border border-dashed border-white/[0.08] flex flex-col items-center justify-center space-y-2">
+                <p className="text-xs text-[#858585]">
+                  No reports submitted yet. Walk into any active 200m geofence and snap photo evidence to earn SOL!
                 </p>
+                <button
+                  onClick={() => setSubTab('radar')}
+                  className="mt-1 px-4 py-2 rounded-full bg-[#A8FF00] hover:bg-[#b8ff24] text-black font-black text-xs shadow-md shadow-[#A8FF00]/25 transition-all cursor-pointer"
+                >
+                  Open 200m Radar →
+                </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -198,19 +194,19 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
                   return (
                     <div
                       key={report.id}
-                      className="p-5 rounded-2xl border border-zinc-800 bg-[#18181b] space-y-3 shadow-lg"
+                      className="p-4 rounded-xl border border-white/[0.07] bg-[#101010] space-y-3 shadow-md"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-white">
+                        <span className="text-xs font-bold text-[#F5F5F5]">
                           {targetBounty ? targetBounty.place_name : 'Spot Location'}
                         </span>
-                        <span className="text-[10px] font-mono bg-lime-400/10 px-3 py-0.5 rounded-full border border-lime-400/30 font-bold text-lime-400">
+                        <span className="text-[10px] font-mono bg-[#0B0B0B] px-2.5 py-0.5 rounded-full border border-white/[0.08] font-bold text-[#A8FF00]">
                           {targetBounty ? `${targetBounty.amount_sol} SOL` : '0.20 SOL'}
                         </span>
                       </div>
 
                       {report.photo_url && (
-                        <div className="rounded-xl overflow-hidden aspect-video bg-black max-h-40 border border-zinc-800">
+                        <div className="rounded-xl overflow-hidden aspect-video bg-black max-h-40 border border-white/[0.06]">
                           <img
                             src={report.photo_url}
                             alt="Captured proof"
@@ -219,8 +215,8 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
                         </div>
                       )}
 
-                      <div className="text-[11px] font-mono space-y-1 bg-[#0a0a0a] p-3 rounded-xl border border-zinc-800/80 text-zinc-300">
-                        <div>Answer: <strong className="text-lime-400">{report.answer_text}</strong></div>
+                      <div className="text-[11px] font-mono space-y-1 bg-[#050505] p-2.5 rounded-xl border border-white/[0.05] text-[#858585]">
+                        <div>Answer: <strong className="text-[#A8FF00]">{report.answer_text}</strong></div>
                         <div className="truncate">SHA-256: {report.fingerprint}</div>
                         <div>GPS Fix: {report.gps_lat.toFixed(4)}, {report.gps_lng.toFixed(4)} (±{report.gps_accuracy || 3}m)</div>
                         <div>Biometric Tremor: {report.gyro_variance || 0.046}g</div>
@@ -228,11 +224,11 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
                       </div>
 
                       <div className="flex items-center justify-between text-[11px] pt-1">
-                        <span className="text-zinc-500">
+                        <span className="text-[#858585]">
                           {new Date(report.observed_at).toLocaleString()}
                         </span>
-                        <span className="font-bold text-lime-400 flex items-center space-x-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-lime-400" />
+                        <span className="font-bold text-[#A8FF00] flex items-center space-x-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#A8FF00]" />
                           <span>
                             {targetBounty?.status === 'PAID'
                               ? 'Paid & Settled ✓'
