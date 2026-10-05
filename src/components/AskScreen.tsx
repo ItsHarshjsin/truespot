@@ -5,7 +5,7 @@ import { JUDGE_PRESETS } from '../utils/mockLocations';
 import { lockBountyOnChain } from '../utils/solana';
 import { hybridStore } from '../utils/storage';
 import { searchLocationOSM } from '../utils/evidence';
-import { Navigation, ShieldCheck, MapPin, Search, Sparkles, ArrowRight } from 'lucide-react';
+import { Navigation, ShieldCheck, MapPin, Search, Sparkles, ArrowRight, Coins } from 'lucide-react';
 
 interface AskScreenProps {
   userCoords: Coordinates;
@@ -126,57 +126,110 @@ export const AskScreen: React.FC<AskScreenProps> = ({
   };
 
   return (
-    <div className="space-y-6 pb-6 max-w-5xl mx-auto">
+    <div className="space-y-6 pb-6 max-w-6xl mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {/* Left Column (5 cols on desktop): Escrow Vault Details & 100% Payout Model */}
+        {/* Left Column (5 cols on desktop): CoinVex "Your Portfolio" Style Escrow Card */}
         <div className="lg:col-span-5 space-y-5">
-          {/* Hero Escrow Bounty Bento Card */}
-          <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-6 text-center shadow-xl shadow-black/40 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-lime-400/5 rounded-full blur-2xl pointer-events-none" />
-            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest block mb-2">
-              Escrow Bounty Deposit
-            </span>
-            <div className="flex items-baseline justify-center space-x-2 my-1">
-              <span className="text-6xl font-black text-white tracking-tight">
-                {amountSol}
-              </span>
-              <span className="text-2xl font-bold text-lime-400">SOL</span>
-            </div>
-
-            <div className="mt-3 flex items-center justify-center">
-              <span className="bg-lime-400/10 text-lime-400 border border-lime-400/30 text-xs px-3.5 py-1 rounded-full font-semibold shadow-[0_0_15px_rgba(163,230,53,0.15)]">
-                Locked in Solana Devnet Vault
-              </span>
-            </div>
-
-            {/* Visual Indicator Bar */}
-            <div className="mt-5 w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
-              <div className="bg-lime-400 h-full w-full rounded-full shadow-[0_0_10px_rgba(163,230,53,0.8)]" />
-            </div>
-
-            {/* 100% Payout Breakdown */}
-            <div className="mt-5 pt-4 border-t border-zinc-800 text-left space-y-2.5 text-xs text-zinc-400">
-              <div className="flex items-center justify-between">
-                <span>Worker Payout:</span>
-                <span className="font-mono font-bold text-lime-400">
-                  100% ({amountSol.toFixed(2)} SOL upon approval)
-                </span>
+          {/* Main Portfolio Panel */}
+          <div className="bg-[#121212] border border-zinc-800/90 rounded-[28px] p-6 space-y-5 shadow-2xl shadow-black/50">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-bold text-white tracking-tight">Your Escrow Vault</h2>
+              <div className="flex items-center space-x-1.5 bg-[#18181b] border border-zinc-800 rounded-full px-3 py-1 text-xs font-semibold text-lime-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-lime-400 animate-pulse" />
+                <span>Devnet Live</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span>Geofence Radius:</span>
-                <span className="font-semibold text-zinc-200">Strict 200m Physical Radius</span>
+            </div>
+
+            {/* Quick Action Circles Row (CoinVex Signature: Receive, Send, Trade pucks) */}
+            <div className="grid grid-cols-3 gap-3 pt-1 text-center">
+              <div className="flex flex-col items-center space-y-1.5">
+                <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center font-extrabold shadow-md hover:scale-105 transition-transform">
+                  <Coins className="w-5 h-5 text-black" />
+                </div>
+                <span className="text-[11px] font-semibold text-zinc-300">Deposit</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span>Hardware Proof:</span>
-                <span className="font-semibold text-lime-400">Biometric Gyro + SHA-256</span>
+
+              <div className="flex flex-col items-center space-y-1.5">
+                <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center font-extrabold shadow-md hover:scale-105 transition-transform">
+                  <MapPin className="w-5 h-5 text-black" />
+                </div>
+                <span className="text-[11px] font-semibold text-zinc-300">200m Range</span>
+              </div>
+
+              <div className="flex flex-col items-center space-y-1.5">
+                <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center font-extrabold shadow-md hover:scale-105 transition-transform">
+                  <ShieldCheck className="w-5 h-5 text-black" />
+                </div>
+                <span className="text-[11px] font-semibold text-zinc-300">Biometric</span>
+              </div>
+            </div>
+
+            {/* Balance Indicator & Progress Bar */}
+            <div className="space-y-2 pt-2 border-t border-zinc-800/80">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-zinc-400 font-medium">Bounty Lock:</span>
+                <span className="font-mono text-zinc-300">Target: <strong className="text-white font-bold">{amountSol.toFixed(2)} SOL</strong></span>
+              </div>
+              <div className="w-full bg-zinc-800/80 h-2.5 rounded-full overflow-hidden flex">
+                <div className="bg-lime-400 h-full w-3/4 rounded-full shadow-[0_0_12px_rgba(163,230,53,0.8)]" />
+                <div className="bg-zinc-700/50 h-full w-1/4" />
+              </div>
+            </div>
+
+            {/* Stacked Featured Cards (EXACT CoinVex Crypto & Stocks style) */}
+            <div className="space-y-3 pt-1">
+              {/* 1. Neon Green Gradient Card (Worker Payout) */}
+              <div className="bg-gradient-to-r from-lime-400 to-emerald-400 text-black rounded-2xl p-5 shadow-lg shadow-lime-400/15 relative overflow-hidden">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 rounded-full bg-black/10 flex items-center justify-center font-bold text-xs">
+                      ⚡
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-wider">Worker Payout</span>
+                  </div>
+                  <span className="text-[11px] font-mono font-extrabold bg-black/15 px-2 py-0.5 rounded-full">
+                    100%
+                  </span>
+                </div>
+                <div className="text-3xl font-black tracking-tight my-1">
+                  {amountSol.toFixed(2)} SOL
+                </div>
+                <div className="flex items-center justify-between text-[11px] font-semibold pt-1">
+                  <span className="bg-black text-lime-400 px-2.5 py-0.5 rounded-full font-mono font-bold">
+                    ↗ Instant Release
+                  </span>
+                  <span className="text-black/75">Upon Approval</span>
+                </div>
+              </div>
+
+              {/* 2. Vibrant Purple Gradient Card (Hardware & Biometrics) */}
+              <div className="bg-gradient-to-r from-purple-500 to-violet-600 text-white rounded-2xl p-5 shadow-lg shadow-purple-500/20 relative overflow-hidden">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center font-bold text-xs">
+                      🛡️
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-purple-100">DePIN Proof</span>
+                  </div>
+                  <span className="text-[11px] font-mono font-bold bg-white/20 px-2 py-0.5 rounded-full">
+                    SHA-256
+                  </span>
+                </div>
+                <div className="text-2xl font-black tracking-tight my-1">
+                  Biometric Gyro
+                </div>
+                <div className="text-[11px] text-purple-200">
+                  Physical tremor + Solana devnet blockhash nonce
+                </div>
               </div>
             </div>
           </div>
 
           {/* Quick Idea Prompts Card */}
-          <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-5 space-y-3 shadow-lg shadow-black/30">
-            <div className="flex items-center space-x-2 text-xs font-bold text-white">
+          <div className="bg-[#121212] border border-zinc-800/90 rounded-[28px] p-6 space-y-3 shadow-xl shadow-black/40">
+            <div className="flex items-center space-x-2 text-xs font-bold text-white uppercase tracking-wider">
               <Sparkles className="w-4 h-4 text-lime-400" />
               <span>1-Click Prompt Ideas</span>
             </div>
@@ -186,7 +239,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                   type="button"
                   key={idx}
                   onClick={() => setQuestion(p)}
-                  className="w-full text-left p-3.5 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-xs text-zinc-300 hover:text-white rounded-2xl transition-all leading-snug font-medium"
+                  className="w-full text-left p-3.5 bg-[#18181b] hover:bg-zinc-800 border border-zinc-800/80 hover:border-zinc-700 text-xs text-zinc-300 hover:text-white rounded-2xl transition-all leading-snug font-medium"
                 >
                   {p}
                 </button>
@@ -195,11 +248,16 @@ export const AskScreen: React.FC<AskScreenProps> = ({
           </div>
         </div>
 
-        {/* Right Column (7 cols on desktop): Free-Form Task Creation Form */}
-        <div className="lg:col-span-7 bg-[#121212] border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-black/40">
-          <h2 className="text-lg font-bold text-white tracking-tight mb-4">
-            Create Physical Oracle Query
-          </h2>
+        {/* Right Column (7 cols on desktop): Roomy, Clean CoinVex Form Card */}
+        <div className="lg:col-span-7 bg-[#121212] border border-zinc-800/90 rounded-[28px] p-7 sm:p-8 space-y-6 shadow-2xl shadow-black/50">
+          <div>
+            <h2 className="text-xl font-extrabold text-white tracking-tight">
+              Create Physical Oracle Query
+            </h2>
+            <p className="text-xs text-zinc-400 mt-1">
+              Dispatch a verifiable ground truth request backed by Solana Devnet escrow
+            </p>
+          </div>
 
           <form onSubmit={handleLockBounty} className="space-y-5">
             {/* Free-form Question Textarea */}
@@ -212,7 +270,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                 onChange={(e) => setQuestion(e.target.value)}
                 rows={3}
                 placeholder="Ask any verifiable physical question (e.g. Is the coffee counter open? Are parking spots free? How long is the line?)"
-                className="w-full bg-[#18181b] border border-zinc-800 focus:border-lime-400/60 focus:ring-1 focus:ring-lime-400/30 rounded-2xl p-4 text-xs sm:text-sm text-white font-medium outline-none transition-all placeholder:text-zinc-500"
+                className="w-full bg-[#18181b] border border-zinc-800 focus:border-lime-400 rounded-2xl p-4 text-xs sm:text-sm text-white font-medium outline-none transition-all placeholder:text-zinc-500"
                 required
               />
             </div>
@@ -224,21 +282,21 @@ export const AskScreen: React.FC<AskScreenProps> = ({
               </label>
 
               {/* Location Search Bar */}
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 <div className="relative flex items-center">
-                  <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 pointer-events-none" />
+                  <Search className="w-4 h-4 text-zinc-500 absolute left-4 pointer-events-none" />
                   <input
                     type="text"
                     value={locationSearchQuery}
                     onChange={(e) => setLocationSearchQuery(e.target.value)}
                     placeholder="Search any place or address (e.g. Kathmandu, Tokyo, Coffee Bar)..."
-                    className="w-full bg-[#18181b] border border-zinc-800 focus:border-lime-400/60 rounded-full pl-10 pr-24 py-2.5 text-xs text-white placeholder-zinc-500 outline-none"
+                    className="w-full bg-[#18181b] border border-zinc-800 focus:border-lime-400 rounded-full pl-11 pr-24 py-3 text-xs text-white placeholder-zinc-500 outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => handleSearchLocation()}
                     disabled={isSearchingLocation}
-                    className="absolute right-1.5 px-3.5 py-1 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white text-xs font-semibold rounded-full transition-all disabled:opacity-50"
+                    className="absolute right-2 px-4 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-full transition-all disabled:opacity-50"
                   >
                     {isSearchingLocation ? '...' : 'Search'}
                   </button>
@@ -252,7 +310,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                         key={idx}
                         type="button"
                         onClick={() => handleSelectSearchResult(item)}
-                        className="w-full text-left px-3.5 py-2.5 hover:bg-zinc-800 text-xs text-zinc-200 flex items-center space-x-2"
+                        className="w-full text-left px-4 py-2.5 hover:bg-zinc-800 text-xs text-zinc-200 flex items-center space-x-2"
                       >
                         <MapPin className="w-3.5 h-3.5 text-lime-400 shrink-0" />
                         <span className="truncate">{item.name}</span>
@@ -262,7 +320,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                 )}
 
                 {/* Place Name and GPS Info */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                   <div>
                     <label className="text-[11px] font-semibold text-zinc-400">Place Name / Title</label>
                     <input
@@ -270,7 +328,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                       value={placeName}
                       onChange={(e) => setPlaceName(e.target.value)}
                       placeholder="e.g. Starbucks Main Street"
-                      className="w-full bg-[#18181b] border border-zinc-800 rounded-xl px-3 py-2 text-xs font-medium text-white placeholder-zinc-500 outline-none focus:border-lime-400/50"
+                      className="w-full bg-[#18181b] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs font-medium text-white placeholder-zinc-500 outline-none focus:border-lime-400"
                       required
                     />
                   </div>
@@ -285,7 +343,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                           setPlaceName(preset.name);
                         }
                       }}
-                      className="w-full bg-[#18181b] border border-zinc-800 rounded-xl px-3 py-2 text-xs font-medium text-white outline-none cursor-pointer focus:border-lime-400/50"
+                      className="w-full bg-[#18181b] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs font-medium text-white outline-none cursor-pointer focus:border-lime-400"
                     >
                       <option value="" className="bg-zinc-900 text-zinc-500">Select Popular Hub...</option>
                       {JUDGE_PRESETS.map((p) => (
@@ -295,16 +353,16 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                   </div>
                 </div>
 
-                <div className="text-[11px] font-mono text-zinc-400 px-1">
-                  Selected GPS Pin: <strong className="text-lime-400">{targetLat.toFixed(5)}, {targetLng.toFixed(5)}</strong>
+                <div className="text-[11px] font-mono text-zinc-400 px-1 pt-1">
+                  Target Pin: <strong className="text-lime-400 font-bold">{targetLat.toFixed(5)}, {targetLng.toFixed(5)}</strong>
                 </div>
               </div>
             </div>
 
             {/* Bounty Amount & Expiry */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
               <div>
-                <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">
                   Bounty Amount (SOL)
                 </label>
                 <div className="flex items-center space-x-2">
@@ -315,7 +373,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                     max="10.0"
                     value={amountSol}
                     onChange={(e) => setAmountSol(parseFloat(e.target.value) || 0.1)}
-                    className="w-full bg-[#18181b] border border-zinc-800 rounded-full px-4 py-2.5 text-xs text-lime-400 font-mono font-bold outline-none focus:border-lime-400/50"
+                    className="w-full bg-[#18181b] border border-zinc-800 rounded-full px-4 py-2.5 text-xs text-lime-400 font-mono font-bold outline-none focus:border-lime-400"
                   />
                   <div className="flex space-x-1 shrink-0">
                     {[0.1, 0.25, 0.5].map((val) => (
@@ -337,13 +395,13 @@ export const AskScreen: React.FC<AskScreenProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">
                   Time-to-Live Window
                 </label>
                 <select
                   value={expiryMinutes}
                   onChange={(e) => setExpiryMinutes(parseInt(e.target.value))}
-                  className="w-full bg-[#18181b] border border-zinc-800 rounded-full px-4 py-2.5 text-xs text-white font-medium outline-none cursor-pointer focus:border-lime-400/50"
+                  className="w-full bg-[#18181b] border border-zinc-800 rounded-full px-4 py-2.5 text-xs text-white font-medium outline-none cursor-pointer focus:border-lime-400"
                 >
                   <option value={15} className="bg-zinc-900 text-white">15 Minutes (High Priority)</option>
                   <option value={30} className="bg-zinc-900 text-white">30 Minutes (Recommended)</option>
@@ -353,18 +411,24 @@ export const AskScreen: React.FC<AskScreenProps> = ({
               </div>
             </div>
 
-            {/* Primary Action Button (CoinVex Neon CTA) */}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-4 px-6 rounded-full bg-lime-400 hover:bg-lime-300 text-black font-bold text-sm tracking-wide shadow-lg shadow-lime-400/20 flex items-center justify-center space-x-2 transition-all active:scale-[0.99] disabled:opacity-50"
-            >
-              <ShieldCheck className="w-5 h-5 text-black" />
-              <span>
-                {isSubmitting ? 'Depositing to Solana Escrow...' : `Lock in Escrow: Deposit ${amountSol} SOL & Publish Task`}
-              </span>
-              <span className="font-mono text-xs bg-black/10 px-2 py-0.5 rounded-full ml-1">↗</span>
-            </button>
+            {/* Error Message */}
+            {errorMsg && (
+              <p className="text-xs text-rose-400 font-medium">{errorMsg}</p>
+            )}
+
+            {/* CoinVex Neon Transfer Button */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-4 px-6 rounded-full bg-gradient-to-r from-lime-400 to-emerald-400 hover:from-lime-300 hover:to-emerald-300 text-black font-extrabold text-sm tracking-wide shadow-xl shadow-lime-400/25 flex items-center justify-center space-x-2 transition-all active:scale-[0.99] disabled:opacity-50"
+              >
+                <span className="text-lg">⇄</span>
+                <span>
+                  {isSubmitting ? 'Depositing to Solana Escrow...' : `Lock in Escrow: Deposit ${amountSol} SOL & Publish Task`}
+                </span>
+              </button>
+            </div>
           </form>
         </div>
 

@@ -179,45 +179,45 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
   return (
     <div className="space-y-6 pb-12 max-w-7xl mx-auto">
       {/* Top Banner: 3-Role Architecture Summary */}
-      <div className="bento-card-accent p-6 sm:p-8 text-white relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="bg-[#121212] border border-zinc-800 rounded-[28px] p-6 sm:p-8 text-white relative overflow-hidden shadow-2xl shadow-black/40">
+        <div className="absolute right-0 top-0 w-96 h-96 bg-lime-400/5 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-300 text-xs font-semibold backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-lime-400/10 border border-lime-400/30 text-lime-400 text-xs font-semibold backdrop-blur-md">
+              <span className="w-2 h-2 rounded-full bg-lime-400 animate-pulse" />
               <span>3-Party Cryptographic Trust Protocol</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
               3-Wallet DePIN Verification & History Hub
             </h1>
-            <p className="text-sm text-slate-300 leading-relaxed">
+            <p className="text-sm text-zinc-300 leading-relaxed">
               Every truth query is executed across 3 isolated entities: the <strong>Task Maker</strong> who creates & escrows funds, the <strong>Task Receiver</strong> who physically captures cryptographic photo proof, and the autonomous <strong>Solana Escrow Vault</strong> that settles payments on-chain.
             </p>
           </div>
 
           {/* Quick TVL & Solana Devnet Status Pill */}
           <div className="flex md:flex-col gap-3 shrink-0">
-            <div className="bento-card p-3.5 text-right border-white/10">
-              <div className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+            <div className="bg-[#18181b] rounded-2xl p-3.5 text-right border border-zinc-800">
+              <div className="text-[11px] uppercase tracking-wider text-zinc-400 font-semibold">
                 Total Escrow TVL
               </div>
-              <div className="text-2xl font-black font-mono text-sky-300">
+              <div className="text-2xl font-black font-mono text-lime-400">
                 {totalEscrowLockedSol.toFixed(2)} SOL
               </div>
-              <div className="text-[10px] text-slate-400 font-mono">
+              <div className="text-[10px] text-zinc-400 font-mono">
                 {bounties.filter((b) => b.status === 'OPEN').length} active escrows
               </div>
             </div>
 
-            <div className="bento-card p-3.5 text-right border-white/10">
-              <div className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold flex items-center justify-end space-x-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+            <div className="bg-[#18181b] rounded-2xl p-3.5 text-right border border-zinc-800">
+              <div className="text-[11px] uppercase tracking-wider text-zinc-400 font-semibold flex items-center justify-end space-x-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-lime-400 animate-pulse" />
                 <span>Solana Devnet</span>
               </div>
               <div className="text-xs font-mono font-bold text-white mt-1">
                 Slot: {solanaSlot ? solanaSlot.toLocaleString() : 'Loading...'}
               </div>
-              <div className="text-[10px] font-mono text-sky-400/80 truncate max-w-[150px]">
+              <div className="text-[10px] font-mono text-lime-400/80 truncate max-w-[150px]">
                 {rpcLatencyMs ? `${rpcLatencyMs}ms RPC` : 'Confirmed'}
               </div>
             </div>

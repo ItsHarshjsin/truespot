@@ -59,32 +59,29 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
-      {/* Receiver Account Overview Header - Bento Card */}
-      <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl shadow-black/40">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-2xl bg-lime-400/10 text-lime-400 border border-lime-400/30 flex items-center justify-center text-xl font-bold shadow-[0_0_20px_rgba(163,230,53,0.2)]">
-            📸
+      {/* CoinVex Style Subheader: Large Title + Sub-navigation Pills */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-1 pb-2">
+        <div>
+          <div className="flex items-center space-x-3">
+            <h1 className="text-3xl font-extrabold text-white tracking-tight">
+              Field Earner Radar
+            </h1>
+            <span className="text-[11px] px-3 py-0.5 rounded-full bg-lime-400/10 text-lime-400 font-bold border border-lime-400/30">
+              Worker Portal
+            </span>
           </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h1 className="text-xl font-extrabold text-white tracking-tight">Task Receiver / Field Earner Hub</h1>
-              <span className="text-xs px-3 py-0.5 rounded-full bg-lime-400/10 text-lime-400 font-bold border border-lime-400/30">
-                Worker Portal
-              </span>
-            </div>
-            <div className="text-xs font-mono text-zinc-400 mt-1">
-              Wallet: <span className="text-zinc-200 font-bold">{activeAccount.address}</span> • Available: <span className="text-lime-400 font-bold">{activeAccount.balanceSol.toFixed(2)} SOL</span>
-            </div>
-          </div>
+          <p className="text-xs text-zinc-400 mt-1 font-medium">
+            Physical Truth Hunter • Wallet: <span className="font-mono text-zinc-300 font-bold">{activeAccount.address}</span> • Available: <strong className="text-lime-400 font-mono">{activeAccount.balanceSol.toFixed(2)} SOL</strong>
+          </p>
         </div>
 
-        {/* Sub-navigation Switcher Pills */}
-        <div className="flex items-center bg-[#0a0a0a] p-1.5 rounded-full border border-zinc-800 self-start md:self-auto space-x-1.5">
+        {/* Sub-navigation Switcher Pills (CoinVex Style) */}
+        <div className="flex items-center bg-[#141414] p-1.5 rounded-full border border-zinc-800 shadow-inner self-start sm:self-auto space-x-1.5 shrink-0">
           <button
             onClick={() => setSubTab('radar')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
               subTab === 'radar'
-                ? 'bg-lime-400 text-black shadow-md'
+                ? 'bg-lime-400 text-black shadow-md shadow-lime-400/20'
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
@@ -95,7 +92,7 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
             onClick={() => setSubTab('report')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
               subTab === 'report'
-                ? 'bg-lime-400 text-black shadow-md'
+                ? 'bg-lime-400 text-black shadow-md shadow-lime-400/20'
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
@@ -106,7 +103,7 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
             onClick={() => setSubTab('earnings')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
               subTab === 'earnings'
-                ? 'bg-lime-400 text-black shadow-md'
+                ? 'bg-lime-400 text-black shadow-md shadow-lime-400/20'
                 : 'text-zinc-400 hover:text-white'
             }`}
           >

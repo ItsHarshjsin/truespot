@@ -69,29 +69,29 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-1 select-none">
-      <div className="bg-[#121212] border border-zinc-800 rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-lg shadow-black/40">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 select-none">
+      <div className="flex flex-wrap items-center justify-between gap-3 py-3 border-b border-zinc-900">
         {/* Left: Real Device GPS & Coordinates Trigger */}
         <div className="flex items-center space-x-2 flex-wrap gap-y-1">
           <button
             onClick={onUseLiveGps}
-            className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-lime-400/10 border border-lime-400/30 text-lime-400 hover:bg-lime-400/20 shrink-0 transition-colors"
+            className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-lime-400 text-black shadow-sm shadow-lime-400/20 shrink-0 transition-transform active:scale-95"
             title="Auto-detect real GPS"
           >
-            <Navigation className="w-3.5 h-3.5 text-lime-400" />
+            <Navigation className="w-3.5 h-3.5 text-black" />
             <span>Real GPS</span>
           </button>
 
           <button
             onClick={() => setShowManualInput(!showManualInput)}
-            className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 shrink-0 transition-colors"
+            className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#18181b] border border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700 shrink-0 transition-colors"
             title="Type coordinates"
           >
             <Edit3 className="w-3.5 h-3.5 text-zinc-400" />
             <span>Custom Coords</span>
           </button>
 
-          <div className="flex items-center space-x-2 text-xs text-zinc-300 font-medium bg-[#0a0a0a] px-3.5 py-1.5 rounded-full border border-zinc-800">
+          <div className="flex items-center space-x-2 text-xs text-zinc-300 font-medium bg-[#141414] px-3.5 py-1.5 rounded-full border border-zinc-800">
             <span className="w-2 h-2 rounded-full bg-lime-400 animate-pulse shadow-[0_0_8px_rgba(163,230,53,0.8)]" />
             <span className="truncate max-w-[200px] sm:max-w-xs">{currentLocationName}</span>
           </div>
@@ -119,7 +119,7 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
           <button
             onClick={handleAirdrop}
             disabled={airdropping}
-            className="flex items-center space-x-1.5 bg-lime-400 hover:bg-lime-300 text-black font-bold px-4 py-1.5 rounded-full text-xs transition-all shadow-[0_0_15px_rgba(163,230,53,0.3)] hover:scale-105 active:scale-95"
+            className="flex items-center space-x-1.5 bg-lime-400 hover:bg-lime-300 text-black font-bold px-4 py-1.5 rounded-full text-xs transition-all shadow-[0_0_15px_rgba(163,230,53,0.25)] hover:scale-105 active:scale-95"
             title="Airdrop 1 Devnet SOL"
           >
             <Coins className="w-3.5 h-3.5 text-black" />
@@ -128,7 +128,7 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
 
           <button
             onClick={onRefreshData}
-            className="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center text-zinc-300 hover:text-white transition-colors"
+            className="w-8 h-8 rounded-full bg-[#18181b] border border-zinc-800 hover:bg-zinc-800 flex items-center justify-center text-zinc-300 hover:text-white transition-colors"
             title="Refresh oracle data"
           >
             <RotateCcw className="w-3.5 h-3.5" />
