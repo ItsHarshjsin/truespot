@@ -60,32 +60,32 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       {/* Receiver Account Overview Header - Bento Card */}
-      <div className="bento-card p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl shadow-black/40">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-2xl bg-sky-500/15 text-sky-300 border border-sky-500/30 flex items-center justify-center text-xl font-bold shadow-[0_0_20px_rgba(56,189,248,0.25)]">
+          <div className="w-12 h-12 rounded-2xl bg-lime-400/10 text-lime-400 border border-lime-400/30 flex items-center justify-center text-xl font-bold shadow-[0_0_20px_rgba(163,230,53,0.2)]">
             📸
           </div>
           <div>
             <div className="flex items-center space-x-2">
               <h1 className="text-xl font-extrabold text-white tracking-tight">Task Receiver / Field Earner Hub</h1>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-sky-500/15 text-sky-300 font-bold border border-sky-500/30">
+              <span className="text-xs px-3 py-0.5 rounded-full bg-lime-400/10 text-lime-400 font-bold border border-lime-400/30">
                 Worker Portal
               </span>
             </div>
-            <div className="text-xs font-mono text-slate-400 mt-1">
-              Wallet: <span className="text-slate-200 font-bold">{activeAccount.address}</span> • Available: <span className="text-sky-300 font-bold">{activeAccount.balanceSol.toFixed(2)} SOL</span>
+            <div className="text-xs font-mono text-zinc-400 mt-1">
+              Wallet: <span className="text-zinc-200 font-bold">{activeAccount.address}</span> • Available: <span className="text-lime-400 font-bold">{activeAccount.balanceSol.toFixed(2)} SOL</span>
             </div>
           </div>
         </div>
 
-        {/* Sub-navigation Switcher Pills (Tactile Keycaps) */}
-        <div className="flex items-center bg-black/50 p-1.5 rounded-2xl border border-white/10 shadow-inner self-start md:self-auto space-x-1.5">
+        {/* Sub-navigation Switcher Pills */}
+        <div className="flex items-center bg-[#0a0a0a] p-1.5 rounded-full border border-zinc-800 self-start md:self-auto space-x-1.5">
           <button
             onClick={() => setSubTab('radar')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
               subTab === 'radar'
-                ? 'tactile-keycap-active text-sky-200'
-                : 'tactile-keycap text-slate-400 hover:text-white'
+                ? 'bg-lime-400 text-black shadow-md'
+                : 'text-zinc-400 hover:text-white'
             }`}
           >
             <Compass className="w-3.5 h-3.5" />
@@ -93,10 +93,10 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
           </button>
           <button
             onClick={() => setSubTab('report')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
               subTab === 'report'
-                ? 'tactile-keycap-active text-sky-200'
-                : 'tactile-keycap text-slate-400 hover:text-white'
+                ? 'bg-lime-400 text-black shadow-md'
+                : 'text-zinc-400 hover:text-white'
             }`}
           >
             <Camera className="w-3.5 h-3.5" />
@@ -104,10 +104,10 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
           </button>
           <button
             onClick={() => setSubTab('earnings')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
               subTab === 'earnings'
-                ? 'tactile-keycap-active text-sky-200'
-                : 'tactile-keycap text-slate-400 hover:text-white'
+                ? 'bg-lime-400 text-black shadow-md'
+                : 'text-zinc-400 hover:text-white'
             }`}
           >
             <Coins className="w-3.5 h-3.5" />
@@ -155,41 +155,41 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
         <div className="space-y-6">
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bento-card p-5 text-center">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Total Settled SOL</span>
-              <span className="text-2xl font-extrabold text-sky-300 font-mono">
+            <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-5 text-center shadow-lg shadow-black/30">
+              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Total Settled SOL</span>
+              <span className="text-2xl font-extrabold text-lime-400 font-mono">
                 {totalSettledEarnings.toFixed(2)} SOL
               </span>
             </div>
-            <div className="bento-card p-5 text-center">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Submitted Attestations</span>
+            <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-5 text-center shadow-lg shadow-black/30">
+              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Submitted Attestations</span>
               <span className="text-2xl font-extrabold text-white font-mono">
                 {reports.length}
               </span>
             </div>
-            <div className="bento-card p-5 text-center">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Pending Review</span>
-              <span className="text-2xl font-extrabold text-amber-400 font-mono">
+            <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-5 text-center shadow-lg shadow-black/30">
+              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Pending Review</span>
+              <span className="text-2xl font-extrabold text-purple-400 font-mono">
                 {bounties.filter((b) => b.status === 'ANSWERED').length}
               </span>
             </div>
           </div>
 
           {/* Submitted Evidence Gallery & Proofs */}
-          <div className="bento-card-accent p-6 sm:p-8 space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+          <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl shadow-black/40">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
               <div className="flex items-center space-x-2">
-                <ShieldCheck className="w-5 h-5 text-sky-400" />
+                <ShieldCheck className="w-5 h-5 text-lime-400" />
                 <h2 className="text-base font-bold text-white tracking-tight">
                   My Submitted Field Proofs & Hardware Stamps ({reports.length})
                 </h2>
               </div>
-              <span className="text-xs text-sky-300/80">Cryptographic Verification</span>
+              <span className="text-xs text-lime-400 font-mono">Cryptographic Verification</span>
             </div>
 
             {reports.length === 0 ? (
-              <div className="p-8 text-center bg-white/5 rounded-2xl border border-dashed border-white/10">
-                <p className="text-xs text-gray-400">
+              <div className="p-8 text-center bg-[#18181b]/50 rounded-2xl border border-dashed border-zinc-800">
+                <p className="text-xs text-zinc-400">
                   No reports submitted yet. Switch to the 200m Radar tab, walk into geofence range, and snap photo evidence to earn SOL!
                 </p>
               </div>
@@ -201,19 +201,19 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
                   return (
                     <div
                       key={report.id}
-                      className="p-5 rounded-2xl border border-white/10 bg-white/5 space-y-3"
+                      className="p-5 rounded-2xl border border-zinc-800 bg-[#18181b] space-y-3 shadow-lg"
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-white">
                           {targetBounty ? targetBounty.place_name : 'Spot Location'}
                         </span>
-                        <span className="text-[10px] font-mono bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 font-bold text-emerald-400">
+                        <span className="text-[10px] font-mono bg-lime-400/10 px-3 py-0.5 rounded-full border border-lime-400/30 font-bold text-lime-400">
                           {targetBounty ? `${targetBounty.amount_sol} SOL` : '0.20 SOL'}
                         </span>
                       </div>
 
                       {report.photo_url && (
-                        <div className="rounded-xl overflow-hidden aspect-video bg-black/80 max-h-40 border border-white/10">
+                        <div className="rounded-xl overflow-hidden aspect-video bg-black max-h-40 border border-zinc-800">
                           <img
                             src={report.photo_url}
                             alt="Captured proof"
@@ -222,20 +222,20 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
                         </div>
                       )}
 
-                      <div className="text-[11px] font-mono space-y-1 bg-black/40 p-3 rounded-xl border border-white/5 text-gray-300">
-                        <div>Answer: <strong className="text-emerald-400">{report.answer_text}</strong></div>
+                      <div className="text-[11px] font-mono space-y-1 bg-[#0a0a0a] p-3 rounded-xl border border-zinc-800/80 text-zinc-300">
+                        <div>Answer: <strong className="text-lime-400">{report.answer_text}</strong></div>
                         <div className="truncate">SHA-256: {report.fingerprint}</div>
                         <div>GPS Fix: {report.gps_lat.toFixed(4)}, {report.gps_lng.toFixed(4)} (±{report.gps_accuracy || 3}m)</div>
                         <div>Biometric Tremor: {report.gyro_variance || 0.046}g</div>
-                        <div className="truncate">Blockhash: {report.blockhash_stamp || '8Zk9jNm...'}</div>
+                        <div className="truncate text-zinc-500">Blockhash: {report.blockhash_stamp || '8Zk9jNm...'}</div>
                       </div>
 
                       <div className="flex items-center justify-between text-[11px] pt-1">
-                        <span className="text-gray-400">
+                        <span className="text-zinc-500">
                           {new Date(report.observed_at).toLocaleString()}
                         </span>
-                        <span className="font-bold text-emerald-400 flex items-center space-x-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="font-bold text-lime-400 flex items-center space-x-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-lime-400" />
                           <span>
                             {targetBounty?.status === 'PAID'
                               ? 'Paid & Settled ✓'

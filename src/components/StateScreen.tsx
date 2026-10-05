@@ -237,17 +237,17 @@ export const StateScreen: React.FC<StateScreenProps> = ({
           <div className="lg:col-span-6 space-y-5">
             {/* Evidence Thumbnail Card */}
             {report && (
-              <div className="bento-card p-6 space-y-4">
+              <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-6 space-y-4 shadow-xl shadow-black/40">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-400 uppercase">
+                  <span className="text-xs font-bold text-zinc-400 uppercase">
                     Verified Observation
                   </span>
-                  <span className="text-xs font-bold font-mono text-sky-300 bg-sky-500/15 border border-sky-500/30 px-2.5 py-0.5 rounded-full">
+                  <span className="text-xs font-bold font-mono text-lime-400 bg-lime-400/10 border border-lime-400/30 px-3 py-0.5 rounded-full">
                     {selectedBounty.amount_sol} SOL Escrowed
                   </span>
                 </div>
 
-                <div className="rounded-2xl overflow-hidden border border-white/10 bg-black aspect-video flex items-center justify-center">
+                <div className="rounded-2xl overflow-hidden border border-zinc-800 bg-black aspect-video flex items-center justify-center">
                   <img
                     src={report.photo_url}
                     alt="Physical Evidence"
@@ -255,9 +255,9 @@ export const StateScreen: React.FC<StateScreenProps> = ({
                   />
                 </div>
 
-                <div className="p-3.5 bg-black/40 border border-white/5 rounded-2xl flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-400">Confirmed Claim:</span>
-                  <span className="text-xs font-bold text-sky-300 bg-sky-500/15 px-3 py-1 rounded-full border border-sky-500/30">
+                <div className="p-3.5 bg-[#18181b] border border-zinc-800 rounded-2xl flex items-center justify-between">
+                  <span className="text-xs font-semibold text-zinc-400">Confirmed Claim:</span>
+                  <span className="text-xs font-bold text-lime-400 bg-lime-400/10 px-3 py-1 rounded-full border border-lime-400/30">
                     {report.answer_text}
                   </span>
                 </div>
@@ -266,63 +266,59 @@ export const StateScreen: React.FC<StateScreenProps> = ({
 
             {/* Payout Receipt */}
             {payoutSig && (
-              <div className="p-5 bg-sky-950/25 rounded-3xl border border-sky-500/30 text-xs text-sky-300 space-y-3 shadow-inner">
+              <div className="p-5 bg-[#121212] rounded-3xl border border-lime-400/30 text-xs text-lime-400 space-y-3 shadow-inner">
                 <div className="flex items-center justify-between font-bold">
                   <span className="flex items-center space-x-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-sky-400" />
+                    <CheckCircle2 className="w-4 h-4 text-lime-400" />
                     <span className="text-sm text-white">Solana Devnet Escrow Settled</span>
                   </span>
                   <a
                     href={`https://solscan.io/tx/${payoutSig}?cluster=devnet`}
                     target="_blank"
                     rel="noreferrer"
-                    className="underline flex items-center space-x-1 text-sky-400 hover:text-sky-300 font-semibold"
+                    className="underline flex items-center space-x-1 text-lime-400 hover:text-lime-300 font-semibold"
                   >
                     <span>Solscan</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
-                <div className="text-xs space-y-1 pt-1 text-slate-300 font-mono">
+                <div className="text-xs space-y-1 pt-1 text-zinc-300 font-mono">
                   <div>• Spotter Payout (80%): +{(selectedBounty.amount_sol * 0.8).toFixed(3)} SOL</div>
                   <div>• Consensus Verifiers (20%): +{(selectedBounty.amount_sol * 0.2).toFixed(3)} SOL Split</div>
                 </div>
               </div>
             )}
 
-            {/* Primary Action Button (Inspiration Capsule) */}
+            {/* Primary Action Button */}
             {selectedBounty.status === 'ANSWERED' && (
               <button
                 onClick={handleExecutePayout}
                 disabled={isPayingOut}
-                className="w-full bg-[#0a0e17] hover:bg-[#121927] border border-white/20 text-white rounded-full py-2.5 pl-6 pr-3 flex items-center justify-between shadow-2xl transition-all duration-300 group hover:border-sky-400/50 hover:shadow-[0_0_30px_rgba(56,189,248,0.2)] disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full py-4 px-6 rounded-full bg-lime-400 hover:bg-lime-300 text-black font-bold text-sm tracking-wide shadow-lg shadow-lime-400/20 flex items-center justify-center space-x-2 transition-all active:scale-[0.99] disabled:opacity-40"
               >
-                <span className="font-semibold text-sm flex items-center space-x-2">
-                  <Send className="w-4 h-4 text-sky-400" />
-                  <span>{isPayingOut ? 'Settling on Solana Devnet...' : `Execute Payout (${selectedBounty.amount_sol} SOL)`}</span>
-                </span>
-                <div className="w-9 h-9 rounded-full bg-white text-slate-950 font-bold flex items-center justify-center text-sm shadow-md group-hover:scale-105 group-hover:bg-sky-400 group-hover:text-black transition-all">
-                  ↗
-                </div>
+                <Send className="w-4 h-4 text-black" />
+                <span>{isPayingOut ? 'Settling on Solana Devnet...' : `Execute Payout (${selectedBounty.amount_sol} SOL)`}</span>
+                <span className="font-mono text-xs bg-black/10 px-2 py-0.5 rounded-full ml-1">↗</span>
               </button>
             )}
           </div>
         </div>
 
         {/* Physical Oracle Consumer API & Solana CPI Integration Panel */}
-        <div className="mt-8 bento-card p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-white/10 gap-4">
+        <div className="mt-8 bg-[#121212] border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-black/40">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-zinc-800 gap-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-2xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400">
-                <Cpu className="w-5 h-5 text-sky-400" />
+              <div className="w-10 h-10 rounded-2xl bg-lime-400/10 border border-lime-400/30 flex items-center justify-center text-lime-400">
+                <Cpu className="w-5 h-5 text-lime-400" />
               </div>
               <div>
                 <div className="flex items-center space-x-2">
                   <h3 className="text-base font-bold text-white">Physical Oracle Consumer Gateway</h3>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-lime-400/10 text-lime-400 border border-lime-400/30">
                     Anchor CPI Ready
                   </span>
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-zinc-400">
                   Query verified real-world ground truth directly from Solana smart contracts, AI agents, or REST API.
                 </p>
               </div>

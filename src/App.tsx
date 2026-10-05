@@ -201,15 +201,11 @@ export const App: React.FC = () => {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          {/* Full Web Application Canvas - Inspiration Dark Space Bento Design */}
-          <div className="min-h-screen cosmic-atmosphere text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200 relative overflow-x-hidden">
-            {/* The prominent Top-Left Luminous Cyan Flare Beam from Inspiration UI */}
-            <div className="top-left-beam" />
-            <div className="top-left-beam-streak" />
-
-            {/* Ambient Cosmic Radial Glows */}
-            <div className="absolute top-1/4 left-1/3 w-[600px] h-[600px] bg-sky-500/5 rounded-full blur-[140px] pointer-events-none" />
-            <div className="absolute bottom-1/3 right-10 w-[550px] h-[550px] bg-indigo-500/5 rounded-full blur-[140px] pointer-events-none" />
+          {/* Full Web Application Canvas - Neon Dark Mode Fintech Dashboard (CoinVex) */}
+          <div className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-lime-400 selection:text-black relative overflow-x-hidden">
+            {/* Subtle Neon Glow Highlights */}
+            <div className="top-glow" />
+            <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[140px] pointer-events-none" />
 
             {/* Global Floating Toast Notifications */}
             <ToastContainer toasts={toasts} onDismiss={dismissToast} />
@@ -313,30 +309,30 @@ export const App: React.FC = () => {
               )}
             </main>
 
-            {/* 4. Desktop Web Footer - Dark Glassmorphism */}
-            <footer className="w-full bg-[#050811]/90 backdrop-blur-2xl border-t border-white/10 py-6 mt-12 text-xs text-slate-400 select-none shadow-[0_-4px_30px_rgba(0,0,0,0.8)]">
+            {/* 4. Desktop Web Footer - Neon Dark Mode */}
+            <footer className="w-full bg-[#121212] border-t border-zinc-800/80 py-6 mt-12 text-xs text-zinc-400 select-none">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 rounded-lg bg-sky-500/20 border border-sky-500/30 text-sky-400 flex items-center justify-center font-bold text-xs shadow-[0_0_12px_rgba(56,189,248,0.3)]">
+                <div className="flex items-center space-x-2.5">
+                  <div className="w-7 h-7 rounded-full bg-lime-400 text-black flex items-center justify-center font-black text-xs shadow-md shadow-lime-400/20">
                     T
                   </div>
-                  <span className="font-bold text-white">TrueSpot Protocol</span>
+                  <span className="font-bold text-white tracking-tight">TrueSpot Protocol</span>
                   <span>•</span>
-                  <span>Physical DePIN Oracle on Solana Devnet</span>
+                  <span className="text-zinc-400">Physical DePIN Oracle on Solana Devnet</span>
                 </div>
 
-                <div className="flex items-center space-x-4 text-[11px] font-medium text-slate-400">
+                <div className="flex items-center space-x-4 text-[11px] font-medium text-zinc-400">
                   <span>Colosseum Hackathon MVP</span>
                   <span>•</span>
                   <span>OpenStreetMap Geofence (200m)</span>
                   <span>•</span>
-                  <span className="font-mono text-sky-400">Escrow: 9WzD...AWWM</span>
+                  <span className="font-mono text-lime-400 font-semibold">Escrow: 9WzD...AWWM</span>
                 </div>
               </div>
             </footer>
 
-            {/* Mobile Bottom Floating Navigation Bar - Dark Glassmorphism */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#050811]/95 backdrop-blur-2xl border-t border-white/10 px-4 py-2 flex items-center justify-around select-none">
+            {/* Mobile Bottom Floating Navigation Bar - Neon Dark Mode */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#121212]/95 backdrop-blur-2xl border-t border-zinc-800 px-4 py-2 flex items-center justify-around select-none">
               {[
                 { id: 'maker', label: 'Task Maker', icon: Shield },
                 { id: 'receiver', label: 'Field Receiver', icon: Compass },
@@ -349,10 +345,10 @@ export const App: React.FC = () => {
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
                     className={`relative flex flex-col items-center py-1 px-3 rounded-2xl text-[11px] font-semibold transition-all ${
-                      isActive ? 'text-sky-300 font-bold' : 'text-slate-400 hover:text-white'
+                      isActive ? 'text-lime-400 font-bold' : 'text-zinc-400 hover:text-white'
                     }`}
                   >
-                    <div className={`p-1 rounded-full ${isActive ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30 shadow-[0_0_12px_rgba(56,189,248,0.25)]' : ''}`}>
+                    <div className={`p-1.5 rounded-full ${isActive ? 'bg-lime-400/20 text-lime-400 shadow-sm' : ''}`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     <span className="mt-0.5">{item.label}</span>
