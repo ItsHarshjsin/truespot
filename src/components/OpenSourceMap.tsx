@@ -213,42 +213,6 @@ export const OpenSourceMap: React.FC<OpenSourceMapProps> = ({
 
   return (
     <div className="relative w-full rounded-3xl overflow-hidden border border-emerald-950/10 shadow-sm bg-white">
-      {/* Search Bar Overlay on Top of Map */}
-      <div className="absolute top-3.5 left-3.5 right-3.5 z-10 max-w-md">
-        <form onSubmit={handleSearch} className="relative flex items-center">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search address or landmark..."
-            className="w-full bg-white/95 backdrop-blur-md border border-emerald-950/15 focus:border-[#0F3822] rounded-2xl pl-9 pr-24 py-2.5 text-xs text-[#11291B] placeholder-[#6B7F72] outline-none shadow-md"
-          />
-          <Search className="absolute left-3 w-4 h-4 text-[#1E5E38] pointer-events-none" />
-          <button
-            type="submit"
-            className="absolute right-1.5 px-3 py-1.5 bg-[#0F3822] hover:bg-[#154A2E] text-white text-[11px] font-semibold rounded-xl transition-all shadow-xs"
-          >
-            {isSearching ? 'Searching...' : 'Find Spot'}
-          </button>
-        </form>
-
-        {/* Search Results Dropdown */}
-        {searchResults.length > 0 && (
-          <div className="mt-1.5 bg-white border border-emerald-950/10 rounded-2xl overflow-hidden shadow-xl text-xs max-h-48 overflow-y-auto">
-            {searchResults.map((res, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => handleSelectSearchResult(res)}
-                className="w-full text-left px-3.5 py-2.5 hover:bg-[#E8F5E9] text-[#11291B] border-b border-gray-100 last:border-0 truncate flex items-center space-x-2 transition-colors"
-              >
-                <MapPin className="w-3.5 h-3.5 text-[#1E5E38] shrink-0" />
-                <span className="truncate">{res.name}</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
 
       {/* Responsive Height Container for Leaflet */}
       <div

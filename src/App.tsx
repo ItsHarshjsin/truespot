@@ -110,7 +110,7 @@ export const App: React.FC = () => {
   const [unverifiedCount, setUnverifiedCount] = useState<number>(1);
 
   useEffect(() => {
-    fetchDeviceGps();
+    fetchDeviceGps(false);
     hybridStore.setupRealtimeChannel();
     const unsubscribe = hybridStore.subscribeToChanges(() => {
       refreshData();
@@ -118,7 +118,7 @@ export const App: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
-  const fetchDeviceGps = async () => {
+  const fetchDeviceGps = async (isUserInitiated: boolean = false) => {
     setGpsError(null);
     try {
       const fix = await getRealDeviceGps();
@@ -135,7 +135,9 @@ export const App: React.FC = () => {
       showToast('GPS Fix Acquired', `Locked live coordinates: ±${fix.accuracy}m accuracy`, 'info');
     } catch (err: any) {
       console.warn('Real device GPS error:', err.message);
-      setGpsError(err.message || 'Unable to retrieve device GPS');
+      if (isUserInitiated) {
+        setGpsError(err.message || 'Unable to retrieve device GPS');
+      }
     }
   };
 
@@ -215,7 +217,7 @@ export const App: React.FC = () => {
               currentLocationName={locationName}
               isSimulated={isSimulated}
               onSelectPreset={handleSelectPreset}
-              onUseLiveGps={fetchDeviceGps}
+              onUseLiveGps={() => fetchDeviceGps(true)}
               onRefreshData={() => {
                 refreshData();
                 showToast('Oracle Refreshed', 'Synced state with hybrid storage', 'info');
@@ -243,7 +245,7 @@ export const App: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-2 shrink-0 ml-3">
                     <button
-                      onClick={fetchDeviceGps}
+                      onClick={() => fetchDeviceGps(true)}
                       className="px-3 py-1 rounded-full bg-amber-200 text-amber-900 text-xs font-bold hover:bg-amber-300 transition-colors shrink-0"
                     >
                       Retry GPS

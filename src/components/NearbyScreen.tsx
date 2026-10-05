@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Bounty, Coordinates } from '../types';
 import { hybridStore } from '../utils/storage';
+import { searchLocationOSM } from '../utils/evidence';
 import { OpenSourceMap } from './OpenSourceMap';
 import { AnalogProximityDial } from './AnalogProximityDial';
-import { Coins, ArrowRight, Navigation } from 'lucide-react';
+import { Coins, ArrowRight, Navigation, Search, MapPin } from 'lucide-react';
 
 interface NearbyScreenProps {
   userCoords: Coordinates;
@@ -30,6 +31,11 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
   );
   const [filter, setFilter] = useState<'all' | 'in_range' | 'open'>('all');
 
+  // Location search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<{ name: string; lat: number; lng: number }[]>([]);
+
   const selectedBountyId = externalSelectedBountyId || internalSelectedBountyId;
 
   const handleSelectBountyInternal = (id: string) => {
@@ -50,6 +56,26 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
   useEffect(() => {
     fetchNearby();
   }, [userCoords.lat, userCoords.lng]);
+
+  const handleSearchSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!searchQuery.trim()) return;
+    setIsSearching(true);
+    try {
+      const results = await searchLocationOSM(searchQuery.trim());
+      setSearchResults(results);
+    } catch (err) {
+      console.warn('OSM search failed', err);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handlePickSearchResult = (item: { name: string; lat: number; lng: number }) => {
+    onSetUserLocation(item.lat, item.lng, item.name.split(',')[0]);
+    setSearchResults([]);
+    setSearchQuery(item.name.split(',')[0]);
+  };
 
   const filteredBounties = bounties.filter((b) => {
     if (filter === 'in_range') return b.is_within_range;
@@ -237,6 +263,54 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
               <span className="text-xs font-semibold text-[#1E5E38] bg-emerald-100 px-3 py-1 rounded-full">
                 {inRangeCount} bounties inside 200m range
               </span>
+            </div>
+
+            {/* Professional Location Search Bar */}
+            <div className="relative mb-3">
+              <form onSubmit={handleSearchSubmit} className="relative flex items-center">
+                <Search className="w-4 h-4 text-emerald-800/60 absolute left-3 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search any city or address (e.g. Kathmandu, Tokyo, London)..."
+                  className="w-full bg-[#F4F9F5] text-xs text-[#11291B] font-medium pl-9 pr-20 py-2.5 rounded-2xl border border-emerald-950/10 focus:outline-none focus:ring-2 focus:ring-[#0F3822]/20 focus:border-[#0F3822] placeholder:text-gray-400"
+                />
+                <button
+                  type="submit"
+                  disabled={isSearching}
+                  className="absolute right-1.5 px-3 py-1 bg-[#0F3822] hover:bg-[#154A2E] text-white text-xs font-semibold rounded-xl transition-all disabled:opacity-50"
+                >
+                  {isSearching ? 'Searching...' : 'Search'}
+                </button>
+              </form>
+
+              {/* Autocomplete / Search Results Dropdown */}
+              {searchResults.length > 0 && (
+                <div className="absolute z-30 left-0 right-0 top-full mt-1.5 bg-white border border-emerald-950/10 rounded-2xl shadow-xl overflow-hidden max-h-56 overflow-y-auto">
+                  <div className="px-3 py-1.5 bg-emerald-50/70 border-b border-emerald-950/5 flex items-center justify-between text-[11px] text-[#1E5E38] font-bold">
+                    <span>Matching Locations</span>
+                    <button
+                      type="button"
+                      onClick={() => setSearchResults([])}
+                      className="text-gray-400 hover:text-gray-600 text-xs"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  {searchResults.map((item, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => handlePickSearchResult(item)}
+                      className="w-full text-left px-3.5 py-2.5 hover:bg-[#F4F9F5] text-xs text-[#11291B] border-b border-gray-100 last:border-b-0 flex items-start space-x-2 transition-colors"
+                    >
+                      <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
+                      <span className="truncate">{item.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <OpenSourceMap
