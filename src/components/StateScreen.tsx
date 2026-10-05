@@ -9,7 +9,16 @@ import {
   CheckCircle2,
   ExternalLink,
   Send,
+  Code2,
+  Copy,
+  Check,
+  Cpu,
+  Database,
+  ChevronDown,
+  ChevronUp,
+  Radio,
 } from 'lucide-react';
+import { CONSUMER_INTEGRATION_CODE } from '../solana/truespotProgram';
 
 interface StateScreenProps {
   bountyId?: string;
@@ -31,6 +40,11 @@ export const StateScreen: React.FC<StateScreenProps> = ({
 
   const [isPayingOut, setIsPayingOut] = useState(false);
   const [payoutSig, setPayoutSig] = useState<string | null>(null);
+
+  // Developer Oracle Consumer Drawer State
+  const [isOracleDrawerOpen, setIsOracleDrawerOpen] = useState(true);
+  const [oracleTab, setOracleTab] = useState<'rust' | 'ts' | 'rest' | 'payload'>('rust');
+  const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
 
   // Dynamic Real-Time 1-second interval ticker
   const [now, setNow] = useState<number>(Date.now());
@@ -197,7 +211,8 @@ export const StateScreen: React.FC<StateScreenProps> = ({
       </div>
 
       {selectedBounty && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left Column (6 cols on desktop): Tactile Skeuomorphic Truth & Freshness Gauges */}
           <div className="lg:col-span-6 space-y-5">
             {/* Tactile Spectrum Truth Gauge Card (Reference Screen 3) */}
@@ -287,6 +302,180 @@ export const StateScreen: React.FC<StateScreenProps> = ({
             )}
           </div>
         </div>
+
+        {/* Physical Oracle Consumer API & Solana CPI Integration Panel */}
+        <div className="mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-emerald-950/5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-gray-100 gap-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-2xl bg-[#E8F5E9] border border-[#8BC34A]/30 flex items-center justify-center text-[#1E5E38]">
+                <Cpu className="w-5 h-5 text-[#2E7D32]" />
+              </div>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <h3 className="text-base font-bold text-[#0F3822]">Physical Oracle Consumer Gateway</h3>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#99E35E]/20 text-[#1E5E38]">
+                    Anchor CPI Ready
+                  </span>
+                </div>
+                <p className="text-xs text-[#6B7F72]">
+                  Query verified real-world ground truth directly from Solana smart contracts, AI agents, or REST API.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsOracleDrawerOpen(!isOracleDrawerOpen)}
+              className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full border border-gray-200 text-xs font-semibold text-[#0F3822] hover:bg-[#F4F9F5] transition-colors self-start sm:self-auto"
+            >
+              <span>{isOracleDrawerOpen ? 'Collapse Integration' : 'View Code & Payload'}</span>
+              {isOracleDrawerOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
+          </div>
+
+          {isOracleDrawerOpen && (
+            <div className="mt-5 space-y-4">
+              {/* Navigation Tabs */}
+              <div className="flex flex-wrap gap-2 border-b border-gray-100 pb-3">
+                <button
+                  onClick={() => setOracleTab('rust')}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1.5 transition-colors ${
+                    oracleTab === 'rust'
+                      ? 'bg-[#0F3822] text-white shadow-sm'
+                      : 'bg-[#F4F9F5] text-[#6B7F72] hover:text-[#0F3822]'
+                  }`}
+                >
+                  <Cpu className="w-3.5 h-3.5" />
+                  <span>Solana Anchor CPI (Rust)</span>
+                </button>
+
+                <button
+                  onClick={() => setOracleTab('ts')}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1.5 transition-colors ${
+                    oracleTab === 'ts'
+                      ? 'bg-[#0F3822] text-white shadow-sm'
+                      : 'bg-[#F4F9F5] text-[#6B7F72] hover:text-[#0F3822]'
+                  }`}
+                >
+                  <Code2 className="w-3.5 h-3.5" />
+                  <span>TypeScript Web3 SDK</span>
+                </button>
+
+                <button
+                  onClick={() => setOracleTab('rest')}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1.5 transition-colors ${
+                    oracleTab === 'rest'
+                      ? 'bg-[#0F3822] text-white shadow-sm'
+                      : 'bg-[#F4F9F5] text-[#6B7F72] hover:text-[#0F3822]'
+                  }`}
+                >
+                  <Database className="w-3.5 h-3.5" />
+                  <span>Supabase REST & PostGIS</span>
+                </button>
+
+                <button
+                  onClick={() => setOracleTab('payload')}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1.5 transition-colors ${
+                    oracleTab === 'payload'
+                      ? 'bg-[#0F3822] text-white shadow-sm'
+                      : 'bg-[#F4F9F5] text-[#6B7F72] hover:text-[#0F3822]'
+                  }`}
+                >
+                  <Radio className="w-3.5 h-3.5" />
+                  <span>Live Oracle Feed (JSON)</span>
+                </button>
+              </div>
+
+              {/* Code Snippet Box */}
+              <div className="relative rounded-2xl bg-[#0b1d14] p-4 font-mono text-xs text-emerald-100 overflow-x-auto shadow-inner border border-emerald-900/40">
+                <div className="flex items-center justify-between pb-3 mb-2 border-b border-emerald-900/60 text-[11px] text-emerald-400/80">
+                  <span>
+                    {oracleTab === 'rust' && 'programs/client/src/consume_oracle.rs'}
+                    {oracleTab === 'ts' && 'src/services/oracleClient.ts'}
+                    {oracleTab === 'rest' && 'curl -X GET (Supabase PostGIS)'}
+                    {oracleTab === 'payload' && `Physical Oracle Feed: Bounty #${selectedBounty.id.slice(0, 8)}`}
+                  </span>
+
+                  <button
+                    onClick={() => {
+                      let text = '';
+                      if (oracleTab === 'rust') text = CONSUMER_INTEGRATION_CODE.rustCpi;
+                      else if (oracleTab === 'ts') text = CONSUMER_INTEGRATION_CODE.typeScriptSdk;
+                      else if (oracleTab === 'rest') text = CONSUMER_INTEGRATION_CODE.restApi;
+                      else {
+                        text = JSON.stringify(
+                          {
+                            oracle_version: '1.0.0',
+                            program_id: 'TrUEspot11111111111111111111111111111111111',
+                            bounty_id: selectedBounty.id,
+                            question: selectedBounty.question,
+                            status: selectedBounty.status,
+                            truth_confidence_percent: confidenceScore,
+                            agreed_votes: agreeCount,
+                            total_votes: totalVotes,
+                            geo_coordinates: [selectedBounty.lat, selectedBounty.lng],
+                            verified_answer: report?.answer_text || null,
+                            evidence_sha256: report?.fingerprint || null,
+                            solana_settlement_tx: payoutSig || selectedBounty.payout_tx || null,
+                            solscan_link: payoutSig ? `https://solscan.io/tx/${payoutSig}?cluster=devnet` : null,
+                            updated_at: new Date().toISOString(),
+                          },
+                          null,
+                          2
+                        );
+                      }
+
+                      navigator.clipboard.writeText(text);
+                      setCopiedSnippet(oracleTab);
+                      if (onShowToast) onShowToast('Copied to Clipboard', 'Integration snippet copied successfully', 'info');
+                      setTimeout(() => setCopiedSnippet(null), 2500);
+                    }}
+                    className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-emerald-900/50 hover:bg-emerald-900/80 text-emerald-300 transition-colors"
+                  >
+                    {copiedSnippet === oracleTab ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Copied</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <pre className="text-emerald-200 leading-relaxed overflow-x-auto text-[11px]">
+                  {oracleTab === 'rust' && CONSUMER_INTEGRATION_CODE.rustCpi}
+                  {oracleTab === 'ts' && CONSUMER_INTEGRATION_CODE.typeScriptSdk}
+                  {oracleTab === 'rest' && CONSUMER_INTEGRATION_CODE.restApi}
+                  {oracleTab === 'payload' &&
+                    JSON.stringify(
+                      {
+                        oracle_version: '1.0.0',
+                        program_id: 'TrUEspot11111111111111111111111111111111111',
+                        bounty_id: selectedBounty.id,
+                        question: selectedBounty.question,
+                        status: selectedBounty.status,
+                        truth_confidence_percent: confidenceScore,
+                        agreed_votes: agreeCount,
+                        total_votes: totalVotes,
+                        geo_coordinates: [selectedBounty.lat, selectedBounty.lng],
+                        verified_answer: report?.answer_text || null,
+                        evidence_sha256: report?.fingerprint || null,
+                        solana_settlement_tx: payoutSig || selectedBounty.payout_tx || null,
+                        solscan_link: payoutSig ? `https://solscan.io/tx/${payoutSig}?cluster=devnet` : null,
+                        updated_at: new Date().toISOString(),
+                      },
+                      null,
+                      2
+                    )}
+                </pre>
+              </div>
+            </div>
+          )}
+        </div>
+        </>
       )}
     </div>
   );
