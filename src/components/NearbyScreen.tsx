@@ -1,0 +1,273 @@
+import React, { useState, useEffect } from 'react';
+import { Bounty, Coordinates } from '../types';
+import { hybridStore } from '../utils/storage';
+import { OpenSourceMap } from './OpenSourceMap';
+import { AnalogProximityDial } from './AnalogProximityDial';
+import { Coins, ArrowRight, Navigation } from 'lucide-react';
+
+interface NearbyScreenProps {
+  userCoords: Coordinates;
+  selectedBountyId?: string;
+  onSelectBounty?: (bountyId: string) => void;
+  onSelectReportBounty: (bountyId: string) => void;
+  onSelectStateBounty: (bountyId: string) => void;
+  onSetUserLocation: (lat: number, lng: number, name?: string) => void;
+}
+
+export const NearbyScreen: React.FC<NearbyScreenProps> = ({
+  userCoords,
+  selectedBountyId: externalSelectedBountyId,
+  onSelectBounty,
+  onSelectReportBounty,
+  onSelectStateBounty,
+  onSetUserLocation,
+}) => {
+  const [bounties, setBounties] = useState<
+    (Bounty & { distance_meters: number; is_within_range: boolean })[]
+  >([]);
+  const [internalSelectedBountyId, setInternalSelectedBountyId] = useState<string | undefined>(
+    externalSelectedBountyId
+  );
+  const [filter, setFilter] = useState<'all' | 'in_range' | 'open'>('all');
+
+  const selectedBountyId = externalSelectedBountyId || internalSelectedBountyId;
+
+  const handleSelectBountyInternal = (id: string) => {
+    setInternalSelectedBountyId(id);
+    if (onSelectBounty) {
+      onSelectBounty(id);
+    }
+  };
+
+  const fetchNearby = async () => {
+    const nearby = await hybridStore.getNearbyBounties(userCoords.lat, userCoords.lng, 200);
+    setBounties(nearby);
+    if (nearby.length > 0 && !selectedBountyId) {
+      handleSelectBountyInternal(nearby[0].id);
+    }
+  };
+
+  useEffect(() => {
+    fetchNearby();
+  }, [userCoords.lat, userCoords.lng]);
+
+  const filteredBounties = bounties.filter((b) => {
+    if (filter === 'in_range') return b.is_within_range;
+    if (filter === 'open') return b.status === 'OPEN';
+    return true;
+  });
+
+  const selectedBounty = bounties.find((b) => b.id === selectedBountyId) || bounties[0];
+  const inRangeCount = bounties.filter((b) => b.is_within_range).length;
+
+  return (
+    <div className="space-y-6 pb-6">
+      {/* 2-Column Responsive Desktop Web Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        {/* Left Column (5 cols on desktop): Tactile Dial & Bounties Feed */}
+        <div className="lg:col-span-5 space-y-5">
+          {/* 1. Tactile Skeuomorphic Analog Proximity Gauge Card (Reference Screen 1) */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-950/5">
+            <AnalogProximityDial
+              distanceMeters={selectedBounty ? selectedBounty.distance_meters : 25}
+              placeName={selectedBounty ? selectedBounty.place_name : 'Nearby Location'}
+            />
+          </div>
+
+          {/* 2. Segmented Filter Pills & Header */}
+          <div className="flex items-center justify-between px-1">
+            <span className="text-xs font-bold text-[#6B7F72] uppercase tracking-wider">
+              Nearby Truth Tasks
+            </span>
+
+            <div className="bg-white border border-emerald-950/5 rounded-full p-1 shadow-xs flex space-x-1">
+              <button
+                onClick={() => setFilter('all')}
+                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                  filter === 'all'
+                    ? 'bg-[#0F3822] text-white shadow-xs'
+                    : 'text-[#6B7F72] hover:text-[#11291B]'
+                }`}
+              >
+                All ({bounties.length})
+              </button>
+              <button
+                onClick={() => setFilter('in_range')}
+                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                  filter === 'in_range'
+                    ? 'bg-[#0F3822] text-white shadow-xs'
+                    : 'text-[#6B7F72] hover:text-[#11291B]'
+                }`}
+              >
+                In 200m ({inRangeCount})
+              </button>
+              <button
+                onClick={() => setFilter('open')}
+                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                  filter === 'open'
+                    ? 'bg-[#0F3822] text-white shadow-xs'
+                    : 'text-[#6B7F72] hover:text-[#11291B]'
+                }`}
+              >
+                Open
+              </button>
+            </div>
+          </div>
+
+          {/* 3. Crisp White Bounties Cards List */}
+          <div className="space-y-3 max-h-[580px] overflow-y-auto pr-1">
+            {filteredBounties.map((bounty) => {
+              const isEligible = bounty.is_within_range;
+              const isOpen = bounty.status === 'OPEN';
+              const isSelected = selectedBountyId === bounty.id;
+
+              return (
+                <div
+                  key={bounty.id}
+                  onClick={() => handleSelectBountyInternal(bounty.id)}
+                  className={`p-5 rounded-3xl bg-white shadow-sm border transition-all cursor-pointer flex flex-col gap-3 ${
+                    isSelected
+                      ? 'border-[#0F3822] ring-2 ring-[#0F3822]/10 shadow-md'
+                      : 'border-emerald-950/5 hover:border-emerald-950/15'
+                  }`}
+                >
+                  {/* Top Row: Distance Pill & SOL Reward Badge */}
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`text-xs font-semibold px-2.5 py-0.5 rounded-full inline-flex items-center space-x-1.5 ${
+                        isEligible
+                          ? 'bg-emerald-100 text-[#1E5E38]'
+                          : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          isEligible ? 'bg-[#7CB342] animate-pulse' : 'bg-gray-400'
+                        }`}
+                      />
+                      <span>{bounty.distance_meters}m away</span>
+                    </span>
+
+                    <div className="flex items-center space-x-1 bg-[#E8F5E9] text-[#1E5E38] px-2.5 py-0.5 rounded-full text-xs font-bold font-mono">
+                      <Coins className="w-3.5 h-3.5 text-[#7CB342]" />
+                      <span>{bounty.amount_sol} SOL</span>
+                    </div>
+                  </div>
+
+                  {/* Title & Question */}
+                  <div>
+                    <h3 className="text-base font-bold text-[#11291B] tracking-tight">
+                      {bounty.place_name}
+                    </h3>
+                    <p className="text-sm text-[#6B7F72] mt-0.5 leading-snug">
+                      "{bounty.question}"
+                    </p>
+                  </div>
+
+                  {/* Quick Teleport Jumper to Test 200m Verification */}
+                  <div className="pt-1 flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectBountyInternal(bounty.id);
+                        onSetUserLocation(
+                          bounty.lat + 0.0001,
+                          bounty.lng + 0.0001,
+                          `${bounty.place_name} (15m Geofence)`
+                        );
+                      }}
+                      className="text-[11px] px-2.5 py-1 rounded-full font-semibold bg-[#F4F9F5] hover:bg-[#E8F5E9] text-[#1E5E38] border border-emerald-950/10 transition-colors flex items-center space-x-1"
+                      title="Move your GPS pin to test physical proximity verification"
+                    >
+                      <span>📍</span>
+                      <span>Walk Inside Geofence (15m)</span>
+                    </button>
+
+                    <span className="text-[11px] font-mono text-[#6B7F72]">
+                      Status: <strong className={isEligible ? 'text-[#1E5E38]' : 'text-gray-500'}>{isEligible ? 'In Range' : 'Out of Range'}</strong>
+                    </span>
+                  </div>
+
+                  {/* Deep Forest Green Primary CTA Button */}
+                  {isOpen ? (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectBountyInternal(bounty.id);
+                        onSelectReportBounty(bounty.id);
+                      }}
+                      className={`w-full py-3.5 px-6 rounded-full font-semibold text-sm shadow-sm flex items-center justify-center space-x-2 transition-all active:scale-[0.98] ${
+                        isEligible
+                          ? 'bg-[#0F3822] hover:bg-[#154A2E] text-white shadow-md'
+                          : 'bg-emerald-50 hover:bg-emerald-100 text-[#0F3822] border border-emerald-200/60'
+                      }`}
+                    >
+                      <span>{isEligible ? 'Snap Photo & Earn SOL' : 'View Details (Out of 200m)'}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectBountyInternal(bounty.id);
+                        onSelectStateBounty(bounty.id);
+                      }}
+                      className="w-full py-3 px-5 rounded-full font-semibold text-sm bg-emerald-50 hover:bg-emerald-100 text-[#0F3822] border border-emerald-200/60 flex items-center justify-center space-x-2 transition-all"
+                    >
+                      <span>View Oracle Settlement</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Right Column (7 cols on desktop): Wide Interactive OpenSourceMap */}
+        <div className="lg:col-span-7 space-y-4">
+          <div className="bg-white rounded-3xl p-4 shadow-sm border border-emerald-950/5">
+            <div className="flex items-center justify-between px-2 pb-3">
+              <div className="flex items-center space-x-2 text-sm font-bold text-[#11291B]">
+                <Navigation className="w-4 h-4 text-[#1E5E38]" />
+                <span>OpenStreetMap 200m Geofence Radar</span>
+              </div>
+              <span className="text-xs font-semibold text-[#1E5E38] bg-emerald-100 px-3 py-1 rounded-full">
+                {inRangeCount} bounties inside 200m range
+              </span>
+            </div>
+
+            <OpenSourceMap
+              userCoords={userCoords}
+              bounties={bounties}
+              selectedBountyId={selectedBountyId}
+              onSelectBounty={(bId) => handleSelectBountyInternal(bId)}
+              onSetUserLocation={onSetUserLocation}
+            />
+          </div>
+
+          {/* Quick Oracle Stats Strip */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-white p-4 rounded-2xl border border-emerald-950/5 shadow-xs text-center">
+              <span className="text-[11px] font-semibold text-[#6B7F72] uppercase block">Total Bounties</span>
+              <span className="text-xl font-extrabold text-[#11291B]">{bounties.length}</span>
+            </div>
+            <div className="bg-white p-4 rounded-2xl border border-emerald-950/5 shadow-xs text-center">
+              <span className="text-[11px] font-semibold text-[#6B7F72] uppercase block">In 200m Range</span>
+              <span className="text-xl font-extrabold text-[#1E5E38]">{inRangeCount}</span>
+            </div>
+            <div className="bg-white p-4 rounded-2xl border border-emerald-950/5 shadow-xs text-center">
+              <span className="text-[11px] font-semibold text-[#6B7F72] uppercase block">Escrow Pool</span>
+              <span className="text-xl font-extrabold text-[#0F3822] font-mono">
+                {bounties.reduce((acc, b) => acc + b.amount_sol, 0).toFixed(2)} SOL
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+};
