@@ -36,6 +36,8 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
 }) => {
   const { publicKey, sendTransaction } = useWallet();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   const [bounty, setBounty] = useState<Bounty | null>(null);
   const [bountiesList, setBountiesList] = useState<Bounty[]>([]);
@@ -47,9 +49,98 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
   const [telemetry, setTelemetry] = useState<SensorTelemetry | null>(null);
   const [answerText, setAnswerText] = useState('YES, actively open with short wait');
 
+  // WebRTC Live Camera State
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
+
   const [measuringSensors, setMeasuringSensors] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      stopCameraStream();
+    };
+  }, []);
+
+  const startCameraStream = async () => {
+    setErrorMsg(null);
+    try {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: facingMode,
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: false,
+      });
+
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+      setIsStreaming(true);
+    } catch (err: any) {
+      console.warn('WebRTC camera error:', err);
+      setErrorMsg(
+        'Unable to access browser camera directly. You can use Upload or Quick Capture below.'
+      );
+      setIsStreaming(false);
+    }
+  };
+
+  const stopCameraStream = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    setIsStreaming(false);
+  };
+
+  const toggleFacingMode = () => {
+    const nextMode = facingMode === 'environment' ? 'user' : 'environment';
+    setFacingMode(nextMode);
+    if (isStreaming) {
+      setTimeout(() => {
+        startCameraStream();
+      }, 100);
+    }
+  };
+
+  const captureLiveFrame = async () => {
+    if (!videoRef.current || !bounty) return;
+    const video = videoRef.current;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 1280;
+    canvas.height = video.videoHeight || 720;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Draw video frame
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Overlay Tactical Cryptographic Watermark
+    ctx.fillStyle = 'rgba(15, 56, 34, 0.75)';
+    ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
+
+    ctx.fillStyle = '#99E35E';
+    ctx.font = 'bold 16px monospace';
+    ctx.fillText(`TRUESPOT LIVE ATTESTATION • ${bounty.place_name.toUpperCase()}`, 20, canvas.height - 44);
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '12px monospace';
+    ctx.fillText(`GPS: ${userCoords.lat.toFixed(5)}, ${userCoords.lng.toFixed(5)} • UTC: ${new Date().toISOString()}`, 20, canvas.height - 20);
+
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    setPhotoDataUrl(dataUrl);
+    stopCameraStream();
+    await runHardwareTelemetry(dataUrl);
+  };
 
   useEffect(() => {
     hybridStore.getBounties().then((list) => {
@@ -328,6 +419,56 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                 Retake
               </button>
             </div>
+          ) : isStreaming ? (
+            <div className="relative rounded-2xl overflow-hidden border-2 border-[#0F3822] bg-black aspect-video flex flex-col items-center justify-center shadow-md">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover"
+              />
+
+              {/* Tactical HUD Corner Marks */}
+              <div className="absolute top-3 left-3 border-t-2 border-l-2 border-[#99E35E] w-6 h-6 pointer-events-none" />
+              <div className="absolute top-3 right-3 border-t-2 border-r-2 border-[#99E35E] w-6 h-6 pointer-events-none" />
+              <div className="absolute bottom-16 left-3 border-b-2 border-l-2 border-[#99E35E] w-6 h-6 pointer-events-none" />
+              <div className="absolute bottom-16 right-3 border-b-2 border-r-2 border-[#99E35E] w-6 h-6 pointer-events-none" />
+
+              {/* Viewfinder Target Label */}
+              <div className="absolute top-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-mono text-[#99E35E] border border-[#8BC34A]/40">
+                LIVE SENSOR STREAM • {bounty.place_name}
+              </div>
+
+              {/* Controls Toolbar at Bottom of Viewfinder */}
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between px-2">
+                <button
+                  type="button"
+                  onClick={toggleFacingMode}
+                  className="bg-black/60 hover:bg-black/80 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-md border border-white/20 transition-all font-semibold"
+                >
+                  Flip ({facingMode === 'environment' ? 'Rear' : 'Front'})
+                </button>
+
+                {/* Tactile Shutter Button */}
+                <button
+                  type="button"
+                  onClick={captureLiveFrame}
+                  className="w-14 h-14 rounded-full bg-[#0F3822] border-4 border-[#99E35E] shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-white"
+                  title="Snap Evidence Photo"
+                >
+                  <Camera className="w-6 h-6 text-[#99E35E]" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={stopCameraStream}
+                  className="bg-black/60 hover:bg-black/80 text-rose-300 text-xs px-3 py-1.5 rounded-full backdrop-blur-md border border-white/20 transition-all font-semibold"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           ) : (
             <div className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center bg-[#F4F9F5]">
               <div className="w-14 h-14 mx-auto rounded-full bg-emerald-100 flex items-center justify-center mb-3 text-[#1E5E38]">
@@ -337,26 +478,34 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                 Live Evidence Capture
               </h3>
               <p className="text-xs text-[#6B7F72] max-w-sm mx-auto mb-5 leading-relaxed">
-                Requires real rear camera with involuntary hand-tremor biometric verification and Solana blockhash nonce.
+                Requires real camera with involuntary hand-tremor biometric verification and Solana blockhash nonce.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                 <button
                   type="button"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={startCameraStream}
                   className="flex-1 py-3.5 px-5 rounded-full bg-[#0F3822] hover:bg-[#154A2E] text-white text-sm font-semibold flex items-center justify-center space-x-2 shadow-sm transition-all"
                 >
-                  <Camera className="w-4 h-4" />
-                  <span>Open Live Camera</span>
+                  <Camera className="w-4 h-4 text-[#99E35E]" />
+                  <span>Start Live Viewfinder</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex-1 py-3 px-5 rounded-full bg-white hover:bg-gray-50 text-[#11291B] border border-gray-200 text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all"
+                >
+                  <span>Upload File</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleGenerateFrame}
-                  className="flex-1 py-3 px-5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-[#0F3822] border border-emerald-200/60 text-xs font-semibold flex items-center justify-center space-x-2 transition-all"
+                  className="flex-1 py-3 px-5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-[#0F3822] border border-emerald-200/60 text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all"
                 >
-                  <Sparkles className="w-4 h-4 text-[#7CB342]" />
-                  <span>Quick Capture (Simulated)</span>
+                  <Sparkles className="w-3.5 h-3.5 text-[#7CB342]" />
+                  <span>Simulate Frame</span>
                 </button>
               </div>
             </div>
