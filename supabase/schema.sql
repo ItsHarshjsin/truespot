@@ -120,11 +120,38 @@ VALUES ('bounty-evidence', 'bounty-evidence', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Public read access policy for storage
+DROP POLICY IF EXISTS "Public Read Evidence" ON storage.objects;
 CREATE POLICY "Public Read Evidence" 
 ON storage.objects FOR SELECT 
 USING (bucket_id = 'bounty-evidence');
 
 -- Authenticated/Anon upload policy for photo reports
+DROP POLICY IF EXISTS "Public Upload Evidence" ON storage.objects;
 CREATE POLICY "Public Upload Evidence" 
 ON storage.objects FOR INSERT 
 WITH CHECK (bucket_id = 'bounty-evidence');
+
+-- 8. Row Level Security (RLS) Policies for Public DePIN Oracle Access
+ALTER TABLE bounties ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Bounties" ON bounties;
+CREATE POLICY "Public Read Bounties" ON bounties FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Insert Bounties" ON bounties;
+CREATE POLICY "Public Insert Bounties" ON bounties FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public Update Bounties" ON bounties;
+CREATE POLICY "Public Update Bounties" ON bounties FOR UPDATE USING (true);
+
+ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Reports" ON reports;
+CREATE POLICY "Public Read Reports" ON reports FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Insert Reports" ON reports;
+CREATE POLICY "Public Insert Reports" ON reports FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public Update Reports" ON reports;
+CREATE POLICY "Public Update Reports" ON reports FOR UPDATE USING (true);
+
+ALTER TABLE verifications ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Verifications" ON verifications;
+CREATE POLICY "Public Read Verifications" ON verifications FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Insert Verifications" ON verifications;
+CREATE POLICY "Public Insert Verifications" ON verifications FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public Update Verifications" ON verifications;
+CREATE POLICY "Public Update Verifications" ON verifications FOR UPDATE USING (true);
