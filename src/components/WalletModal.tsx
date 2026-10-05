@@ -1,8 +1,20 @@
-import React from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import React, { useState, useEffect } from 'react';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { requestDevnetAirdrop } from '../utils/solana';
-import { X, Check, Wallet, Zap, Coins } from 'lucide-react';
+import {
+  X,
+  Check,
+  Wallet,
+  Coins,
+  ExternalLink,
+  Copy,
+  RefreshCw,
+  LogOut,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 
 export interface DemoAccount {
   id: string;
@@ -57,54 +69,104 @@ export const WalletModal: React.FC<WalletModalProps> = ({
   demoAccounts,
   onAirdropDemo,
 }) => {
-  const { connected, publicKey } = useWallet();
-  const [airdropping, setAirdropping] = React.useState(false);
-  const [msg, setMsg] = React.useState<string | null>(null);
+  const { connection } = useConnection();
+  const { connected, publicKey, wallet, disconnect } = useWallet();
 
-  if (!isOpen) return null;
+  const [realBalance, setRealBalance] = useState<number | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [airdropping, setAirdropping] = useState(false);
+  const [statusMsg, setStatusMsg] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [showDemoList, setShowDemoList] = useState(!connected);
 
   const accountsList = demoAccounts || DEMO_ACCOUNTS;
 
+  // Fetch live on-chain balance from Solana Devnet
+  const fetchRealBalance = async () => {
+    if (!connected || !publicKey) return;
+    setIsRefreshing(true);
+    try {
+      const lamports = await connection.getBalance(publicKey, 'confirmed');
+      setRealBalance(lamports / LAMPORTS_PER_SOL);
+    } catch (e: any) {
+      console.warn('Failed to fetch Devnet balance:', e.message);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    if (connected && publicKey) {
+      fetchRealBalance();
+      // Automatically disable demo mode when real Phantom wallet is connected
+      if (isUsingDemo) {
+        onToggleDemoMode(false);
+      }
+    }
+  }, [connected, publicKey]);
+
+  if (!isOpen) return null;
+
+  // Handle Devnet Airdrop
   const handleAirdrop = async () => {
     setAirdropping(true);
-    setMsg('Requesting 1 SOL from Solana Devnet faucet...');
+    setStatusMsg({ text: 'Requesting 1 SOL from Solana Devnet faucet...', type: 'info' });
+
     try {
       if (connected && publicKey) {
-        await requestDevnetAirdrop(publicKey);
-        setMsg('Airdropped 1 SOL to your connected wallet!');
+        const sig = await requestDevnetAirdrop(publicKey);
+        await fetchRealBalance();
+        setStatusMsg({
+          text: `Success! Airdropped 1 SOL to Phantom (TX: ${sig.slice(0, 8)}...)`,
+          type: 'success',
+        });
       } else {
         if (onAirdropDemo) {
           onAirdropDemo();
         } else {
           activeDemoAccount.balanceSol += 1.0;
         }
-        setMsg('Added +1.00 Devnet SOL to your Demo Wallet!');
+        setStatusMsg({ text: 'Added +1.00 SOL to Demo Wallet!', type: 'success' });
       }
-    } catch (e) {
-      if (onAirdropDemo) {
-        onAirdropDemo();
-      } else {
-        activeDemoAccount.balanceSol += 1.0;
-      }
-      setMsg('Devnet faucet busy. Added +1.00 SOL to Demo Wallet!');
+    } catch (err: any) {
+      if (onAirdropDemo) onAirdropDemo();
+      setStatusMsg({
+        text: 'Devnet faucet rate-limited. Added +1.00 SOL in test mode.',
+        type: 'info',
+      });
     } finally {
       setAirdropping(false);
-      setTimeout(() => setMsg(null), 3500);
+      setTimeout(() => setStatusMsg(null), 5000);
+    }
+  };
+
+  const handleCopyAddress = () => {
+    if (publicKey) {
+      navigator.clipboard.writeText(publicKey.toBase58());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn select-none">
-      <div className="relative w-full max-w-sm bg-white border border-emerald-950/10 rounded-3xl p-6 shadow-2xl">
+      <div className="relative w-full max-w-md bg-white border border-emerald-950/10 rounded-3xl p-6 shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-4">
+        <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-5">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-full bg-[#E8F5E9] flex items-center justify-center">
-              <Wallet className="w-4 h-4 text-[#1E5E38]" />
+            <div className="w-9 h-9 rounded-2xl bg-[#E8F5E9] flex items-center justify-center border border-[#8BC34A]/30">
+              <Wallet className="w-5 h-5 text-[#1E5E38]" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-[#11291B]">Solana Wallet</h2>
-              <p className="text-xs text-[#6B7F72]">Instant Demo Persona or Phantom</p>
+              <div className="flex items-center space-x-2">
+                <h2 className="text-base font-bold text-[#11291B]">Solana Devnet Wallet</h2>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#E8F5E9] text-[#1E5E38] border border-[#8BC34A]/40">
+                  Devnet
+                </span>
+              </div>
+              <p className="text-xs text-[#6B7F72]">
+                {connected ? 'Real Phantom / Solana Wallet Connected' : 'Connect Phantom or use Demo Personas'}
+              </p>
             </div>
           </div>
           <button
@@ -115,77 +177,168 @@ export const WalletModal: React.FC<WalletModalProps> = ({
           </button>
         </div>
 
-        {/* Section 1: Instant Demo Personas */}
-        <div className="mb-4">
-          <span className="text-xs font-semibold text-[#6B7F72] uppercase tracking-wider block mb-2">
-            Demo Personas (No Extension Needed)
-          </span>
+        {/* SECTION 1: Connected Real Solana Wallet (Phantom / Solflare) */}
+        {connected && publicKey ? (
+          <div className="mb-5 p-4 rounded-2xl bg-[#F4F9F5] border border-[#8BC34A]/40 space-y-3.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#7CB342] animate-pulse" />
+                <span className="text-xs font-bold text-[#0F3822]">
+                  {wallet?.adapter.name || 'Phantom'} (Active)
+                </span>
+              </div>
+              <button
+                onClick={() => disconnect()}
+                className="flex items-center space-x-1 text-xs text-red-600 hover:text-red-700 font-semibold transition-colors"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Disconnect</span>
+              </button>
+            </div>
 
-          <div className="space-y-2">
-            {accountsList.map((acc) => {
-              const isSelected = isUsingDemo && activeDemoAccount.id === acc.id;
-
-              return (
+            {/* Address & Solscan Link */}
+            <div className="p-2.5 bg-white rounded-xl border border-gray-200 flex items-center justify-between">
+              <div className="font-mono text-xs text-[#11291B] font-semibold truncate mr-2">
+                {publicKey.toBase58().slice(0, 8)}...{publicKey.toBase58().slice(-8)}
+              </div>
+              <div className="flex items-center space-x-1 shrink-0">
                 <button
-                  key={acc.id}
-                  onClick={() => {
-                    onSelectDemoAccount(acc);
-                    onToggleDemoMode(true);
-                  }}
-                  className={`w-full p-3 rounded-2xl border text-left flex items-center justify-between transition-all ${
-                    isSelected
-                      ? 'bg-[#E8F5E9] border-[#8BC34A] shadow-xs'
-                      : 'bg-[#F4F9F5] border-gray-100 hover:border-gray-200'
-                  }`}
+                  onClick={handleCopyAddress}
+                  className="p-1 rounded-md text-gray-500 hover:text-[#0F3822] hover:bg-gray-100 transition-colors"
+                  title="Copy address"
                 >
-                  <div>
-                    <div className="text-xs font-bold text-[#11291B]">{acc.name}</div>
-                    <div className="text-[10px] text-[#6B7F72] font-mono">{acc.address}</div>
-                  </div>
-
-                  <div className="text-right">
-                    <div className="text-xs font-bold text-[#1E5E38] font-mono">{acc.balanceSol.toFixed(2)} SOL</div>
-                    {isSelected && (
-                      <span className="text-[9px] font-bold text-[#1E5E38] flex items-center justify-end space-x-0.5">
-                        <Check className="w-2.5 h-2.5" />
-                        <span>ACTIVE</span>
-                      </span>
-                    )}
-                  </div>
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
-              );
-            })}
-          </div>
-        </div>
+                <a
+                  href={`https://solscan.io/account/${publicKey.toBase58()}?cluster=devnet`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-1 rounded-md text-gray-500 hover:text-[#0F3822] hover:bg-gray-100 transition-colors"
+                  title="View on Solscan Devnet"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
 
-        {/* Section 2: Browser Extension */}
-        <div className="mb-4 pt-3 border-t border-gray-100">
-          <span className="text-xs font-semibold text-[#6B7F72] uppercase tracking-wider block mb-2">
-            Or Connect Browser Wallet
-          </span>
-          <div className="flex items-center justify-between bg-[#F4F9F5] p-2.5 rounded-2xl border border-gray-100">
-            <span className="text-xs text-[#6B7F72]">Phantom / Solflare</span>
-            <div onClick={() => onToggleDemoMode(false)}>
-              <WalletMultiButton className="!h-8 !py-0 !px-3 !text-xs !font-semibold !rounded-full" />
+            {/* Devnet Balance Display */}
+            <div className="flex items-center justify-between px-1">
+              <div>
+                <span className="text-xs text-[#6B7F72]">Live Devnet Balance:</span>
+                <div className="text-lg font-bold font-mono text-[#0F3822]">
+                  {realBalance !== null ? `${realBalance.toFixed(3)} SOL` : 'Fetching...'}
+                </div>
+              </div>
+              <button
+                onClick={fetchRealBalance}
+                disabled={isRefreshing}
+                className="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs font-semibold text-[#0F3822] hover:bg-gray-50 transition-colors"
+                title="Refresh balance from Solana RPC"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <span>Refresh</span>
+              </button>
             </div>
           </div>
-        </div>
+        ) : (
+          /* When NOT connected: Prominent Phantom / Solflare Connect Button */
+          <div className="mb-5 p-4 rounded-2xl bg-[#E8F5E9]/50 border border-[#8BC34A]/40 space-y-3 text-center">
+            <div className="flex flex-col items-center justify-center space-y-1">
+              <div className="w-10 h-10 rounded-full bg-[#0F3822] text-[#99E35E] flex items-center justify-center shadow-sm">
+                <Wallet className="w-5 h-5" />
+              </div>
+              <h3 className="text-sm font-bold text-[#0F3822]">Connect Browser Wallet</h3>
+              <p className="text-xs text-[#6B7F72]">
+                Connect Phantom or Solflare to post bounties, stake, and receive payouts with real Devnet SOL.
+              </p>
+            </div>
 
-        {/* Section 3: Airdrop Button */}
-        <div>
+            <div className="flex justify-center pt-1" onClick={() => onToggleDemoMode(false)}>
+              <WalletMultiButton className="!w-full !justify-center !h-10 !py-0 !px-4 !text-xs !font-bold !rounded-full !bg-[#0F3822] hover:!bg-[#154A2E] !shadow-sm" />
+            </div>
+          </div>
+        )}
+
+        {/* SECTION 2: 1-Click Devnet SOL Faucet */}
+        <div className="mb-5">
           <button
             onClick={handleAirdrop}
             disabled={airdropping}
-            className="w-full py-3 px-4 rounded-full bg-[#0F3822] hover:bg-[#154A2E] text-white text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all shadow-xs"
+            className="w-full py-3.5 px-4 rounded-full bg-[#0F3822] hover:bg-[#154A2E] text-white text-xs font-semibold flex items-center justify-center space-x-2 transition-all shadow-sm active:scale-[0.99] disabled:opacity-50"
           >
-            <Coins className="w-3.5 h-3.5 text-[#99E35E]" />
-            <span>{airdropping ? 'Requesting...' : 'Request +1.00 Devnet SOL'}</span>
+            <Coins className="w-4 h-4 text-[#99E35E]" />
+            <span>
+              {airdropping
+                ? 'Requesting from Solana Faucet...'
+                : connected
+                ? 'Request +1.00 SOL to Connected Phantom'
+                : 'Request +1.00 SOL Devnet Airdrop'}
+            </span>
           </button>
 
-          {msg && (
-            <p className="mt-2 text-[11px] text-[#1E5E38] font-medium text-center">
-              {msg}
-            </p>
+          {statusMsg && (
+            <div
+              className={`mt-2.5 p-2.5 rounded-xl text-xs font-medium text-center ${
+                statusMsg.type === 'success'
+                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                  : statusMsg.type === 'error'
+                  ? 'bg-red-50 text-red-800 border border-red-200'
+                  : 'bg-amber-50 text-amber-800 border border-amber-200'
+              }`}
+            >
+              {statusMsg.text}
+            </div>
+          )}
+        </div>
+
+        {/* SECTION 3: Demo Personas (Collapsible Fallback for offline judging) */}
+        <div className="border-t border-gray-100 pt-3">
+          <button
+            onClick={() => setShowDemoList(!showDemoList)}
+            className="w-full flex items-center justify-between text-xs font-semibold text-[#6B7F72] hover:text-[#0F3822] py-1 transition-colors"
+          >
+            <span>Or Use Demo Personas (Offline / Fast Testing)</span>
+            {showDemoList ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+
+          {showDemoList && (
+            <div className="space-y-2 mt-2.5">
+              {accountsList.map((acc) => {
+                const isSelected = isUsingDemo && activeDemoAccount.id === acc.id;
+
+                return (
+                  <button
+                    key={acc.id}
+                    onClick={() => {
+                      onSelectDemoAccount(acc);
+                      onToggleDemoMode(true);
+                    }}
+                    className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all ${
+                      isSelected
+                        ? 'bg-[#E8F5E9] border-[#8BC34A] shadow-xs'
+                        : 'bg-[#F4F9F5] border-gray-100 hover:border-gray-200'
+                    }`}
+                  >
+                    <div>
+                      <div className="text-xs font-bold text-[#11291B]">{acc.name}</div>
+                      <div className="text-[10px] text-[#6B7F72] font-mono">{acc.address}</div>
+                    </div>
+
+                    <div className="text-right">
+                      <div className="text-xs font-bold text-[#1E5E38] font-mono">
+                        {acc.balanceSol.toFixed(2)} SOL
+                      </div>
+                      {isSelected && (
+                        <span className="text-[9px] font-bold text-[#1E5E38] flex items-center justify-end space-x-0.5">
+                          <Check className="w-2.5 h-2.5" />
+                          <span>ACTIVE DEMO</span>
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           )}
         </div>
       </div>

@@ -46,6 +46,7 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
     try {
       const sig = await requestDevnetAirdrop(publicKey);
       setStatusMsg(`Airdropped 1 SOL! TX: ${sig.slice(0, 8)}...`);
+      onRefreshData();
     } catch (e: any) {
       if (onAirdropDemo) onAirdropDemo();
       setStatusMsg('Devnet busy: +1.00 SOL credited locally!');

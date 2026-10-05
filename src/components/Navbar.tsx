@@ -1,7 +1,8 @@
-import React from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import React, { useState, useEffect } from 'react';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { DemoAccount } from './WalletModal';
-import { ChevronLeft, HelpCircle, Shield, PlusCircle, Compass, Camera, CheckSquare, Coins, Database } from 'lucide-react';
+import { ChevronLeft, HelpCircle, Shield, PlusCircle, Compass, Camera, CheckSquare, Coins, Database, Wallet } from 'lucide-react';
 
 interface NavbarProps {
   title: string;
@@ -34,10 +35,39 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeDemoAccount,
   isUsingDemo,
 }) => {
-  const { connected } = useWallet();
+  const { connection } = useConnection();
+  const { connected, publicKey, wallet } = useWallet();
+  const [realBalance, setRealBalance] = useState<number | null>(null);
 
-  const displayBalance = !isUsingDemo && connected
-    ? 'Connected'
+  useEffect(() => {
+    if (connected && publicKey) {
+      let isMounted = true;
+      const fetchBal = async () => {
+        try {
+          const lamports = await connection.getBalance(publicKey, 'confirmed');
+          if (isMounted) setRealBalance(lamports / LAMPORTS_PER_SOL);
+        } catch (e) {
+          console.warn('Could not query Devnet balance:', e);
+        }
+      };
+      fetchBal();
+      const interval = setInterval(fetchBal, 10000);
+      return () => {
+        isMounted = false;
+        clearInterval(interval);
+      };
+    } else {
+      setRealBalance(null);
+    }
+  }, [connected, publicKey, connection]);
+
+  const isRealWalletActive = connected && !isUsingDemo;
+  const displayWalletName = isRealWalletActive
+    ? (wallet?.adapter.name || 'Phantom')
+    : activeDemoAccount.name.split(' ')[0];
+
+  const displayBalance = isRealWalletActive
+    ? realBalance !== null ? `${realBalance.toFixed(2)} SOL` : 'Loading...'
     : `${activeDemoAccount.balanceSol.toFixed(2)} SOL`;
 
   const tabs = [
@@ -150,7 +180,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <span className="w-2 h-2 rounded-full bg-[#7CB342] animate-pulse" />
             <span className="hidden sm:inline text-[#6B7F72] font-medium font-sans">
-              {activeDemoAccount.name.split(' ')[0]}:
+              {displayWalletName}:
             </span>
             <span className="font-mono text-[#0F3822]">{displayBalance}</span>
           </button>
