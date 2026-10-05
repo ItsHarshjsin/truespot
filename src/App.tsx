@@ -314,10 +314,10 @@ export const App: React.FC = () => {
             </main>
 
             {/* 4. Desktop Web Footer - Dark Glassmorphism */}
-            <footer className="w-full bg-slate-950/70 backdrop-blur-xl border-t border-white/10 py-6 mt-12 text-xs text-gray-400 select-none">
+            <footer className="w-full bg-[#050811]/90 backdrop-blur-2xl border-t border-white/10 py-6 mt-12 text-xs text-slate-400 select-none shadow-[0_-4px_30px_rgba(0,0,0,0.8)]">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold text-xs shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                  <div className="w-6 h-6 rounded-lg bg-sky-500/20 border border-sky-500/30 text-sky-400 flex items-center justify-center font-bold text-xs shadow-[0_0_12px_rgba(56,189,248,0.3)]">
                     T
                   </div>
                   <span className="font-bold text-white">TrueSpot Protocol</span>
@@ -325,18 +325,18 @@ export const App: React.FC = () => {
                   <span>Physical DePIN Oracle on Solana Devnet</span>
                 </div>
 
-                <div className="flex items-center space-x-4 text-[11px] font-medium text-gray-400">
+                <div className="flex items-center space-x-4 text-[11px] font-medium text-slate-400">
                   <span>Colosseum Hackathon MVP</span>
                   <span>•</span>
                   <span>OpenStreetMap Geofence (200m)</span>
                   <span>•</span>
-                  <span className="font-mono text-emerald-400">Escrow: 9WzD...AWWM</span>
+                  <span className="font-mono text-sky-400">Escrow: 9WzD...AWWM</span>
                 </div>
               </div>
             </footer>
 
             {/* Mobile Bottom Floating Navigation Bar - Dark Glassmorphism */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/90 backdrop-blur-2xl border-t border-white/10 px-4 py-2 flex items-center justify-around select-none">
+            <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#050811]/95 backdrop-blur-2xl border-t border-white/10 px-4 py-2 flex items-center justify-around select-none">
               {[
                 { id: 'maker', label: 'Task Maker', icon: Shield },
                 { id: 'receiver', label: 'Field Receiver', icon: Compass },
@@ -349,10 +349,10 @@ export const App: React.FC = () => {
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
                     className={`relative flex flex-col items-center py-1 px-3 rounded-2xl text-[11px] font-semibold transition-all ${
-                      isActive ? 'text-emerald-400 font-bold' : 'text-gray-400 hover:text-white'
+                      isActive ? 'text-sky-300 font-bold' : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    <div className={`p-1 rounded-full ${isActive ? 'bg-emerald-500/20 text-emerald-300' : ''}`}>
+                    <div className={`p-1 rounded-full ${isActive ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30 shadow-[0_0_12px_rgba(56,189,248,0.25)]' : ''}`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     <span className="mt-0.5">{item.label}</span>
