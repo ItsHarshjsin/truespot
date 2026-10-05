@@ -480,6 +480,12 @@ class HybridStore {
       }
     }
 
+    // Auto-Consensus Resolution: If verification is approved, automatically settle bounty to PAID
+    if (ver.agreed && report) {
+      const payoutSig = 'payout_' + Array.from({ length: 48 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+      await this.updateBountyPayout(report.bounty_id, payoutSig);
+    }
+
     return newVer;
   }
 
@@ -506,6 +512,29 @@ class HybridStore {
         }
       }
     }
+  }
+
+  /**
+   * Hackathon Reset Engine: Resets all bounties, reports, and verifications to 0
+   * Clears localStorage and Supabase tables, alerting all components
+   */
+  public async resetStateToZero(): Promise<void> {
+    this.bounties = [];
+    this.reports = [];
+    this.verifications = [];
+    this.persist();
+
+    if (this.supabase) {
+      try {
+        await this.supabase.from('verifications').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        await this.supabase.from('reports').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        await this.supabase.from('bounties').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      } catch (err) {
+        console.warn('Supabase reset warning:', err);
+      }
+    }
+
+    this.notifyListeners();
   }
 
   public resetToCoordinates(userLat: number, userLng: number) {

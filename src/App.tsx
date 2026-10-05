@@ -14,25 +14,22 @@ import { hybridStore } from './utils/storage';
 
 import { JudgeDeck } from './components/JudgeDeck';
 import { Navbar } from './components/Navbar';
-import { NearbyScreen } from './components/NearbyScreen';
-import { AskScreen } from './components/AskScreen';
-import { ReportScreen } from './components/ReportScreen';
-import { VerifyScreen } from './components/VerifyScreen';
-import { StateScreen } from './components/StateScreen';
+import { MakerPortal } from './components/MakerPortal';
+import { ReceiverPortal } from './components/ReceiverPortal';
 import { ThreeWalletsHub } from './components/ThreeWalletsHub';
 import { WalletModal, DEMO_ACCOUNTS, DemoAccount } from './components/WalletModal';
 import { HowItWorksModal } from './components/HowItWorksModal';
 import { SupabaseModal } from './components/SupabaseModal';
 import { ToastContainer, ToastMessage } from './components/Toast';
 
-import { PlusCircle, Compass, Camera, CheckSquare, Coins, AlertCircle } from 'lucide-react';
+import { Shield, Compass, Camera, AlertCircle } from 'lucide-react';
 
 export const App: React.FC = () => {
   const endpoint = useMemo(() => clusterApiUrl('devnet'), []);
   const wallets = useMemo(() => [], []);
 
-  // Navigation state (5 steps)
-  const [activeTab, setActiveTab] = useState<string>('nearby');
+  // Top-level Two-Portal Switcher: 'maker' | 'receiver' | 'escrow'
+  const [activeTab, setActiveTab] = useState<string>('maker');
   const [selectedBountyId, setSelectedBountyId] = useState<string | undefined>(undefined);
 
   // Modals state
@@ -182,16 +179,23 @@ export const App: React.FC = () => {
     }
   };
 
-  // Step information
-  const stepMap: { [key: string]: { num: number; title: string; prev?: string } } = {
-    ask: { num: 1, title: 'Deposit Bounty', prev: 'nearby' },
-    nearby: { num: 2, title: 'Nearby Truth', prev: undefined },
-    report: { num: 3, title: 'Capture Evidence', prev: 'nearby' },
-    verify: { num: 4, title: 'Audit Consensus', prev: 'report' },
-    state: { num: 5, title: 'Oracle Settlement', prev: 'verify' },
+  const handleResetDemoState = async () => {
+    if (window.confirm('Reset all demo bounties and reports back to 0 for a clean hackathon run?')) {
+      await hybridStore.resetStateToZero();
+      hybridStore.seedBountiesAroundUser(currentCoords.lat, currentCoords.lng);
+      refreshData();
+      showToast('Demo State Cleared', 'Reset all test escrows and reports to clean initial state', 'info');
+    }
   };
 
-  const currentStep = stepMap[activeTab] || stepMap.nearby;
+  // Step / Portal information
+  const stepMap: { [key: string]: { num: number; title: string; prev?: string } } = {
+    maker: { num: 1, title: 'Task Maker Portal', prev: undefined },
+    receiver: { num: 2, title: 'Field Receiver Portal', prev: undefined },
+    escrow: { num: 3, title: 'Escrow Protocol', prev: undefined },
+  };
+
+  const currentStep = stepMap[activeTab] || stepMap.maker;
 
   return (
     <ConnectionProvider endpoint={endpoint}>
@@ -205,20 +209,17 @@ export const App: React.FC = () => {
             {/* 1. Full-Width Web Navbar with brand logo, workflow tabs, and wallet persona */}
             <Navbar
               title={currentStep.title}
-              stepNumber={currentStep.num}
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               unverifiedCount={unverifiedCount}
-              canGoBack={!!currentStep.prev}
-              onBack={() => {
-                if (currentStep.prev) setActiveTab(currentStep.prev);
-              }}
+              canGoBack={false}
               onOpenWalletModal={() => setWalletModalOpen(true)}
               onOpenHowItWorks={() => setHowItWorksOpen(true)}
               onOpenSupabaseModal={() => setSupabaseModalOpen(true)}
               isSupabaseConnected={hybridStore.isConnectedToSupabase}
               activeDemoAccount={activeDemoAccount}
               isUsingDemo={isUsingDemo}
+              onResetDemoState={handleResetDemoState}
             />
 
             {/* 2. Web Toolbar: Real Device GPS, Preset Jumper, and Devnet Airdrop */}
@@ -271,87 +272,34 @@ export const App: React.FC = () => {
               </div>
             )}
 
-            {/* 3. Main Web Application Screen Content */}
+            {/* 3. Main Web Application Two-Portal Content */}
             <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-              {activeTab === 'ask' && (
-                <AskScreen
+              {(activeTab === 'maker' || activeTab === 'ask') && (
+                <MakerPortal
                   userCoords={currentCoords}
-                  onBountyCreated={(id) => {
-                    setSelectedBountyId(id);
-                    refreshData();
-                    setActiveTab('nearby');
-                  }}
+                  activeAccount={activeDemoAccount}
                   onAdjustBalance={adjustBalance}
                   onShowToast={showToast}
                 />
               )}
 
-              {activeTab === 'nearby' && (
-                <NearbyScreen
+              {(activeTab === 'receiver' || activeTab === 'nearby' || activeTab === 'report' || activeTab === 'verify' || activeTab === 'state') && (
+                <ReceiverPortal
                   userCoords={currentCoords}
-                  selectedBountyId={selectedBountyId}
-                  onSelectBounty={(id) => setSelectedBountyId(id)}
-                  onSelectReportBounty={(id) => {
-                    setSelectedBountyId(id);
-                    setActiveTab('report');
-                  }}
-                  onSelectStateBounty={(id) => {
-                    setSelectedBountyId(id);
-                    setActiveTab('state');
-                  }}
+                  activeAccount={activeDemoAccount}
                   onSetUserLocation={handleSetUserLocation}
-                />
-              )}
-
-              {activeTab === 'report' && (
-                <ReportScreen
-                  bountyId={selectedBountyId}
-                  userCoords={currentCoords}
-                  activeReporterWallet={activeDemoAccount.address}
-                  onReportSubmitted={(bId) => {
-                    setSelectedBountyId(bId);
-                    refreshData();
-                    setActiveTab('verify');
-                  }}
-                  onBackToNearby={() => setActiveTab('nearby')}
                   onShowToast={showToast}
                 />
               )}
 
-              {activeTab === 'verify' && (
-                <VerifyScreen
-                  bountyId={selectedBountyId}
-                  onSelectBounty={(id) => setSelectedBountyId(id)}
-                  onVerificationComplete={(bId) => {
-                    setSelectedBountyId(bId);
-                    refreshData();
-                    setActiveTab('state');
-                  }}
-                  onAdjustBalance={adjustBalance}
-                  onShowToast={showToast}
-                />
-              )}
-
-              {activeTab === 'state' && (
-                <StateScreen
-                  bountyId={selectedBountyId}
-                  onSelectBounty={(id) => setSelectedBountyId(id)}
-                  onAdjustBalance={adjustBalance}
-                  onShowToast={showToast}
-                />
-              )}
-
-              {activeTab === 'wallets' && (
+              {(activeTab === 'escrow' || activeTab === 'wallets') && (
                 <ThreeWalletsHub
                   activeDemoAccount={activeDemoAccount}
                   onSelectDemoAccount={setActiveDemoAccount}
                   demoAccounts={demoAccounts}
                   onAdjustBalance={adjustBalance}
-                  onNavigateToReport={(bId) => {
-                    setSelectedBountyId(bId);
-                    setActiveTab('report');
-                  }}
-                  onNavigateToAsk={() => setActiveTab('ask')}
+                  onNavigateToReport={() => setActiveTab('receiver')}
+                  onNavigateToAsk={() => setActiveTab('maker')}
                   onShowToast={showToast}
                 />
               )}
@@ -382,11 +330,9 @@ export const App: React.FC = () => {
             {/* Mobile Bottom Floating Navigation Bar (Only on mobile screens) */}
             <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-emerald-950/10 px-4 py-2 flex items-center justify-around select-none">
               {[
-                { id: 'ask', label: 'Ask', icon: PlusCircle },
-                { id: 'nearby', label: 'Radar', icon: Compass },
-                { id: 'report', label: 'Report', icon: Camera },
-                { id: 'verify', label: 'Verify', icon: CheckSquare, badge: unverifiedCount },
-                { id: 'state', label: 'State', icon: Coins },
+                { id: 'maker', label: 'Task Maker', icon: Shield },
+                { id: 'receiver', label: 'Field Receiver', icon: Compass },
+                { id: 'escrow', label: 'Escrow Vault', icon: Camera },
               ].map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
@@ -402,9 +348,6 @@ export const App: React.FC = () => {
                       <Icon className="w-4 h-4" />
                     </div>
                     <span className="mt-0.5">{item.label}</span>
-                    {item.badge !== undefined && item.badge > 0 && (
-                      <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-[#7CB342]" />
-                    )}
                   </button>
                 );
               })}
