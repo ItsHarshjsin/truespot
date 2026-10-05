@@ -90,33 +90,33 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
-      {/* Maker Account Overview Header - Dark Glass Card */}
-      <div className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Maker Account Overview Header - Bento Card */}
+      <div className="bento-card p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl font-bold shadow-[0_0_15px_rgba(245,158,11,0.15)]">
+          <div className="w-12 h-12 rounded-2xl bg-sky-500/15 border border-sky-500/30 text-sky-300 flex items-center justify-center text-xl font-bold shadow-[0_0_20px_rgba(56,189,248,0.25)]">
             🏗️
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h1 className="text-xl font-extrabold text-white">Task Maker Control Room</h1>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 font-bold border border-amber-500/30">
+              <h1 className="text-xl font-extrabold text-white tracking-tight">Task Maker Control Room</h1>
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-sky-500/15 text-sky-300 font-bold border border-sky-500/30">
                 Requester Portal
               </span>
             </div>
-            <div className="text-xs font-mono text-gray-400 mt-1">
-              Wallet: <span className="text-gray-200 font-bold">{activeAccount.address}</span> • Available: <span className="text-emerald-400 font-bold">{activeAccount.balanceSol.toFixed(2)} SOL</span>
+            <div className="text-xs font-mono text-slate-400 mt-1">
+              Wallet: <span className="text-slate-200 font-bold">{activeAccount.address}</span> • Available: <span className="text-sky-300 font-bold">{activeAccount.balanceSol.toFixed(2)} SOL</span>
             </div>
           </div>
         </div>
 
-        {/* Sub-navigation Switcher Pills */}
-        <div className="flex items-center bg-black/40 p-1.5 rounded-full border border-white/10 shadow-lg self-start md:self-auto">
+        {/* Sub-navigation Switcher Pills (Tactile Keycaps) */}
+        <div className="flex items-center bg-black/50 p-1.5 rounded-2xl border border-white/10 shadow-inner self-start md:self-auto space-x-1.5">
           <button
             onClick={() => setSubTab('create')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
               subTab === 'create'
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
-                : 'text-gray-400 hover:text-white'
+                ? 'tactile-keycap-active text-sky-200'
+                : 'tactile-keycap text-slate-400 hover:text-white'
             }`}
           >
             <PlusCircle className="w-3.5 h-3.5" />
@@ -124,16 +124,16 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
           </button>
           <button
             onClick={() => setSubTab('dashboard')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold transition-all relative ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all relative ${
               subTab === 'dashboard'
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
-                : 'text-gray-400 hover:text-white'
+                ? 'tactile-keycap-active text-sky-200'
+                : 'tactile-keycap text-slate-400 hover:text-white'
             }`}
           >
             <FileCheck className="w-3.5 h-3.5" />
             <span>My Tasks & Review</span>
             {pendingApprovalBounties.length > 0 && (
-              <span className="ml-1 px-1.5 py-0.2 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black animate-pulse">
+              <span className="ml-1 px-1.5 py-0.2 rounded-full bg-sky-400 text-slate-950 text-[10px] font-black animate-pulse shadow-[0_0_10px_rgba(56,189,248,0.8)]">
                 {pendingApprovalBounties.length}
               </span>
             )}
@@ -158,23 +158,23 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
       {/* Sub-tab 2: Maker Dashboard & Review */}
       {subTab === 'dashboard' && (
         <div className="space-y-6">
-          {/* Incoming Submissions Awaiting Approval Card */}
-          <div className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/10 space-y-4">
+          {/* Incoming Submissions Awaiting Approval Bento Card */}
+          <div className="bento-card-accent p-6 sm:p-8 space-y-4">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center space-x-2">
-                <FileCheck className="w-5 h-5 text-emerald-400" />
-                <h2 className="text-base font-bold text-white">
+                <FileCheck className="w-5 h-5 text-sky-400" />
+                <h2 className="text-base font-bold text-white tracking-tight">
                   Incoming Evidence Awaiting Approval ({pendingApprovalBounties.length})
                 </h2>
               </div>
-              <span className="text-xs text-emerald-300 font-semibold bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/30">
+              <span className="text-xs text-sky-300 font-semibold bg-sky-500/15 px-3 py-1 rounded-full border border-sky-500/30">
                 100% Payout on Approval
               </span>
             </div>
 
             {pendingApprovalBounties.length === 0 ? (
-              <div className="p-8 text-center bg-black/30 rounded-2xl border border-dashed border-white/10">
-                <p className="text-xs text-gray-400">
+              <div className="p-8 text-center bg-black/40 rounded-2xl border border-dashed border-white/10">
+                <p className="text-xs text-slate-400">
                   No submissions currently waiting for your review. When a field worker snaps photo evidence, it will appear here instantly for 1-click payout approval.
                 </p>
               </div>
@@ -186,18 +186,18 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
                   return (
                     <div
                       key={b.id}
-                      className="p-5 rounded-2xl border border-white/10 bg-black/40 space-y-3 shadow-lg"
+                      className="p-5 rounded-2xl border border-white/10 bg-black/50 space-y-3 shadow-xl"
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-white truncate max-w-[200px]">
                           {b.place_name}
                         </span>
-                        <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
+                        <span className="text-xs font-mono font-bold text-sky-300 bg-sky-500/15 border border-sky-500/30 px-2.5 py-0.5 rounded-full">
                           {b.amount_sol} SOL Escrowed
                         </span>
                       </div>
 
-                      <p className="text-xs text-gray-400 italic">"{b.question}"</p>
+                      <p className="text-xs text-slate-400 italic">"{b.question}"</p>
 
                       {report && (
                         <div className="space-y-2.5 pt-2 border-t border-white/10">
@@ -211,12 +211,12 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
                             </div>
                           )}
 
-                          <div className="text-[11px] font-mono bg-black/50 p-3 rounded-xl border border-white/5 space-y-1 text-gray-300">
-                            <div>Observed Truth: <strong className="text-emerald-400">{report.answer_text}</strong></div>
-                            <div>Worker Wallet: <strong className="text-gray-200">{report.reporter_wallet}</strong></div>
+                          <div className="text-[11px] font-mono bg-black/60 p-3 rounded-xl border border-white/5 space-y-1 text-slate-300">
+                            <div>Observed Truth: <strong className="text-sky-300">{report.answer_text}</strong></div>
+                            <div>Worker Wallet: <strong className="text-slate-200">{report.reporter_wallet}</strong></div>
                             <div>GPS Fix: {report.gps_lat.toFixed(4)}, {report.gps_lng.toFixed(4)} (±{report.gps_accuracy || 3}m)</div>
                             <div>Biometric Tremor: {report.gyro_variance || 0.046}g</div>
-                            <div className="truncate text-gray-400">SHA-256 Fingerprint: {report.fingerprint}</div>
+                            <div className="truncate text-slate-400">SHA-256: {report.fingerprint}</div>
                           </div>
                         </div>
                       )}
@@ -225,14 +225,17 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
                         <button
                           onClick={() => handleApproveAndRelease(b.id)}
                           disabled={approvingId === b.id}
-                          className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs font-bold shadow-[0_0_20px_rgba(16,185,129,0.3)] flex items-center justify-center space-x-1.5 transition-all disabled:opacity-50"
+                          className="w-full bg-[#0a0e17] hover:bg-[#121927] border border-white/20 text-white rounded-full py-2.5 pl-5 pr-2.5 flex items-center justify-between shadow-[0_10px_30px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.2)] group transition-all active:scale-[0.99] disabled:opacity-50"
                         >
-                          <CheckCircle2 className="w-4 h-4 text-slate-950" />
-                          <span>
-                            {approvingId === b.id
-                              ? 'Releasing Escrow...'
-                              : `Approve & Release ${b.amount_sol} SOL to Worker`}
-                          </span>
+                          <div className="flex items-center space-x-2">
+                            <CheckCircle2 className="w-4 h-4 text-sky-400" />
+                            <span className="text-xs font-bold text-white">
+                              {approvingId === b.id ? 'Releasing Escrow...' : `Approve & Release ${b.amount_sol} SOL`}
+                            </span>
+                          </div>
+                          <div className="w-8 h-8 rounded-full bg-white text-slate-950 flex items-center justify-center font-bold text-xs shadow-md group-hover:scale-105 group-hover:bg-sky-300 transition-transform">
+                            ↗
+                          </div>
                         </button>
                       </div>
                     </div>
@@ -243,9 +246,9 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
           </div>
 
           {/* All Created Tasks History Table */}
-          <div className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/10 space-y-4">
+          <div className="bento-card p-6 sm:p-8 space-y-4">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <h2 className="text-base font-bold text-white">
+              <h2 className="text-base font-bold text-white tracking-tight">
                 All Created Bounties & Escrow Ledger ({bounties.length})
               </h2>
               <span className="text-xs text-gray-400 font-mono">

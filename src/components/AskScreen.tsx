@@ -131,56 +131,56 @@ export const AskScreen: React.FC<AskScreenProps> = ({
         
         {/* Left Column (5 cols on desktop): Escrow Vault Details & 100% Payout Model */}
         <div className="lg:col-span-5 space-y-5">
-          {/* Hero Escrow Bounty Card */}
-          <div className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-2xl border border-white/10 text-center">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">
+          {/* Hero Escrow Bounty Bento Card */}
+          <div className="bento-card-accent p-6 text-center">
+            <span className="text-[11px] font-bold text-sky-300/80 uppercase tracking-widest block mb-2">
               Escrow Bounty Deposit
             </span>
-            <div className="flex items-baseline justify-center space-x-2">
-              <span className="text-6xl font-extrabold text-white tracking-tight drop-shadow-md">
+            <div className="flex items-baseline justify-center space-x-2 my-1">
+              <span className="text-6xl font-black text-white tracking-tight drop-shadow-[0_0_35px_rgba(56,189,248,0.35)]">
                 {amountSol}
               </span>
-              <span className="text-2xl font-bold text-emerald-400">SOL</span>
+              <span className="text-2xl font-bold text-sky-400">SOL</span>
             </div>
 
             <div className="mt-3 flex items-center justify-center">
-              <span className="bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-xs px-3.5 py-1 rounded-full font-semibold shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <span className="bg-sky-500/15 text-sky-300 border border-sky-500/30 text-xs px-3.5 py-1 rounded-full font-semibold shadow-[0_0_20px_rgba(56,189,248,0.2)]">
                 Locked in Solana Devnet Vault
               </span>
             </div>
 
-            {/* 100% Payout Breakdown for Hackathon Simplicity */}
-            <div className="mt-5 pt-4 border-t border-white/10 text-left space-y-2.5 text-xs text-gray-400">
+            {/* 100% Payout Breakdown */}
+            <div className="mt-5 pt-4 border-t border-white/10 text-left space-y-2.5 text-xs text-slate-400">
               <div className="flex items-center justify-between">
                 <span>Worker Payout:</span>
-                <span className="font-mono font-bold text-emerald-400">
+                <span className="font-mono font-bold text-sky-300">
                   100% ({amountSol.toFixed(2)} SOL upon approval)
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Geofence Radius:</span>
-                <span className="font-semibold text-gray-200">Strict 200m Physical Radius</span>
+                <span className="font-semibold text-slate-200">Strict 200m Physical Radius</span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Hardware Proof:</span>
-                <span className="font-semibold text-emerald-400">Biometric Gyro + SHA-256</span>
+                <span className="font-semibold text-sky-300">Biometric Gyro + SHA-256</span>
               </div>
             </div>
           </div>
 
-          {/* Quick Idea Prompts */}
-          <div className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-5 shadow-2xl border border-white/10 space-y-2.5">
-            <div className="flex items-center space-x-1.5 text-xs font-bold text-gray-200">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
+          {/* Quick Idea Prompts Bento Card */}
+          <div className="bento-card p-5 space-y-3">
+            <div className="flex items-center space-x-2 text-xs font-bold text-white">
+              <Sparkles className="w-4 h-4 text-sky-400" />
               <span>1-Click Prompt Ideas</span>
             </div>
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {QUICK_PROMPTS.map((p, idx) => (
                 <button
                   type="button"
                   key={idx}
                   onClick={() => setQuestion(p)}
-                  className="w-full text-left p-3 rounded-2xl bg-white/5 hover:bg-white/10 text-xs text-slate-200 hover:text-white transition-colors leading-snug border border-white/5 font-medium"
+                  className="w-full text-left p-3.5 tactile-keycap text-xs text-slate-300 hover:text-white transition-all leading-snug font-medium"
                 >
                   {p}
                 </button>
@@ -190,7 +190,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
         </div>
 
         {/* Right Column (7 cols on desktop): Free-Form Task Creation Form */}
-        <div className="lg:col-span-7 bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/10">
+        <div className="lg:col-span-7 bento-card p-6 sm:p-8">
           <h2 className="text-lg font-bold text-white tracking-tight mb-4">
             Create Physical Oracle Query
           </h2>
@@ -347,20 +347,21 @@ export const AskScreen: React.FC<AskScreenProps> = ({
               </div>
             </div>
 
-            {errorMsg && (
-              <p className="text-xs text-rose-400 font-medium px-1">{errorMsg}</p>
-            )}
-
-            {/* Primary Action Button */}
+            {/* Primary Action Button (Inspiration Capsule with circular arrow puck) */}
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-4 px-6 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-[0_0_25px_rgba(16,185,129,0.35)] flex items-center justify-center space-x-2 transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full bg-[#0a0e17] hover:bg-[#121927] border border-white/20 text-white rounded-full py-2.5 pl-6 pr-3 flex items-center justify-between shadow-[0_12px_35px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.2)] group transition-all active:scale-[0.99] disabled:opacity-50"
             >
-              <ShieldCheck className="w-5 h-5 text-slate-950" />
-              <span>
-                {isSubmitting ? 'Depositing to Solana Escrow...' : `Deposit ${amountSol} SOL & Create Task`}
-              </span>
+              <div className="flex items-center space-x-3">
+                <ShieldCheck className="w-5 h-5 text-sky-400" />
+                <span className="text-sm font-bold tracking-tight text-white">
+                  {isSubmitting ? 'Depositing to Solana Escrow...' : `Deposit ${amountSol} SOL & Create Task`}
+                </span>
+              </div>
+              <div className="w-9 h-9 rounded-full bg-white text-slate-950 flex items-center justify-center font-bold text-sm shadow-md group-hover:scale-105 group-hover:bg-sky-300 transition-transform">
+                ↗
+              </div>
             </button>
           </form>
         </div>

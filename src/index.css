@@ -10,24 +10,109 @@
   }
 }
 
-/* Glassmorphism Surface Helpers */
+/* Glassmorphism Surface Helpers & Tactile Bento Cards (Inspiration UI) */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(180deg, rgba(19, 23, 34, 0.85) 0%, rgba(10, 13, 22, 0.95) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), inset 0 1px 1px rgba(255, 255, 255, 0.18);
+  border-radius: 28px;
+}
+
+.bento-card {
+  background: linear-gradient(180deg, rgba(19, 23, 34, 0.85) 0%, rgba(10, 13, 22, 0.95) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), inset 0 1px 1px rgba(255, 255, 255, 0.18);
+  border-radius: 28px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bento-card:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.95), inset 0 1px 1px rgba(255, 255, 255, 0.28);
+}
+
+.bento-card-accent {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.18) 0%, rgba(15, 23, 42, 0.85) 45%, rgba(2, 6, 23, 0.98) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 35px rgba(56, 189, 248, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  border-radius: 28px;
+}
+
+/* Tactile 3D Embossed Keycaps (like Python keycap in inspiration) */
+.tactile-keycap {
+  background: linear-gradient(180deg, #1c2333 0%, #101522 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  transition: all 0.2s ease;
+}
+
+.tactile-keycap:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.tactile-keycap-active {
+  background: linear-gradient(180deg, #242f46 0%, #141b2c 100%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.3), 0 4px 16px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+  border-radius: 16px;
+}
+
+/* Cosmic Top-Left Beam Flare & Stars Background */
+.cosmic-atmosphere {
+  background-color: #030712;
+  background-image: 
+    radial-gradient(1px 1px at 35px 45px, rgba(255, 255, 255, 0.85), transparent),
+    radial-gradient(1.5px 1.5px at 160px 180px, rgba(147, 197, 253, 0.9), transparent),
+    radial-gradient(1px 1px at 280px 90px, rgba(255, 255, 255, 0.75), transparent),
+    radial-gradient(2px 2px at 420px 340px, rgba(255, 255, 255, 0.95), transparent),
+    radial-gradient(1px 1px at 580px 210px, rgba(167, 139, 250, 0.8), transparent),
+    radial-gradient(1.5px 1.5px at 740px 130px, rgba(255, 255, 255, 0.85), transparent);
+  background-repeat: repeat;
+  background-size: 800px 800px;
+}
+
+/* Luminous Beam Flare projecting from top-left corner */
+.top-left-beam {
+  position: absolute;
+  top: -120px;
+  left: -80px;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.45) 0%, rgba(37, 99, 235, 0.2) 25%, rgba(15, 23, 42, 0) 65%);
+  filter: blur(40px);
+  pointer-events: none;
+  transform: rotate(-15deg);
+}
+
+.top-left-beam-streak {
+  position: absolute;
+  top: -40px;
+  left: 20px;
+  width: 380px;
+  height: 140px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(56, 189, 248, 0.4) 30%, transparent 80%);
+  filter: blur(28px);
+  transform: rotate(-28deg);
+  pointer-events: none;
 }
 
 .glass-input {
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(10, 14, 22, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: #FFFFFF;
 }
 
 .glass-input:focus {
-  border-color: rgba(52, 211, 153, 0.6);
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+  border-color: rgba(56, 189, 248, 0.6);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
 }
 
 /* Custom Sleek Dark Scrollbar */

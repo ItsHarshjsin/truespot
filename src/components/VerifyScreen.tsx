@@ -128,33 +128,33 @@ export const VerifyScreen: React.FC<VerifyScreenProps> = ({
         {/* Left Column (5 cols on desktop): Audit Selector & Consensus Stats */}
         <div className="lg:col-span-5 space-y-5">
           {/* 1. Audit Selector Header Card */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-950/5">
+          <div className="bento-card p-6 space-y-3">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#E8F5E9] text-[#1E5E38]">
+              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30">
                 Staked Consensus Audit
               </span>
-              <span className="text-xs font-semibold text-[#11291B] bg-emerald-50 border border-emerald-200/60 px-2.5 py-0.5 rounded-full font-mono">
+              <span className="text-xs font-semibold text-sky-300 bg-sky-500/15 border border-sky-500/30 px-2.5 py-0.5 rounded-full font-mono">
                 Stake: 0.01 SOL
               </span>
             </div>
 
-            <h2 className="text-lg font-bold text-[#11291B] tracking-tight">
+            <h2 className="text-lg font-bold text-white tracking-tight">
               Audit Place Truth
             </h2>
-            <p className="text-xs text-[#6B7F72] mt-0.5 leading-relaxed">
+            <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
               Verify submitted photos against the claim. Voters who agree with consensus split 20% yield.
             </p>
 
             {bounties.length > 1 && (
-              <div className="mt-4 pt-3 border-t border-gray-100 flex items-center space-x-2">
-                <span className="text-xs text-[#6B7F72]">Audit:</span>
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center space-x-2">
+                <span className="text-xs text-slate-400">Audit:</span>
                 <select
                   value={selectedBounty?.id || ''}
                   onChange={(e) => handleSelectBounty(e.target.value)}
-                  className="bg-[#F4F9F5] text-xs text-[#11291B] font-medium border border-gray-200 rounded-xl px-2.5 py-1 outline-none flex-1 truncate"
+                  className="bg-[#070b13] text-xs text-white font-medium border border-white/10 rounded-xl px-2.5 py-1.5 outline-none flex-1 truncate"
                 >
                   {bounties.map((b) => (
-                    <option key={b.id} value={b.id}>
+                    <option key={b.id} value={b.id} className="bg-slate-900 text-white">
                       {b.place_name} ({b.status})
                     </option>
                   ))}
@@ -164,22 +164,22 @@ export const VerifyScreen: React.FC<VerifyScreenProps> = ({
           </div>
 
           {/* 2. Consensus Progress Bar Card */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-950/5 space-y-3">
+          <div className="bento-card p-6 space-y-3">
             <div className="flex items-center justify-between text-xs font-semibold">
-              <span className="text-[#6B7F72]">Community Consensus:</span>
-              <span className="text-[#1E5E38] font-bold">{agreeRatio}% Agree ({totalVotes} votes)</span>
+              <span className="text-slate-400">Community Consensus:</span>
+              <span className="text-sky-300 font-bold">{agreeRatio}% Agree ({totalVotes} votes)</span>
             </div>
-            <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden flex">
+            <div className="w-full h-3 bg-black/60 border border-white/10 rounded-full overflow-hidden flex">
               <div
                 style={{ width: `${agreeRatio}%` }}
-                className="bg-[#0F3822] transition-all duration-500"
+                className="bg-gradient-to-r from-sky-500 to-cyan-400 shadow-[0_0_12px_rgba(56,189,248,0.5)] transition-all duration-500"
               />
               <div
                 style={{ width: `${100 - agreeRatio}%` }}
-                className="bg-rose-400 transition-all duration-500"
+                className="bg-rose-500 transition-all duration-500"
               />
             </div>
-            <div className="flex justify-between text-[11px] text-[#6B7F72] pt-1">
+            <div className="flex justify-between text-[11px] text-slate-400 pt-1">
               <span>{agreeCount} Agreed</span>
               <span>{totalVotes - agreeCount} Disagreed</span>
             </div>
@@ -189,9 +189,9 @@ export const VerifyScreen: React.FC<VerifyScreenProps> = ({
         {/* Right Column (7 cols on desktop): Photo Evidence & Audit Actions */}
         <div className="lg:col-span-7 space-y-4">
           {latestReport && selectedBounty ? (
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-950/5 space-y-5">
+            <div className="bento-card p-6 space-y-5">
               {/* Floating Thumbnail with rounded-2xl corners */}
-              <div className="rounded-2xl overflow-hidden border-2 border-emerald-500/20 bg-black aspect-video flex items-center justify-center shadow-xs">
+              <div className="rounded-2xl overflow-hidden border-2 border-sky-400/40 bg-black aspect-video flex items-center justify-center shadow-lg">
                 <img
                   src={latestReport.photo_url}
                   alt="Report Evidence"
@@ -200,53 +200,59 @@ export const VerifyScreen: React.FC<VerifyScreenProps> = ({
               </div>
 
               {/* Claim Details */}
-              <div className="p-4 bg-[#F4F9F5] rounded-2xl space-y-2 text-xs">
+              <div className="p-4 bg-black/40 border border-white/10 rounded-2xl space-y-2 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-[#6B7F72] uppercase">Target Question:</span>
-                  <span className="font-bold text-[#11291B]">{selectedBounty.place_name}</span>
+                  <span className="font-semibold text-slate-400 uppercase">Target Question:</span>
+                  <span className="font-bold text-white">{selectedBounty.place_name}</span>
                 </div>
-                <p className="text-sm font-semibold text-[#11291B]">
+                <p className="text-sm font-semibold text-sky-200">
                   "{selectedBounty.question}"
                 </p>
 
-                <div className="pt-2 border-t border-gray-200/60 flex items-center justify-between">
-                  <span className="font-semibold text-[#6B7F72]">Reporter Claim:</span>
-                  <span className="px-3 py-1 rounded-full bg-emerald-100 text-[#1E5E38] font-bold">
+                <div className="pt-2 border-t border-white/10 flex items-center justify-between">
+                  <span className="font-semibold text-slate-400">Reporter Claim:</span>
+                  <span className="px-3 py-1 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30 font-bold">
                     {latestReport.answer_text}
                   </span>
                 </div>
               </div>
 
               {/* Large Action Buttons */}
-              <div className="space-y-2.5">
+              <div className="space-y-3">
+                {/* Inspiration Tactile Capsule Button */}
                 <button
                   onClick={() => handleVote(true)}
                   disabled={isVoting}
-                  className="w-full py-4 px-6 rounded-full bg-[#0F3822] hover:bg-[#154A2E] text-white font-semibold text-base shadow-sm flex items-center justify-center space-x-2 transition-all active:scale-[0.98] disabled:opacity-50"
+                  className="w-full bg-[#0a0e17] hover:bg-[#121927] border border-white/20 text-white rounded-full py-2.5 pl-6 pr-3 flex items-center justify-between shadow-2xl transition-all duration-300 group hover:border-sky-400/50 hover:shadow-[0_0_30px_rgba(56,189,248,0.2)] disabled:opacity-40"
                 >
-                  <ThumbsUp className="w-5 h-5 text-[#99E35E]" />
-                  <span>Agree (Verify as Truth)</span>
+                  <span className="font-semibold text-sm flex items-center space-x-2">
+                    <ThumbsUp className="w-4 h-4 text-sky-400" />
+                    <span>Agree (Verify as Truth)</span>
+                  </span>
+                  <div className="w-9 h-9 rounded-full bg-white text-slate-950 font-bold flex items-center justify-center text-sm shadow-md group-hover:scale-105 group-hover:bg-sky-400 group-hover:text-black transition-all">
+                    ↗
+                  </div>
                 </button>
 
                 <button
                   onClick={() => handleVote(false)}
                   disabled={isVoting}
-                  className="w-full py-3.5 px-6 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200/80 font-semibold text-sm flex items-center justify-center space-x-2 transition-all active:scale-[0.98] disabled:opacity-50"
+                  className="w-full py-3 px-6 rounded-full tactile-keycap text-rose-300 hover:text-rose-100 font-semibold text-xs flex items-center justify-center space-x-2 transition-all active:scale-[0.98] disabled:opacity-50"
                 >
-                  <ThumbsDown className="w-4 h-4 text-rose-600" />
+                  <ThumbsDown className="w-3.5 h-3.5 text-rose-400" />
                   <span>Disagree (Flag as Fraud)</span>
                 </button>
               </div>
 
               {votedSuccess !== null && (
-                <div className="p-3 bg-[#E8F5E9] border border-[#8BC34A]/40 rounded-2xl text-xs text-[#1E5E38] font-semibold text-center animate-fadeIn">
+                <div className="p-3 bg-sky-500/15 border border-sky-500/30 rounded-2xl text-xs text-sky-300 font-semibold text-center animate-fadeIn">
                   ✓ Vote recorded! Navigating to State & Settlement...
                 </div>
               )}
             </div>
           ) : (
-            <div className="bg-white rounded-3xl p-12 text-center text-[#6B7F72] shadow-sm border border-emerald-950/5">
-              <p className="text-base font-semibold text-[#11291B]">No evidence report submitted for this spot yet.</p>
+            <div className="bento-card p-12 text-center text-slate-400">
+              <p className="text-base font-semibold text-white">No evidence report submitted for this spot yet.</p>
               <p className="text-xs mt-1">Submit a report from the Radar tab first to audit.</p>
             </div>
           )}

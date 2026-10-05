@@ -201,11 +201,15 @@ export const App: React.FC = () => {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          {/* Full Web Application Canvas - Dark Space Glassmorphism */}
-          <div className="min-h-screen bg-gradient-to-br from-slate-950 via-[#090d1a] to-[#02050e] text-slate-100 flex flex-col font-sans selection:bg-emerald-500/30 selection:text-emerald-300 relative overflow-x-hidden">
-            {/* Ambient Cosmic Glow Backdrops */}
-            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute top-1/3 right-10 w-[500px] h-[500px] bg-teal-500/5 rounded-full blur-3xl pointer-events-none" />
+          {/* Full Web Application Canvas - Inspiration Dark Space Bento Design */}
+          <div className="min-h-screen cosmic-atmosphere text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200 relative overflow-x-hidden">
+            {/* The prominent Top-Left Luminous Cyan Flare Beam from Inspiration UI */}
+            <div className="top-left-beam" />
+            <div className="top-left-beam-streak" />
+
+            {/* Ambient Cosmic Radial Glows */}
+            <div className="absolute top-1/4 left-1/3 w-[600px] h-[600px] bg-sky-500/5 rounded-full blur-[140px] pointer-events-none" />
+            <div className="absolute bottom-1/3 right-10 w-[550px] h-[550px] bg-indigo-500/5 rounded-full blur-[140px] pointer-events-none" />
 
             {/* Global Floating Toast Notifications */}
             <ToastContainer toasts={toasts} onDismiss={dismissToast} />

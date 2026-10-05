@@ -70,29 +70,29 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-1 select-none">
-      <div className="bg-slate-900/60 backdrop-blur-2xl rounded-2xl border border-white/10 px-4 py-2.5 shadow-2xl flex flex-wrap items-center justify-between gap-3">
+      <div className="bento-card px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
         {/* Left: Real Device GPS & Coordinates Trigger */}
         <div className="flex items-center space-x-2 flex-wrap gap-y-1">
           <button
             onClick={onUseLiveGps}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all shadow-xs shrink-0"
+            className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold tactile-keycap-active text-sky-200 shrink-0"
             title="Auto-detect real GPS"
           >
-            <Navigation className="w-3.5 h-3.5 text-emerald-400" />
+            <Navigation className="w-3.5 h-3.5 text-sky-400" />
             <span>Real GPS</span>
           </button>
 
           <button
             onClick={() => setShowManualInput(!showManualInput)}
-            className="flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold tactile-keycap text-slate-300 hover:text-white shrink-0"
             title="Type coordinates"
           >
-            <Edit3 className="w-3.5 h-3.5 text-gray-400" />
+            <Edit3 className="w-3.5 h-3.5 text-slate-400" />
             <span>Custom Coords</span>
           </button>
 
-          <div className="flex items-center space-x-1.5 text-xs text-gray-200 font-medium bg-black/40 px-3 py-1.5 rounded-full border border-white/10">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="flex items-center space-x-2 text-xs text-slate-300 font-medium bg-black/50 px-3.5 py-1.5 rounded-xl border border-white/10">
+            <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse shadow-[0_0_8px_rgba(56,189,248,0.8)]" />
             <span className="truncate max-w-[200px] sm:max-w-xs">{currentLocationName}</span>
           </div>
         </div>
@@ -105,7 +105,7 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
               if (e.target.value) onSelectPreset(e.target.value);
             }}
             defaultValue=""
-            className="bg-black/40 text-xs text-gray-200 font-medium border border-white/10 rounded-full px-3 py-1.5 outline-none cursor-pointer hover:border-white/20 transition-colors"
+            className="bg-black/50 text-xs text-slate-200 font-medium border border-white/10 rounded-xl px-3 py-1.5 outline-none cursor-pointer hover:border-white/20 transition-colors"
           >
             <option value="" disabled className="bg-slate-900 text-gray-400">Jump to City...</option>
             {JUDGE_PRESETS.map((p) => (
@@ -119,7 +119,7 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
           <button
             onClick={handleAirdrop}
             disabled={airdropping}
-            className="flex items-center space-x-1.5 bg-gradient-to-r from-emerald-500/90 to-teal-500/90 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold px-3.5 py-1.5 rounded-full text-xs transition-all shadow-[0_0_15px_rgba(16,185,129,0.25)]"
+            className="flex items-center space-x-1.5 bg-gradient-to-r from-sky-400 to-teal-400 hover:from-sky-300 hover:to-teal-300 text-slate-950 font-bold px-3.5 py-1.5 rounded-full text-xs transition-all shadow-[0_0_20px_rgba(56,189,248,0.35)]"
             title="Airdrop 1 Devnet SOL"
           >
             <Coins className="w-3.5 h-3.5 text-slate-950" />
@@ -128,7 +128,7 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
 
           <button
             onClick={onRefreshData}
-            className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+            className="w-8 h-8 rounded-xl tactile-keycap flex items-center justify-center text-slate-300 hover:text-white transition-colors"
             title="Refresh oracle data"
           >
             <RotateCcw className="w-3.5 h-3.5" />
