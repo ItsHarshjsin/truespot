@@ -351,7 +351,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
               {escrowAccount.balanceSol.toFixed(2)} SOL
             </span>
           </div>
-          <h3 className="text-base font-extrabold text-white">3. Escrow Vault & Oracle</h3>
+          <h3 className="text-base font-extrabold text-white">3. Escrow Vault Protocol</h3>
           <p className="text-xs text-slate-400 mt-1 leading-snug">
             Autonomous Solana program: holds funds, validates blockhash nonces & settles.
           </p>

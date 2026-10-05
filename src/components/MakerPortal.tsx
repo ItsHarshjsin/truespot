@@ -7,14 +7,6 @@ import {
   PlusCircle,
   FileCheck,
   CheckCircle2,
-  Lock,
-  ExternalLink,
-  Coins,
-  Camera,
-  MapPin,
-  Clock,
-  ArrowRight,
-  ShieldCheck,
 } from 'lucide-react';
 
 interface MakerPortalProps {
@@ -22,6 +14,7 @@ interface MakerPortalProps {
   activeAccount: DemoAccount;
   onAdjustBalance: (delta: number, role?: 'asker' | 'spotter' | 'verifier') => void;
   onShowToast?: (title: string, message: string, type?: 'success' | 'info' | 'reward' | 'warning') => void;
+  onNavigateToRadar?: () => void;
 }
 
 export const MakerPortal: React.FC<MakerPortalProps> = ({
@@ -29,6 +22,7 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
   activeAccount,
   onAdjustBalance,
   onShowToast,
+  onNavigateToRadar,
 }) => {
   const [subTab, setSubTab] = useState<'create' | 'dashboard'>('create');
   const [bounties, setBounties] = useState<Bounty[]>([]);
@@ -75,7 +69,7 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
 
       if (onShowToast) {
         onShowToast(
-          '🎉 Escrow Released & Settled!',
+          'Escrow Released & Settled',
           `Transferred 100% payout (${amount} SOL) to field worker. Status is now PAID.`,
           'reward'
         );
@@ -89,48 +83,42 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
   };
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
-      {/* CoinVex Style Subheader: Large Title + Sub-navigation Pills */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-1 pb-2">
-        <div>
-          <div className="flex items-center space-x-3">
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">
-              Task Maker Dashboard
-            </h1>
-            <span className="text-[11px] px-3 py-0.5 rounded-full bg-lime-400/10 text-lime-400 font-bold border border-lime-400/30">
-              Requester Portal
-            </span>
-          </div>
-          <p className="text-xs text-zinc-400 mt-1 font-medium">
-            Active Solana Escrow Requester • Wallet: <span className="font-mono text-zinc-300 font-bold">{activeAccount.address}</span> • Available: <strong className="text-lime-400 font-mono">{activeAccount.balanceSol.toFixed(2)} SOL</strong>
-          </p>
+    <div className="space-y-5 max-w-7xl mx-auto">
+      {/* Compact Mode Switcher Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-white/[0.06]">
+        <div className="flex items-center space-x-2 text-xs text-[#858585] flex-wrap">
+          <span className="text-[#F5F5F5] font-semibold">Verification Dispatch</span>
+          <span>•</span>
+          <span>Wallet: <strong className="font-mono text-zinc-300">{activeAccount.address}</strong></span>
+          <span>•</span>
+          <span>Available: <strong className="text-[#A8FF00] font-mono">{activeAccount.balanceSol.toFixed(2)} SOL</strong></span>
         </div>
 
-        {/* Sub-navigation Switcher Pills (CoinVex Style) */}
-        <div className="flex items-center bg-[#141414] p-1.5 rounded-full border border-zinc-800 shadow-inner self-start sm:self-auto space-x-1.5 shrink-0">
+        {/* Sub-navigation Switcher Pills */}
+        <div className="flex items-center bg-[#0D0D0D] p-1 rounded-full border border-white/[0.08] shadow-inner space-x-1 shrink-0 self-start sm:self-auto">
           <button
             onClick={() => setSubTab('create')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
               subTab === 'create'
-                ? 'bg-lime-400 text-black shadow-md shadow-lime-400/20'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-[#A8FF00] text-black shadow-sm'
+                : 'text-[#858585] hover:text-white'
             }`}
           >
             <PlusCircle className="w-3.5 h-3.5" />
-            <span>Create New Task</span>
+            <span>New Task Query</span>
           </button>
           <button
             onClick={() => setSubTab('dashboard')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold transition-all relative ${
+            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all relative ${
               subTab === 'dashboard'
-                ? 'bg-lime-400 text-black shadow-md shadow-lime-400/20'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-[#A8FF00] text-black shadow-sm'
+                : 'text-[#858585] hover:text-white'
             }`}
           >
             <FileCheck className="w-3.5 h-3.5" />
-            <span>My Tasks & Review</span>
+            <span>My Tasks ({bounties.length})</span>
             {pendingApprovalBounties.length > 0 && (
-              <span className="ml-1 px-1.5 py-0.2 rounded-full bg-black text-lime-400 text-[10px] font-black border border-lime-400 animate-pulse">
+              <span className="ml-1 px-1.5 py-0.2 rounded-full bg-black text-[#A8FF00] text-[10px] font-black border border-[#A8FF00] animate-pulse">
                 {pendingApprovalBounties.length}
               </span>
             )}
@@ -149,29 +137,30 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
           }}
           onAdjustBalance={onAdjustBalance}
           onShowToast={onShowToast}
+          onNavigateToRadar={onNavigateToRadar}
         />
       )}
 
       {/* Sub-tab 2: Maker Dashboard & Review */}
       {subTab === 'dashboard' && (
-        <div className="space-y-6">
+        <div className="space-y-5">
           {/* Incoming Submissions Awaiting Approval Bento Card */}
-          <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl shadow-black/40">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 sm:p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
               <div className="flex items-center space-x-2">
-                <FileCheck className="w-5 h-5 text-lime-400" />
-                <h2 className="text-base font-bold text-white tracking-tight">
+                <FileCheck className="w-4 h-4 text-[#A8FF00]" />
+                <h2 className="text-[15px] font-bold text-[#F5F5F5] tracking-tight">
                   Incoming Evidence Awaiting Approval ({pendingApprovalBounties.length})
                 </h2>
               </div>
-              <span className="text-xs text-lime-400 font-semibold bg-lime-400/10 px-3.5 py-1 rounded-full border border-lime-400/30">
+              <span className="text-[11px] text-[#A8FF00] font-semibold bg-[#101010] px-3 py-1 rounded-full border border-white/[0.07]">
                 100% Payout on Approval
               </span>
             </div>
 
             {pendingApprovalBounties.length === 0 ? (
-              <div className="p-8 text-center bg-[#18181b]/50 rounded-2xl border border-dashed border-zinc-800">
-                <p className="text-xs text-zinc-400">
+              <div className="p-8 text-center bg-[#101010] rounded-xl border border-dashed border-white/[0.07]">
+                <p className="text-xs text-[#858585]">
                   No submissions currently waiting for your review. When a field worker snaps photo evidence, it will appear here instantly for 1-click payout approval.
                 </p>
               </div>
@@ -183,23 +172,23 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
                   return (
                     <div
                       key={b.id}
-                      className="p-5 rounded-2xl border border-zinc-800 bg-[#18181b] space-y-3 shadow-xl"
+                      className="p-5 rounded-xl border border-white/[0.07] bg-[#101010] space-y-3 shadow-lg"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-white truncate max-w-[200px]">
+                        <span className="text-xs font-bold text-[#F5F5F5] truncate max-w-[200px]">
                           {b.place_name}
                         </span>
-                        <span className="text-xs font-mono font-bold text-lime-400 bg-lime-400/10 border border-lime-400/30 px-3 py-0.5 rounded-full">
+                        <span className="text-xs font-mono font-bold text-[#A8FF00] bg-[#0B0B0B] border border-white/[0.08] px-3 py-0.5 rounded-full">
                           {b.amount_sol} SOL Escrowed
                         </span>
                       </div>
 
-                      <p className="text-xs text-zinc-400 italic">"{b.question}"</p>
+                      <p className="text-xs text-[#858585] italic">"{b.question}"</p>
 
                       {report && (
-                        <div className="space-y-2.5 pt-2 border-t border-zinc-800">
+                        <div className="space-y-2.5 pt-2 border-t border-white/[0.06]">
                           {report.photo_url && (
-                            <div className="rounded-xl overflow-hidden aspect-video bg-black max-h-44 border border-zinc-800">
+                            <div className="rounded-xl overflow-hidden aspect-video bg-black max-h-44 border border-white/[0.06]">
                               <img
                                 src={report.photo_url}
                                 alt="Worker Evidence"
@@ -208,8 +197,8 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
                             </div>
                           )}
 
-                          <div className="text-[11px] font-mono bg-[#0a0a0a] p-3 rounded-xl border border-zinc-800/80 space-y-1 text-zinc-300">
-                            <div>Observed Truth: <strong className="text-lime-400">{report.answer_text}</strong></div>
+                          <div className="text-[11px] font-mono bg-[#050505] p-3 rounded-xl border border-white/[0.06] space-y-1 text-zinc-300">
+                            <div>Observed Truth: <strong className="text-[#A8FF00]">{report.answer_text}</strong></div>
                             <div>Worker Wallet: <strong className="text-zinc-200">{report.reporter_wallet}</strong></div>
                             <div>GPS Fix: {report.gps_lat.toFixed(4)}, {report.gps_lng.toFixed(4)} (±{report.gps_accuracy || 3}m)</div>
                             <div>Biometric Tremor: {report.gyro_variance || 0.046}g</div>
@@ -222,7 +211,7 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
                         <button
                           onClick={() => handleApproveAndRelease(b.id)}
                           disabled={approvingId === b.id}
-                          className="w-full py-3.5 px-5 rounded-full bg-lime-400 hover:bg-lime-300 text-black font-bold text-xs tracking-wide shadow-md shadow-lime-400/20 flex items-center justify-center space-x-2 transition-all active:scale-[0.99] disabled:opacity-50"
+                          className="w-full py-3 px-5 rounded-full bg-gradient-to-r from-[#A8FF00] to-[#34D399] hover:brightness-105 text-black font-extrabold text-xs tracking-wide shadow-md shadow-[#A8FF00]/20 flex items-center justify-center space-x-2 transition-all active:scale-[0.99] disabled:opacity-50"
                         >
                           <CheckCircle2 className="w-4 h-4 text-black" />
                           <span>
@@ -238,20 +227,20 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
           </div>
 
           {/* All Created Tasks History Table */}
-          <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl shadow-black/40">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-              <h2 className="text-base font-bold text-white tracking-tight">
-                All Created Bounties & Escrow Ledger ({bounties.length})
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 sm:p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
+              <h2 className="text-[15px] font-bold text-[#F5F5F5] tracking-tight">
+                All Created Tasks & Escrow Ledger ({bounties.length})
               </h2>
-              <span className="text-xs text-zinc-400 font-mono">
-                Total Escrow Locked: <strong className="text-lime-400">{totalEscrowLocked.toFixed(2)} SOL</strong>
+              <span className="text-xs text-[#858585] font-mono">
+                Total Escrow Locked: <strong className="text-[#A8FF00]">{totalEscrowLocked.toFixed(2)} SOL</strong>
               </span>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-zinc-800 text-zinc-500 uppercase font-bold text-[10px]">
+                  <tr className="border-b border-white/[0.06] text-[#555555] uppercase font-bold text-[10px]">
                     <th className="py-2.5 px-3">Location & Query</th>
                     <th className="py-2.5 px-3">Escrow Reward</th>
                     <th className="py-2.5 px-3">Status</th>
@@ -259,35 +248,35 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
                     <th className="py-2.5 px-3">Payout TX</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-800 font-mono text-[11px]">
+                <tbody className="divide-y divide-white/[0.05] font-mono text-[11px]">
                   {bounties.map((b) => (
                     <tr key={b.id} className="hover:bg-white/[0.02] transition-colors">
                       <td className="py-3 px-3 font-sans">
-                        <div className="font-bold text-white">{b.place_name}</div>
-                        <div className="text-zinc-400 truncate max-w-xs">{b.question}</div>
+                        <div className="font-bold text-[#F5F5F5]">{b.place_name}</div>
+                        <div className="text-[#858585] truncate max-w-xs">{b.question}</div>
                       </td>
-                      <td className="py-3 px-3 font-bold text-lime-400">
+                      <td className="py-3 px-3 font-bold text-[#A8FF00]">
                         {b.amount_sol} SOL
                       </td>
                       <td className="py-3 px-3 font-sans">
                         <span
-                          className={`px-3 py-1 rounded-full text-[10px] font-bold border ${
+                          className={`px-3 py-0.5 rounded-full text-[10px] font-bold border ${
                             b.status === 'PAID'
-                              ? 'bg-lime-400/10 text-lime-400 border-lime-400/30'
+                              ? 'bg-[#A8FF00]/10 text-[#A8FF00] border-[#A8FF00]/30'
                               : b.status === 'ANSWERED'
-                              ? 'bg-purple-500/10 text-purple-300 border-purple-500/30 animate-pulse'
-                              : 'bg-zinc-800 text-zinc-300 border-zinc-700'
+                              ? 'bg-[#8B4DFF]/10 text-purple-300 border-purple-500/30 animate-pulse'
+                              : 'bg-[#101010] text-[#858585] border-white/[0.07]'
                           }`}
                         >
                           {b.status === 'ANSWERED' ? 'PENDING APPROVAL' : b.status}
                         </span>
                       </td>
-                      <td className="py-3 px-3 text-zinc-500 truncate max-w-[130px]">
+                      <td className="py-3 px-3 text-[#555555] truncate max-w-[130px]">
                         {b.escrow_tx || '0x8f2a...locked'}
                       </td>
-                      <td className="py-3 px-3 text-zinc-500 truncate max-w-[130px]">
+                      <td className="py-3 px-3 text-[#555555] truncate max-w-[130px]">
                         {b.payout_tx ? (
-                          <span className="text-lime-400 font-bold">{b.payout_tx.slice(0, 12)}...</span>
+                          <span className="text-[#A8FF00] font-bold">{b.payout_tx.slice(0, 12)}...</span>
                         ) : (
                           <span className="text-zinc-600">Awaiting Settlement</span>
                         )}

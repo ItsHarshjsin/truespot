@@ -2,9 +2,9 @@ import { JudgeLocationPreset } from '../types';
 
 export const JUDGE_PRESETS: JudgeLocationPreset[] = [
   {
-    id: 'colosseum-hq',
-    name: 'Colosseum Solana Hackathon Venue (SF)',
-    description: 'Directly inside the venue (5m from coffee & badge station)',
+    id: 'financial-hub-sf',
+    name: 'Financial District Innovation Hub (SF)',
+    description: 'Directly inside the hub (5m from main concourse)',
     lat: 37.7879,
     lng: -122.4075
   },

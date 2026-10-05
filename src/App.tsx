@@ -180,11 +180,11 @@ export const App: React.FC = () => {
   };
 
   const handleResetDemoState = async () => {
-    if (window.confirm('Reset all demo bounties and reports back to 0 for a clean hackathon run?')) {
+    if (window.confirm('Reset all active tasks and reports to a clean initial state?')) {
       await hybridStore.resetStateToZero();
       hybridStore.seedBountiesAroundUser(currentCoords.lat, currentCoords.lng);
       refreshData();
-      showToast('Demo State Cleared', 'Reset all test escrows and reports to clean initial state', 'info');
+      showToast('State Cleared', 'Reset all test tasks and reports to clean initial state', 'info');
     }
   };
 
@@ -201,11 +201,10 @@ export const App: React.FC = () => {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          {/* Full Web Application Canvas - Neon Dark Mode Fintech Dashboard (CoinVex) */}
-          <div className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-lime-400 selection:text-black relative overflow-x-hidden">
-            {/* Subtle Neon Glow Highlights */}
-            <div className="top-glow" />
-            <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[140px] pointer-events-none" />
+          {/* Full Web Application Canvas - CoinVex Benchmark Aesthetic */}
+          <div className="min-h-screen bg-[#050505] text-[#F5F5F5] flex flex-col font-sans selection:bg-[#A8FF00] selection:text-black relative overflow-x-hidden">
+            {/* Subtle Ambient Radial Glow */}
+            <div className="ambient-glow" />
 
             {/* Global Floating Toast Notifications */}
             <ToastContainer toasts={toasts} onDismiss={dismissToast} />
@@ -284,6 +283,7 @@ export const App: React.FC = () => {
                   activeAccount={activeDemoAccount}
                   onAdjustBalance={adjustBalance}
                   onShowToast={showToast}
+                  onNavigateToRadar={() => setActiveTab('receiver')}
                 />
               )}
 
@@ -309,24 +309,24 @@ export const App: React.FC = () => {
               )}
             </main>
 
-            {/* 4. Desktop Web Footer - Neon Dark Mode */}
-            <footer className="w-full bg-[#121212] border-t border-zinc-800/80 py-6 mt-12 text-xs text-zinc-400 select-none">
+            {/* 4. Desktop Web Footer - Benchmark Dark Mode */}
+            <footer className="w-full bg-[#0B0B0B] border-t border-white/[0.07] py-6 mt-12 text-xs text-[#858585] select-none relative z-10">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="flex items-center space-x-2.5">
-                  <div className="w-7 h-7 rounded-full bg-lime-400 text-black flex items-center justify-center font-black text-xs shadow-md shadow-lime-400/20">
+                  <div className="w-6 h-6 rounded-full bg-[#A8FF00] text-black flex items-center justify-center font-black text-xs shadow-sm">
                     T
                   </div>
-                  <span className="font-bold text-white tracking-tight">TrueSpot Protocol</span>
+                  <span className="font-bold text-[#F5F5F5] tracking-tight">TrueSpot Protocol</span>
                   <span>•</span>
-                  <span className="text-zinc-400">Physical DePIN Oracle on Solana Devnet</span>
+                  <span className="text-[#858585]">Physical Verification Network on Solana Devnet</span>
                 </div>
 
-                <div className="flex items-center space-x-4 text-[11px] font-medium text-zinc-400">
-                  <span>Colosseum Hackathon MVP</span>
+                <div className="flex items-center space-x-4 text-[11px] font-medium text-[#858585]">
+                  <span>Decentralized Escrow</span>
                   <span>•</span>
-                  <span>OpenStreetMap Geofence (200m)</span>
+                  <span>200m Proximity Geofence</span>
                   <span>•</span>
-                  <span className="font-mono text-lime-400 font-semibold">Escrow: 9WzD...AWWM</span>
+                  <span className="font-mono text-[#A8FF00] font-semibold">Vault: 9WzD...AWWM</span>
                 </div>
               </div>
             </footer>

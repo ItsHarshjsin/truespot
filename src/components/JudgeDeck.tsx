@@ -69,43 +69,54 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 select-none">
-      <div className="flex flex-wrap items-center justify-between gap-3 py-3 border-b border-zinc-900">
-        {/* Left: Real Device GPS & Coordinates Trigger */}
-        <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2 select-none">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
+        {/* Left: CoinVex Large Dashboard Title & Date */}
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#F5F5F5] tracking-tight">
+            Dashboard
+          </h1>
+          <div className="flex items-center space-x-2 text-xs text-[#858585] mt-1 font-medium">
+            <span>25 January 2025</span>
+            <span>•</span>
+            <span className="flex items-center space-x-1.5 text-zinc-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00] animate-pulse" />
+              <span className="truncate max-w-[220px]">{currentLocationName}</span>
+            </span>
+          </div>
+        </div>
+
+        {/* Right: CoinVex Horizontal Filter Pills */}
+        <div className="flex items-center space-x-2 flex-wrap gap-y-2">
+          {/* Active Pill: Real GPS (CoinVex "Grow Stocks" style with green arrow puck) */}
           <button
             onClick={onUseLiveGps}
-            className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-lime-400 text-black shadow-sm shadow-lime-400/20 shrink-0 transition-transform active:scale-95"
+            className="flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#0D0D0D] border border-white/[0.08] text-white hover:border-[#A8FF00]/50 transition-all shadow-sm"
             title="Auto-detect real GPS"
           >
-            <Navigation className="w-3.5 h-3.5 text-black" />
+            <div className="w-5 h-5 rounded-full bg-[#A8FF00] text-black flex items-center justify-center font-bold text-[10px]">
+              ↑
+            </div>
             <span>Real GPS</span>
           </button>
 
+          {/* Inactive Pill 1: Custom Coords */}
           <button
             onClick={() => setShowManualInput(!showManualInput)}
-            className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#18181b] border border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700 shrink-0 transition-colors"
-            title="Type coordinates"
+            className="flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#0D0D0D] border border-white/[0.08] text-[#858585] hover:text-white hover:border-white/20 transition-all"
+            title="Enter custom coordinates"
           >
             <Edit3 className="w-3.5 h-3.5 text-zinc-400" />
             <span>Custom Coords</span>
           </button>
 
-          <div className="flex items-center space-x-2 text-xs text-zinc-300 font-medium bg-[#141414] px-3.5 py-1.5 rounded-full border border-zinc-800">
-            <span className="w-2 h-2 rounded-full bg-lime-400 animate-pulse shadow-[0_0_8px_rgba(163,230,53,0.8)]" />
-            <span className="truncate max-w-[200px] sm:max-w-xs">{currentLocationName}</span>
-          </div>
-        </div>
-
-        {/* Right: Quick Preset Selector & Devnet Airdrop */}
-        <div className="flex items-center space-x-2 shrink-0">
-          {/* Preset Select Dropdown */}
+          {/* Inactive Pill 2: Preset Select Dropdown */}
           <select
             onChange={(e) => {
               if (e.target.value) onSelectPreset(e.target.value);
             }}
             defaultValue=""
-            className="bg-[#18181b] text-xs text-zinc-200 font-medium border border-zinc-800 rounded-full px-3.5 py-1.5 outline-none cursor-pointer hover:border-zinc-700 transition-colors"
+            className="bg-[#0D0D0D] text-xs text-[#858585] hover:text-white font-medium border border-white/[0.08] rounded-full px-3.5 py-1.5 outline-none cursor-pointer hover:border-white/20 transition-all"
           >
             <option value="" disabled className="bg-zinc-900 text-zinc-500">Jump to City...</option>
             {JUDGE_PRESETS.map((p) => (
@@ -115,20 +126,21 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
             ))}
           </select>
 
-          {/* Quick Airdrop Pill */}
+          {/* Inactive Pill 3: Airdrop */}
           <button
             onClick={handleAirdrop}
             disabled={airdropping}
-            className="flex items-center space-x-1.5 bg-lime-400 hover:bg-lime-300 text-black font-bold px-4 py-1.5 rounded-full text-xs transition-all shadow-[0_0_15px_rgba(163,230,53,0.25)] hover:scale-105 active:scale-95"
+            className="flex items-center space-x-1.5 bg-[#0D0D0D] hover:bg-zinc-900 border border-white/[0.08] text-[#A8FF00] font-bold px-3.5 py-1.5 rounded-full text-xs transition-all shadow-sm"
             title="Airdrop 1 Devnet SOL"
           >
-            <Coins className="w-3.5 h-3.5 text-black" />
-            <span>{airdropping ? 'Requesting...' : '+1 Devnet SOL'}</span>
+            <Coins className="w-3.5 h-3.5 text-[#A8FF00]" />
+            <span>{airdropping ? 'Requesting...' : '+1 SOL'}</span>
           </button>
 
+          {/* Circular Refresh Puck */}
           <button
             onClick={onRefreshData}
-            className="w-8 h-8 rounded-full bg-[#18181b] border border-zinc-800 hover:bg-zinc-800 flex items-center justify-center text-zinc-300 hover:text-white transition-colors"
+            className="w-8 h-8 rounded-full bg-[#0D0D0D] border border-white/[0.08] hover:border-white/20 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
             title="Refresh oracle data"
           >
             <RotateCcw className="w-3.5 h-3.5" />

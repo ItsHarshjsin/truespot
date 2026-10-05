@@ -82,23 +82,23 @@ export const Navbar: React.FC<NavbarProps> = ({
     : `${activeDemoAccount.balanceSol.toFixed(2)} SOL`;
 
   const portals = [
-    { id: 'maker', label: '🏗️ Task Maker', icon: PlusCircle, badge: 0 },
-    { id: 'receiver', label: '📸 Field Receiver', icon: Compass, badge: unverifiedCount },
-    { id: 'escrow', label: '🔒 Escrow Vault', icon: Lock, badge: 0 },
+    { id: 'maker', label: 'Dashboard', icon: PlusCircle, badge: 0 },
+    { id: 'receiver', label: 'Analytics & Radar', icon: Compass, badge: unverifiedCount },
+    { id: 'escrow', label: 'Escrow Vault', icon: Lock, badge: 0 },
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#0a0a0a]/95 backdrop-blur-2xl border-b border-zinc-800/80 select-none">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4 py-3">
-        {/* Left: Brand Identity & Back Control */}
+    <header className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2 select-none relative z-40">
+      <div className="flex items-center justify-between gap-4">
+        {/* Left: CoinVex Minimalist Brand Identity */}
         <div className="flex items-center space-x-3">
           {canGoBack && onBack && (
             <button
               onClick={onBack}
-              className="w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white hover:text-lime-400 transition-colors shadow-sm"
+              className="w-8 h-8 rounded-full bg-[#101010] border border-white/10 flex items-center justify-center text-white hover:text-[#A8FF00] transition-colors"
               title="Go back"
             >
-              <ChevronLeft className="w-5 h-5 text-zinc-300" />
+              <ChevronLeft className="w-4 h-4 text-zinc-300" />
             </button>
           )}
 
@@ -106,103 +106,82 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab('maker')}
             className="flex items-center space-x-2.5 cursor-pointer group"
           >
-            <div className="w-10 h-10 rounded-2xl bg-lime-400 text-black flex items-center justify-center shadow-lg shadow-lime-400/20 group-hover:scale-105 transition-transform">
-              <Shield className="w-5 h-5 text-black stroke-[2.5]" />
+            <div className="w-7 h-7 rounded-lg bg-[#A8FF00] text-black flex items-center justify-center shadow-md shadow-[#A8FF00]/25 group-hover:scale-105 transition-transform">
+              <Shield className="w-4 h-4 text-black stroke-[2.5]" />
             </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-lg font-extrabold text-white tracking-tight">
-                  TrueSpot
-                </span>
-                <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-lime-400/10 text-lime-400 border border-lime-400/25">
-                  <span className="w-1.5 h-1.5 rounded-full bg-lime-400 animate-pulse mr-1" />
-                  Solana Devnet
-                </span>
-              </div>
-              <p className="text-[11px] text-zinc-400 hidden sm:block font-medium">
-                Physical DePIN Oracle
-              </p>
-            </div>
+            <span className="text-lg font-bold text-white tracking-tight">
+              TrueSpot
+            </span>
           </div>
         </div>
 
-        {/* Center: Clean Two-Portal Switcher (CoinVex Pill Style) */}
-        <nav className="flex items-center bg-[#121212] p-1.5 rounded-full border border-zinc-800 shadow-inner">
+        {/* Center: CoinVex Floating Pill Switcher */}
+        <nav className="flex items-center bg-[#0D0D0D] p-1 rounded-full border border-white/[0.08] shadow-inner">
           {portals.map((portal) => {
             const isActive = activeTab === portal.id;
+            const Icon = portal.icon;
 
             return (
               <button
                 key={portal.id}
                 onClick={() => setActiveTab(portal.id)}
-                className={`flex items-center space-x-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all relative ${
+                className={`flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-medium transition-all relative ${
                   isActive
-                    ? 'bg-transparent border border-lime-400 text-lime-400 shadow-sm shadow-lime-400/10'
-                    : 'text-zinc-400 hover:text-white'
+                    ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/40 shadow-sm shadow-[#A8FF00]/10'
+                    : 'text-[#858585] hover:text-white'
                 }`}
               >
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
                 <span>{portal.label}</span>
                 {portal.badge > 0 && (
-                  <span className="ml-1 w-2 h-2 rounded-full bg-lime-400 animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00] animate-pulse" />
                 )}
               </button>
             );
           })}
         </nav>
 
-        {/* Right: Actions, Reset Engine & Wallet */}
-        <div className="flex items-center space-x-2 sm:space-x-2.5">
-          {/* Hackathon Reset Demo Engine */}
-          {onResetDemoState && (
-            <button
-              onClick={onResetDemoState}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-bold text-rose-400 hover:border-rose-500/40 transition-colors shadow-sm"
-              title="Reset All State to 0 for Clean Hackathon Demo"
-            >
-              <RotateCcw className="w-3.5 h-3.5 text-rose-400" />
-              <span className="hidden sm:inline">Reset Demo</span>
-            </button>
-          )}
+        {/* Right: CoinVex Avatar, User Greeting & Notification Bell */}
+        <div className="flex items-center space-x-3">
+          {/* User Greeting & Purple Avatar (CoinVex Signature) */}
+          <div
+            onClick={onOpenWalletModal}
+            className="flex items-center space-x-2.5 cursor-pointer hover:opacity-90 transition-opacity"
+            title="Switch User / Persona"
+          >
+            <span className="text-xs text-zinc-300 font-medium hidden sm:inline">
+              Hi, {displayWalletName}
+            </span>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 border border-purple-400/30 flex items-center justify-center text-xs font-bold text-white shadow-sm overflow-hidden">
+              <span>{displayWalletName.charAt(0)}</span>
+            </div>
+          </div>
 
-          {/* Supabase Status Button */}
+          {/* Quick Balance Pill */}
+          <div className="hidden md:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#101010] border border-white/[0.07] text-xs font-mono">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00] animate-pulse" />
+            <span className="text-[#A8FF00] font-bold">{displayBalance}</span>
+          </div>
+
+          {/* Circular Action/Settings Button (CoinVex Bell Icon) */}
+          <button
+            onClick={onOpenHowItWorks}
+            className="w-8 h-8 rounded-full bg-[#101010] border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+            title="System Guide & Information"
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Supabase PostGIS status if available */}
           {onOpenSupabaseModal && (
             <button
               onClick={onOpenSupabaseModal}
-              className="hidden lg:flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-semibold text-zinc-300 hover:text-white transition-colors shadow-sm"
-              title="Configure Supabase PostgreSQL + PostGIS Cloud"
+              className="w-8 h-8 rounded-full bg-[#101010] border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+              title="Database Sync Status"
             >
-              <Database className="w-3.5 h-3.5 text-lime-400" />
-              <span>PostGIS</span>
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  isSupabaseConnected ? 'bg-lime-400 animate-pulse' : 'bg-amber-400'
-                }`}
-              />
+              <Database className="w-3.5 h-3.5" />
             </button>
           )}
-
-          {/* How It Works Button */}
-          <button
-            onClick={onOpenHowItWorks}
-            className="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-semibold text-zinc-300 hover:text-white transition-colors shadow-sm"
-            title="How TrueSpot works"
-          >
-            <HelpCircle className="w-3.5 h-3.5 text-lime-400" />
-            <span className="hidden sm:inline">Guide</span>
-          </button>
-
-          {/* Active Wallet Persona Pill */}
-          <button
-            onClick={onOpenWalletModal}
-            className="flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#121212] border border-zinc-800 text-xs font-bold text-white hover:border-lime-400/50 transition-all"
-            title="Manage Solana Wallet / Demo Personas"
-          >
-            <span className="w-2 h-2 rounded-full bg-lime-400 animate-pulse" />
-            <span className="hidden sm:inline text-zinc-400 font-medium font-sans">
-              {displayWalletName}:
-            </span>
-            <span className="font-mono text-lime-400">{displayBalance}</span>
-          </button>
         </div>
       </div>
     </header>
