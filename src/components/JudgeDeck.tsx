@@ -70,29 +70,29 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-1 select-none">
-      <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-emerald-950/10 px-4 py-2.5 shadow-xs flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-slate-900/60 backdrop-blur-2xl rounded-2xl border border-white/10 px-4 py-2.5 shadow-2xl flex flex-wrap items-center justify-between gap-3">
         {/* Left: Real Device GPS & Coordinates Trigger */}
         <div className="flex items-center space-x-2 flex-wrap gap-y-1">
           <button
             onClick={onUseLiveGps}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#E8F5E9] text-[#1E5E38] border border-[#8BC34A]/40 hover:bg-[#C8E6C9] transition-all shadow-xs shrink-0"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all shadow-xs shrink-0"
             title="Auto-detect real GPS"
           >
-            <Navigation className="w-3.5 h-3.5 text-[#1E5E38]" />
+            <Navigation className="w-3.5 h-3.5 text-emerald-400" />
             <span>Real GPS</span>
           </button>
 
           <button
             onClick={() => setShowManualInput(!showManualInput)}
-            className="flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#F4F9F5] border border-emerald-950/10 text-[#6B7F72] hover:text-[#11291B] hover:bg-[#E8F5E9] transition-colors shrink-0"
+            className="flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10 transition-colors shrink-0"
             title="Type coordinates"
           >
-            <Edit3 className="w-3.5 h-3.5 text-[#1E5E38]" />
+            <Edit3 className="w-3.5 h-3.5 text-gray-400" />
             <span>Custom Coords</span>
           </button>
 
-          <div className="flex items-center space-x-1 text-xs text-[#11291B] font-medium bg-[#F4F9F5] px-3 py-1.5 rounded-full border border-gray-100">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#7CB342]" />
+          <div className="flex items-center space-x-1.5 text-xs text-gray-200 font-medium bg-black/40 px-3 py-1.5 rounded-full border border-white/10">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span className="truncate max-w-[200px] sm:max-w-xs">{currentLocationName}</span>
           </div>
         </div>
@@ -105,11 +105,11 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
               if (e.target.value) onSelectPreset(e.target.value);
             }}
             defaultValue=""
-            className="bg-[#F4F9F5] text-xs text-[#11291B] font-medium border border-emerald-950/10 rounded-full px-3 py-1.5 outline-none cursor-pointer hover:bg-[#E8F5E9] transition-colors"
+            className="bg-black/40 text-xs text-gray-200 font-medium border border-white/10 rounded-full px-3 py-1.5 outline-none cursor-pointer hover:border-white/20 transition-colors"
           >
-            <option value="" disabled>Jump to City...</option>
+            <option value="" disabled className="bg-slate-900 text-gray-400">Jump to City...</option>
             {JUDGE_PRESETS.map((p) => (
-              <option key={p.id} value={p.id}>
+              <option key={p.id} value={p.id} className="bg-slate-900 text-white">
                 {p.name}
               </option>
             ))}
@@ -119,16 +119,16 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
           <button
             onClick={handleAirdrop}
             disabled={airdropping}
-            className="flex items-center space-x-1.5 bg-[#0F3822] hover:bg-[#154A2E] text-white px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all shadow-xs"
+            className="flex items-center space-x-1.5 bg-gradient-to-r from-emerald-500/90 to-teal-500/90 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold px-3.5 py-1.5 rounded-full text-xs transition-all shadow-[0_0_15px_rgba(16,185,129,0.25)]"
             title="Airdrop 1 Devnet SOL"
           >
-            <Coins className="w-3.5 h-3.5 text-[#99E35E]" />
+            <Coins className="w-3.5 h-3.5 text-slate-950" />
             <span>{airdropping ? 'Requesting...' : '+1 Devnet SOL'}</span>
           </button>
 
           <button
             onClick={onRefreshData}
-            className="w-8 h-8 rounded-full bg-[#F4F9F5] border border-emerald-950/10 flex items-center justify-center text-[#6B7F72] hover:text-[#11291B] hover:bg-[#E8F5E9] transition-colors"
+            className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
             title="Refresh oracle data"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -138,32 +138,32 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
 
       {/* Manual Coordinates Input Form */}
       {showManualInput && (
-        <form onSubmit={handleApplyManual} className="mt-2 p-3 bg-white rounded-2xl border border-emerald-950/10 shadow-sm flex flex-wrap gap-2 text-xs items-center">
-          <span className="text-[11px] font-bold text-[#11291B] mr-2">ENTER COORDINATES:</span>
+        <form onSubmit={handleApplyManual} className="mt-2 p-3 bg-slate-900/90 rounded-2xl border border-white/10 shadow-2xl backdrop-blur-2xl flex flex-wrap gap-2 text-xs items-center">
+          <span className="text-[11px] font-bold text-gray-300 mr-2">ENTER COORDINATES:</span>
           <input
             type="text"
             placeholder="Latitude (e.g. 27.7172)"
             value={manualLat}
             onChange={(e) => setManualLat(e.target.value)}
-            className="bg-[#F4F9F5] border border-emerald-900/10 px-3 py-1.5 rounded-xl text-[#11291B] text-xs w-36 outline-none"
+            className="bg-black/50 border border-white/10 px-3 py-1.5 rounded-xl text-white text-xs w-36 outline-none focus:border-emerald-400/50"
           />
           <input
             type="text"
             placeholder="Longitude (e.g. 85.3240)"
             value={manualLng}
             onChange={(e) => setManualLng(e.target.value)}
-            className="bg-[#F4F9F5] border border-emerald-900/10 px-3 py-1.5 rounded-xl text-[#11291B] text-xs w-36 outline-none"
+            className="bg-black/50 border border-white/10 px-3 py-1.5 rounded-xl text-white text-xs w-36 outline-none focus:border-emerald-400/50"
           />
           <input
             type="text"
             placeholder="Label (e.g. My Location)"
             value={manualLabel}
             onChange={(e) => setManualLabel(e.target.value)}
-            className="bg-[#F4F9F5] border border-emerald-900/10 px-3 py-1.5 rounded-xl text-[#11291B] text-xs flex-1 min-w-[140px] outline-none"
+            className="bg-black/50 border border-white/10 px-3 py-1.5 rounded-xl text-white text-xs flex-1 min-w-[140px] outline-none focus:border-emerald-400/50"
           />
           <button
             type="submit"
-            className="bg-[#0F3822] text-white font-semibold px-4 py-1.5 rounded-xl hover:bg-[#154A2E] transition-colors"
+            className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-1.5 rounded-xl transition-colors shadow-sm"
           >
             Apply Location
           </button>
@@ -171,7 +171,7 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
       )}
 
       {statusMsg && (
-        <div className="mt-1.5 text-xs text-[#1E5E38] font-semibold text-center animate-fadeIn">
+        <div className="mt-1.5 text-xs text-emerald-400 font-semibold text-center animate-fadeIn">
           {statusMsg}
         </div>
       )}

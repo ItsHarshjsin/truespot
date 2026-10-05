@@ -162,19 +162,19 @@ export const StateScreen: React.FC<StateScreenProps> = ({
   return (
     <div className="space-y-6 pb-6 max-w-5xl mx-auto">
       {/* 1. Header Card with Live Ticker & Quick Bounty Switcher */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-950/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-2xl border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center space-x-2 mb-1">
-            <span className="text-xs font-bold text-[#6B7F72] uppercase tracking-wider">
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
               Physical Oracle Settlement
             </span>
-            <span className="text-[10px] font-mono text-[#1E5E38] bg-[#E8F5E9] px-2 py-0.5 rounded-full inline-flex items-center space-x-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#7CB342] animate-pulse" />
+            <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full inline-flex items-center space-x-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>LIVE CLOCK: {minutesAge}m {secondsAge}s ago</span>
             </span>
           </div>
 
-          <h2 className="text-xl font-bold text-[#11291B] tracking-tight">
+          <h2 className="text-xl font-bold text-white tracking-tight">
             {selectedBounty ? selectedBounty.place_name : 'Oracle State'}
           </h2>
         </div>
@@ -184,10 +184,10 @@ export const StateScreen: React.FC<StateScreenProps> = ({
             <select
               value={selectedBounty?.id || ''}
               onChange={(e) => handleSelectBounty(e.target.value)}
-              className="bg-[#F4F9F5] text-xs text-[#11291B] font-medium border border-gray-200 rounded-full px-3 py-1.5 outline-none max-w-[200px] truncate"
+              className="bg-black/40 text-xs text-white font-medium border border-white/10 rounded-full px-3 py-1.5 outline-none max-w-[200px] truncate"
             >
               {bounties.map((b) => (
-                <option key={b.id} value={b.id}>
+                <option key={b.id} value={b.id} className="bg-slate-900 text-white">
                   {b.place_name} ({b.status})
                 </option>
               ))}
@@ -198,10 +198,10 @@ export const StateScreen: React.FC<StateScreenProps> = ({
             <span
               className={`text-xs px-3.5 py-1.5 rounded-full font-bold ${
                 selectedBounty.status === 'PAID'
-                  ? 'bg-purple-100 text-purple-900 border border-purple-200'
+                  ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
                   : selectedBounty.status === 'ANSWERED'
-                  ? 'bg-[#E8F5E9] text-[#1E5E38] border border-[#8BC34A]/40'
-                  : 'bg-amber-100 text-amber-900 border border-amber-200'
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
               }`}
             >
               {selectedBounty.status}
@@ -216,7 +216,7 @@ export const StateScreen: React.FC<StateScreenProps> = ({
           {/* Left Column (6 cols on desktop): Tactile Skeuomorphic Truth & Freshness Gauges */}
           <div className="lg:col-span-6 space-y-5">
             {/* Tactile Spectrum Truth Gauge Card (Reference Screen 3) */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-950/5">
+            <div className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-2xl border border-white/10">
               <SpectrumTruthMeter
                 confidencePercent={confidenceScore}
                 agreeCount={agreeCount}
@@ -237,17 +237,17 @@ export const StateScreen: React.FC<StateScreenProps> = ({
           <div className="lg:col-span-6 space-y-5">
             {/* Evidence Thumbnail Card */}
             {report && (
-              <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-950/5 space-y-4">
+              <div className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-2xl border border-white/10 space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#6B7F72] uppercase">
+                  <span className="text-xs font-bold text-gray-400 uppercase">
                     Verified Observation
                   </span>
-                  <span className="text-xs font-bold font-mono text-[#1E5E38] bg-emerald-100 px-3 py-1 rounded-full">
+                  <span className="text-xs font-bold font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
                     {selectedBounty.amount_sol} SOL Escrowed
                   </span>
                 </div>
 
-                <div className="rounded-2xl overflow-hidden border border-gray-100 bg-black aspect-video flex items-center justify-center">
+                <div className="rounded-2xl overflow-hidden border border-white/10 bg-black aspect-video flex items-center justify-center">
                   <img
                     src={report.photo_url}
                     alt="Physical Evidence"
@@ -255,9 +255,9 @@ export const StateScreen: React.FC<StateScreenProps> = ({
                   />
                 </div>
 
-                <div className="p-3.5 bg-[#F4F9F5] rounded-2xl flex items-center justify-between">
-                  <span className="text-xs font-semibold text-[#6B7F72]">Confirmed Claim:</span>
-                  <span className="text-xs font-bold text-[#0F3822] bg-white px-3 py-1 rounded-full border border-gray-200">
+                <div className="p-3.5 bg-black/40 border border-white/5 rounded-2xl flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-400">Confirmed Claim:</span>
+                  <span className="text-xs font-bold text-emerald-300 bg-emerald-500/15 px-3 py-1 rounded-full border border-emerald-500/30">
                     {report.answer_text}
                   </span>
                 </div>
@@ -266,37 +266,37 @@ export const StateScreen: React.FC<StateScreenProps> = ({
 
             {/* Payout Receipt */}
             {payoutSig && (
-              <div className="p-5 bg-[#E8F5E9] rounded-3xl border border-[#8BC34A]/40 text-xs text-[#1E5E38] space-y-3">
+              <div className="p-5 bg-emerald-950/30 rounded-3xl border border-emerald-500/30 text-xs text-emerald-300 space-y-3 shadow-inner">
                 <div className="flex items-center justify-between font-bold">
                   <span className="flex items-center space-x-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#7CB342]" />
-                    <span className="text-sm">Solana Devnet Escrow Settled</span>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span className="text-sm text-white">Solana Devnet Escrow Settled</span>
                   </span>
                   <a
                     href={`https://solscan.io/tx/${payoutSig}?cluster=devnet`}
                     target="_blank"
                     rel="noreferrer"
-                    className="underline flex items-center space-x-1 text-[#0F3822] font-semibold"
+                    className="underline flex items-center space-x-1 text-emerald-400 hover:text-emerald-300 font-semibold"
                   >
                     <span>Solscan</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
-                <div className="text-xs space-y-1 pt-1 text-[#11291B]/80 font-mono">
+                <div className="text-xs space-y-1 pt-1 text-gray-300 font-mono">
                   <div>• Spotter Payout (80%): +{(selectedBounty.amount_sol * 0.8).toFixed(3)} SOL</div>
                   <div>• Consensus Verifiers (20%): +{(selectedBounty.amount_sol * 0.2).toFixed(3)} SOL Split</div>
                 </div>
               </div>
             )}
 
-            {/* Deep Forest Green Primary CTA Button */}
+            {/* Primary Action Button */}
             {selectedBounty.status === 'ANSWERED' && (
               <button
                 onClick={handleExecutePayout}
                 disabled={isPayingOut}
-                className="w-full py-4 px-6 rounded-full bg-[#0F3822] hover:bg-[#154A2E] text-white font-semibold text-base shadow-sm flex items-center justify-center space-x-2 transition-all active:scale-[0.98] disabled:opacity-50"
+                className="w-full py-4 px-6 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-base shadow-xl shadow-emerald-950/50 flex items-center justify-center space-x-2 transition-all active:scale-[0.98] disabled:opacity-50"
               >
-                <Send className="w-4 h-4 text-[#99E35E]" />
+                <Send className="w-4 h-4 text-emerald-200" />
                 <span>{isPayingOut ? 'Settling on Solana Devnet...' : `Execute Payout (${selectedBounty.amount_sol} SOL)`}</span>
               </button>
             )}
@@ -304,20 +304,20 @@ export const StateScreen: React.FC<StateScreenProps> = ({
         </div>
 
         {/* Physical Oracle Consumer API & Solana CPI Integration Panel */}
-        <div className="mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-emerald-950/5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-gray-100 gap-4">
+        <div className="mt-8 bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-white/10 gap-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#E8F5E9] border border-[#8BC34A]/30 flex items-center justify-center text-[#1E5E38]">
-                <Cpu className="w-5 h-5 text-[#2E7D32]" />
+              <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                <Cpu className="w-5 h-5 text-emerald-400" />
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <h3 className="text-base font-bold text-[#0F3822]">Physical Oracle Consumer Gateway</h3>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#99E35E]/20 text-[#1E5E38]">
+                  <h3 className="text-base font-bold text-white">Physical Oracle Consumer Gateway</h3>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                     Anchor CPI Ready
                   </span>
                 </div>
-                <p className="text-xs text-[#6B7F72]">
+                <p className="text-xs text-gray-400">
                   Query verified real-world ground truth directly from Solana smart contracts, AI agents, or REST API.
                 </p>
               </div>
@@ -325,7 +325,7 @@ export const StateScreen: React.FC<StateScreenProps> = ({
 
             <button
               onClick={() => setIsOracleDrawerOpen(!isOracleDrawerOpen)}
-              className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full border border-gray-200 text-xs font-semibold text-[#0F3822] hover:bg-[#F4F9F5] transition-colors self-start sm:self-auto"
+              className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full border border-white/15 text-xs font-semibold text-emerald-300 hover:bg-white/5 transition-colors self-start sm:self-auto"
             >
               <span>{isOracleDrawerOpen ? 'Collapse Integration' : 'View Code & Payload'}</span>
               {isOracleDrawerOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -335,13 +335,13 @@ export const StateScreen: React.FC<StateScreenProps> = ({
           {isOracleDrawerOpen && (
             <div className="mt-5 space-y-4">
               {/* Navigation Tabs */}
-              <div className="flex flex-wrap gap-2 border-b border-gray-100 pb-3">
+              <div className="flex flex-wrap gap-2 border-b border-white/10 pb-3">
                 <button
                   onClick={() => setOracleTab('rust')}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1.5 transition-colors ${
                     oracleTab === 'rust'
-                      ? 'bg-[#0F3822] text-white shadow-sm'
-                      : 'bg-[#F4F9F5] text-[#6B7F72] hover:text-[#0F3822]'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm'
+                      : 'bg-white/5 text-gray-400 hover:text-white'
                   }`}
                 >
                   <Cpu className="w-3.5 h-3.5" />
@@ -352,8 +352,8 @@ export const StateScreen: React.FC<StateScreenProps> = ({
                   onClick={() => setOracleTab('ts')}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1.5 transition-colors ${
                     oracleTab === 'ts'
-                      ? 'bg-[#0F3822] text-white shadow-sm'
-                      : 'bg-[#F4F9F5] text-[#6B7F72] hover:text-[#0F3822]'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm'
+                      : 'bg-white/5 text-gray-400 hover:text-white'
                   }`}
                 >
                   <Code2 className="w-3.5 h-3.5" />
@@ -364,8 +364,8 @@ export const StateScreen: React.FC<StateScreenProps> = ({
                   onClick={() => setOracleTab('rest')}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1.5 transition-colors ${
                     oracleTab === 'rest'
-                      ? 'bg-[#0F3822] text-white shadow-sm'
-                      : 'bg-[#F4F9F5] text-[#6B7F72] hover:text-[#0F3822]'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm'
+                      : 'bg-white/5 text-gray-400 hover:text-white'
                   }`}
                 >
                   <Database className="w-3.5 h-3.5" />
@@ -376,8 +376,8 @@ export const StateScreen: React.FC<StateScreenProps> = ({
                   onClick={() => setOracleTab('payload')}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1.5 transition-colors ${
                     oracleTab === 'payload'
-                      ? 'bg-[#0F3822] text-white shadow-sm'
-                      : 'bg-[#F4F9F5] text-[#6B7F72] hover:text-[#0F3822]'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm'
+                      : 'bg-white/5 text-gray-400 hover:text-white'
                   }`}
                 >
                   <Radio className="w-3.5 h-3.5" />

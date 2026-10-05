@@ -201,8 +201,12 @@ export const App: React.FC = () => {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          {/* Full Web Application Canvas (Soft Tinted Mint-White #F4F9F5) */}
-          <div className="min-h-screen bg-[#F4F9F5] text-[#11291B] flex flex-col selection:bg-[#99E35E] selection:text-black">
+          {/* Full Web Application Canvas - Dark Space Glassmorphism */}
+          <div className="min-h-screen bg-gradient-to-br from-slate-950 via-[#090d1a] to-[#02050e] text-slate-100 flex flex-col font-sans selection:bg-emerald-500/30 selection:text-emerald-300 relative overflow-x-hidden">
+            {/* Ambient Cosmic Glow Backdrops */}
+            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-1/3 right-10 w-[500px] h-[500px] bg-teal-500/5 rounded-full blur-3xl pointer-events-none" />
+
             {/* Global Floating Toast Notifications */}
             <ToastContainer toasts={toasts} onDismiss={dismissToast} />
 
@@ -246,9 +250,9 @@ export const App: React.FC = () => {
             {/* Browser Permission Guidance Banner if blocked */}
             {gpsError && (
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-2">
-                <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-center justify-between shadow-xs">
+                <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 flex items-center justify-between shadow-lg backdrop-blur-md">
                   <div className="flex items-center space-x-2">
-                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
                     <span className="font-medium leading-tight">
                       Device location blocked by browser: Click the 🔒 lock icon in your address bar → Allow Location.
                     </span>
@@ -256,13 +260,13 @@ export const App: React.FC = () => {
                   <div className="flex items-center space-x-2 shrink-0 ml-3">
                     <button
                       onClick={() => fetchDeviceGps(true)}
-                      className="px-3 py-1 rounded-full bg-amber-200 text-amber-900 text-xs font-bold hover:bg-amber-300 transition-colors shrink-0"
+                      className="px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 text-xs font-bold hover:bg-amber-400/30 transition-colors shrink-0"
                     >
                       Retry GPS
                     </button>
                     <button
                       onClick={() => setGpsError(null)}
-                      className="w-6 h-6 rounded-full hover:bg-amber-200/60 flex items-center justify-center text-amber-800 transition-colors"
+                      className="w-6 h-6 rounded-full hover:bg-amber-400/20 flex items-center justify-center text-amber-300 transition-colors"
                       title="Dismiss"
                     >
                       ✕
@@ -305,30 +309,30 @@ export const App: React.FC = () => {
               )}
             </main>
 
-            {/* 4. Desktop Web Footer */}
-            <footer className="w-full bg-white border-t border-emerald-950/10 py-6 mt-12 text-xs text-[#6B7F72] select-none">
+            {/* 4. Desktop Web Footer - Dark Glassmorphism */}
+            <footer className="w-full bg-slate-950/70 backdrop-blur-xl border-t border-white/10 py-6 mt-12 text-xs text-gray-400 select-none">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 rounded-lg bg-[#0F3822] text-[#99E35E] flex items-center justify-center font-bold text-xs">
+                  <div className="w-6 h-6 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold text-xs shadow-[0_0_10px_rgba(16,185,129,0.2)]">
                     T
                   </div>
-                  <span className="font-bold text-[#11291B]">TrueSpot Protocol</span>
+                  <span className="font-bold text-white">TrueSpot Protocol</span>
                   <span>•</span>
                   <span>Physical DePIN Oracle on Solana Devnet</span>
                 </div>
 
-                <div className="flex items-center space-x-4 text-[11px] font-medium">
+                <div className="flex items-center space-x-4 text-[11px] font-medium text-gray-400">
                   <span>Colosseum Hackathon MVP</span>
                   <span>•</span>
                   <span>OpenStreetMap Geofence (200m)</span>
                   <span>•</span>
-                  <span className="font-mono text-[#0F3822]">Escrow: 9WzD...AWWM</span>
+                  <span className="font-mono text-emerald-400">Escrow: 9WzD...AWWM</span>
                 </div>
               </div>
             </footer>
 
-            {/* Mobile Bottom Floating Navigation Bar (Only on mobile screens) */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-emerald-950/10 px-4 py-2 flex items-center justify-around select-none">
+            {/* Mobile Bottom Floating Navigation Bar - Dark Glassmorphism */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/90 backdrop-blur-2xl border-t border-white/10 px-4 py-2 flex items-center justify-around select-none">
               {[
                 { id: 'maker', label: 'Task Maker', icon: Shield },
                 { id: 'receiver', label: 'Field Receiver', icon: Compass },
@@ -341,10 +345,10 @@ export const App: React.FC = () => {
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
                     className={`relative flex flex-col items-center py-1 px-3 rounded-2xl text-[11px] font-semibold transition-all ${
-                      isActive ? 'text-[#0F3822] font-bold' : 'text-[#6B7F72] hover:text-[#11291B]'
+                      isActive ? 'text-emerald-400 font-bold' : 'text-gray-400 hover:text-white'
                     }`}
                   >
-                    <div className={`p-1 rounded-full ${isActive ? 'bg-[#E8F5E9]' : ''}`}>
+                    <div className={`p-1 rounded-full ${isActive ? 'bg-emerald-500/20 text-emerald-300' : ''}`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     <span className="mt-0.5">{item.label}</span>

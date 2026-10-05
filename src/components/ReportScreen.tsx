@@ -358,33 +358,33 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
         {/* Left Column (5 cols on desktop): Spot Details & Observed Truth Input */}
         <div className="lg:col-span-5 space-y-5">
           {/* 1. Target Bounty Header Card */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-950/5">
+          <div className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-2xl border border-white/10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#E8F5E9] text-[#1E5E38]">
+              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 Target Spot
               </span>
-              <span className="text-xs font-bold font-mono text-[#1E5E38] bg-emerald-100 px-2.5 py-0.5 rounded-full">
+              <span className="text-xs font-bold font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
                 Reward: {bounty.amount_sol} SOL
               </span>
             </div>
 
-            <h2 className="text-lg font-bold text-[#11291B] tracking-tight">
+            <h2 className="text-lg font-bold text-white tracking-tight">
               {bounty.place_name}
             </h2>
-            <p className="text-sm text-[#6B7F72] mt-0.5 leading-snug">
+            <p className="text-sm text-gray-400 mt-0.5 leading-snug">
               "{bounty.question}"
             </p>
 
             {bountiesList.length > 1 && (
-              <div className="mt-3 pt-3 border-t border-gray-100 flex items-center space-x-2">
-                <span className="text-xs text-[#6B7F72]">Switch:</span>
+              <div className="mt-3 pt-3 border-t border-white/10 flex items-center space-x-2">
+                <span className="text-xs text-gray-400">Switch:</span>
                 <select
                   value={selectedBountyId}
                   onChange={(e) => handleSelectBounty(e.target.value)}
-                  className="bg-[#F4F9F5] text-xs text-[#11291B] font-medium border border-gray-200 rounded-xl px-2.5 py-1 outline-none"
+                  className="bg-black/40 text-xs text-white font-medium border border-white/10 rounded-xl px-2.5 py-1 outline-none"
                 >
                   {bountiesList.map((b) => (
-                    <option key={b.id} value={b.id}>
+                    <option key={b.id} value={b.id} className="bg-slate-900 text-white">
                       {b.place_name} ({b.amount_sol} SOL)
                     </option>
                   ))}
@@ -394,8 +394,8 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
           </div>
 
           {/* 2. Observed Answer Selection */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-950/5">
-            <label className="block text-xs font-bold text-[#6B7F72] uppercase tracking-wider mb-2.5">
+          <div className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-2xl border border-white/10">
+            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2.5">
               Observed Place Truth
             </label>
 
@@ -412,8 +412,8 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                   onClick={() => setAnswerText(preset)}
                   className={`py-2 px-3 rounded-2xl text-xs font-semibold border transition-all text-center ${
                     answerText === preset
-                      ? 'bg-[#0F3822] text-white border-[#0F3822]'
-                      : 'bg-[#F4F9F5] text-[#6B7F72] border-gray-100 hover:text-[#11291B]'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-transparent shadow-md shadow-emerald-950/40'
+                      : 'bg-black/40 text-gray-400 border-white/10 hover:text-white hover:border-white/20'
                   }`}
                 >
                   {preset}
@@ -426,24 +426,24 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
               value={answerText}
               onChange={(e) => setAnswerText(e.target.value)}
               placeholder="Observation details..."
-              className="w-full bg-[#F4F9F5] border border-gray-200 focus:border-[#0F3822] rounded-2xl px-4 py-2.5 text-xs text-[#11291B] outline-none"
+              className="w-full bg-black/40 border border-white/10 focus:border-emerald-500 rounded-2xl px-4 py-2.5 text-xs text-white placeholder-gray-500 outline-none"
               required
             />
           </div>
 
           {/* 3. Hardware Telemetry Card */}
           {telemetry && fingerprint && (
-            <div className="p-4 bg-[#E8F5E9] rounded-3xl border border-[#8BC34A]/40 text-xs text-[#1E5E38] space-y-2">
+            <div className="p-4 bg-emerald-950/30 rounded-3xl border border-emerald-500/30 text-xs text-emerald-300 space-y-2 shadow-inner">
               <div className="flex items-center justify-between font-bold">
                 <span className="flex items-center space-x-1.5">
-                  <ShieldCheck className="w-4 h-4 text-[#7CB342]" />
-                  <span>Hardware Stamped Evidence</span>
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  <span className="text-white">Hardware Stamped Evidence</span>
                 </span>
-                <span className="text-[10px] bg-white px-2 py-0.5 rounded-full font-mono text-[#0F3822]">
+                <span className="text-[10px] bg-emerald-500/20 px-2 py-0.5 rounded-full font-mono text-emerald-300 border border-emerald-500/30">
                   SHA-256 Valid
                 </span>
               </div>
-              <div className="text-[11px] font-mono text-[#11291B]/80 space-y-0.5">
+              <div className="text-[11px] font-mono text-gray-300 space-y-0.5">
                 <div>• Gyroscope Human Tremor: {telemetry.gyroVariance}g</div>
                 <div>• Devnet Blockhash: {telemetry.blockhash.slice(0, 16)}...</div>
                 <div>• GPS Fix: {telemetry.lat.toFixed(4)}, {telemetry.lng.toFixed(4)}</div>
@@ -453,20 +453,20 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
         </div>
 
         {/* Right Column (7 cols on desktop): Camera Viewfinder & Submission */}
-        <div className="lg:col-span-7 bg-white rounded-3xl p-6 shadow-sm border border-emerald-950/5 space-y-4">
-          <label className="block text-xs font-bold text-[#6B7F72] uppercase tracking-wider">
+        <div className="lg:col-span-7 bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-2xl border border-white/10 space-y-4">
+          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider">
             Physical Camera Verification
           </label>
 
           {photoDataUrl ? (
-            <div className="relative rounded-2xl overflow-hidden border-2 border-[#8BC34A]/50 bg-black aspect-video flex items-center justify-center shadow-xs">
+            <div className="relative rounded-2xl overflow-hidden border-2 border-emerald-500/50 bg-black aspect-video flex items-center justify-center shadow-lg">
               <img
                 src={photoDataUrl}
                 alt="Captured Evidence"
                 className="w-full h-full object-contain"
               />
-              <div className="absolute top-3 left-3 bg-[#0F3822]/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-white flex items-center space-x-1.5 shadow-sm">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#99E35E]" />
+              <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-white flex items-center space-x-1.5 border border-white/15 shadow-sm">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Hardware Verified Frame</span>
               </div>
               <button
@@ -475,13 +475,13 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                   setFingerprint(null);
                   setTelemetry(null);
                 }}
-                className="absolute top-3 right-3 bg-white/90 text-[#11291B] text-xs px-3 py-1 rounded-full font-semibold shadow-xs hover:bg-white"
+                className="absolute top-3 right-3 bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1 rounded-full font-semibold border border-white/20 backdrop-blur-md transition-colors"
               >
                 Retake
               </button>
             </div>
           ) : isStreaming ? (
-            <div className="relative rounded-2xl overflow-hidden border-2 border-[#0F3822] bg-black aspect-video flex flex-col items-center justify-center shadow-md">
+            <div className="relative rounded-2xl overflow-hidden border-2 border-emerald-500/60 bg-black aspect-video flex flex-col items-center justify-center shadow-2xl">
               <video
                 ref={videoRef}
                 autoPlay
@@ -491,13 +491,13 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
               />
 
               {/* Tactical HUD Corner Marks */}
-              <div className="absolute top-3 left-3 border-t-2 border-l-2 border-[#99E35E] w-6 h-6 pointer-events-none" />
-              <div className="absolute top-3 right-3 border-t-2 border-r-2 border-[#99E35E] w-6 h-6 pointer-events-none" />
-              <div className="absolute bottom-16 left-3 border-b-2 border-l-2 border-[#99E35E] w-6 h-6 pointer-events-none" />
-              <div className="absolute bottom-16 right-3 border-b-2 border-r-2 border-[#99E35E] w-6 h-6 pointer-events-none" />
+              <div className="absolute top-3 left-3 border-t-2 border-l-2 border-emerald-400 w-6 h-6 pointer-events-none" />
+              <div className="absolute top-3 right-3 border-t-2 border-r-2 border-emerald-400 w-6 h-6 pointer-events-none" />
+              <div className="absolute bottom-16 left-3 border-b-2 border-l-2 border-emerald-400 w-6 h-6 pointer-events-none" />
+              <div className="absolute bottom-16 right-3 border-b-2 border-r-2 border-emerald-400 w-6 h-6 pointer-events-none" />
 
               {/* Viewfinder Target Label */}
-              <div className="absolute top-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-mono text-[#99E35E] border border-[#8BC34A]/40">
+              <div className="absolute top-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-mono text-emerald-400 border border-emerald-500/40">
                 LIVE SENSOR STREAM • {bounty.place_name}
               </div>
 
@@ -515,10 +515,10 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                 <button
                   type="button"
                   onClick={captureLiveFrame}
-                  className="w-14 h-14 rounded-full bg-[#0F3822] border-4 border-[#99E35E] shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-white"
+                  className="w-14 h-14 rounded-full bg-emerald-600 border-4 border-emerald-400 shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-white"
                   title="Snap Evidence Photo"
                 >
-                  <Camera className="w-6 h-6 text-[#99E35E]" />
+                  <Camera className="w-6 h-6 text-white" />
                 </button>
 
                 <button
@@ -531,14 +531,14 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
               </div>
             </div>
           ) : (
-            <div className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center bg-[#F4F9F5]">
-              <div className="w-14 h-14 mx-auto rounded-full bg-emerald-100 flex items-center justify-center mb-3 text-[#1E5E38]">
+            <div className="border-2 border-dashed border-white/10 rounded-2xl p-8 text-center bg-black/30">
+              <div className="w-14 h-14 mx-auto rounded-full bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center mb-3 text-emerald-400">
                 <Camera className="w-7 h-7" />
               </div>
-              <h3 className="text-base font-bold text-[#11291B] mb-1">
+              <h3 className="text-base font-bold text-white mb-1">
                 Live Evidence Capture
               </h3>
-              <p className="text-xs text-[#6B7F72] max-w-sm mx-auto mb-5 leading-relaxed">
+              <p className="text-xs text-gray-400 max-w-sm mx-auto mb-5 leading-relaxed">
                 Requires real camera with involuntary hand-tremor biometric verification and Solana blockhash nonce.
               </p>
 
@@ -546,16 +546,16 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                 <button
                   type="button"
                   onClick={startCameraStream}
-                  className="flex-1 py-3.5 px-5 rounded-full bg-[#0F3822] hover:bg-[#154A2E] text-white text-sm font-semibold flex items-center justify-center space-x-2 shadow-sm transition-all"
+                  className="flex-1 py-3.5 px-5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-semibold flex items-center justify-center space-x-2 shadow-lg shadow-emerald-950/50 transition-all"
                 >
-                  <Camera className="w-4 h-4 text-[#99E35E]" />
+                  <Camera className="w-4 h-4 text-emerald-200" />
                   <span>Start Live Viewfinder</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex-1 py-3 px-5 rounded-full bg-white hover:bg-gray-50 text-[#11291B] border border-gray-200 text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all"
+                  className="flex-1 py-3 px-5 rounded-full bg-white/5 hover:bg-white/10 text-white border border-white/10 text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all"
                 >
                   <span>Upload File</span>
                 </button>
@@ -563,9 +563,9 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                 <button
                   type="button"
                   onClick={handleGenerateFrame}
-                  className="flex-1 py-3 px-5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-[#0F3822] border border-emerald-200/60 text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all"
+                  className="flex-1 py-3 px-5 rounded-full bg-white/5 hover:bg-white/10 text-emerald-300 border border-white/10 text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-[#7CB342]" />
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Simulate Frame</span>
                 </button>
               </div>
@@ -574,19 +574,19 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
 
           {/* Telemetry Indicator */}
           {measuringSensors && (
-            <p className="text-xs font-semibold text-[#1E5E38] text-center animate-pulse">
+            <p className="text-xs font-semibold text-emerald-400 text-center animate-pulse">
               Analyzing accelerometer tremor & stamping live Solana blockhash...
             </p>
           )}
 
-          {errorMsg && <p className="text-xs text-rose-600 font-medium px-2">{errorMsg}</p>}
+          {errorMsg && <p className="text-xs text-rose-400 font-medium px-2">{errorMsg}</p>}
 
           <button
             onClick={handleSubmitReport}
             disabled={!photoDataUrl || submitting}
-            className="w-full py-4 px-6 rounded-full bg-[#0F3822] hover:bg-[#154A2E] text-white font-semibold text-base shadow-sm flex items-center justify-center space-x-2 transition-all active:scale-[0.98] disabled:opacity-40"
+            className="w-full py-4 px-6 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-base shadow-xl shadow-emerald-950/60 flex items-center justify-center space-x-2 transition-all active:scale-[0.98] disabled:opacity-40"
           >
-            <ShieldCheck className="w-5 h-5 text-[#99E35E]" />
+            <ShieldCheck className="w-5 h-5 text-emerald-200" />
             <span>{submitting ? 'Submitting to Solana...' : 'Submit Evidence & Claim Bounty'}</span>
           </button>
         </div>

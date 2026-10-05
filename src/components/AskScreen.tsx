@@ -132,46 +132,46 @@ export const AskScreen: React.FC<AskScreenProps> = ({
         {/* Left Column (5 cols on desktop): Escrow Vault Details & 100% Payout Model */}
         <div className="lg:col-span-5 space-y-5">
           {/* Hero Escrow Bounty Card */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-950/5 text-center">
-            <span className="text-xs font-bold text-[#6B7F72] uppercase tracking-wider block mb-2">
+          <div className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-2xl border border-white/10 text-center">
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">
               Escrow Bounty Deposit
             </span>
             <div className="flex items-baseline justify-center space-x-2">
-              <span className="text-6xl font-extrabold text-[#11291B] tracking-tight">
+              <span className="text-6xl font-extrabold text-white tracking-tight drop-shadow-md">
                 {amountSol}
               </span>
-              <span className="text-2xl font-bold text-[#6B7F72]">SOL</span>
+              <span className="text-2xl font-bold text-emerald-400">SOL</span>
             </div>
 
             <div className="mt-3 flex items-center justify-center">
-              <span className="bg-emerald-100 text-[#1E5E38] text-xs px-3 py-1 rounded-full font-semibold">
+              <span className="bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-xs px-3.5 py-1 rounded-full font-semibold shadow-[0_0_15px_rgba(16,185,129,0.15)]">
                 Locked in Solana Devnet Vault
               </span>
             </div>
 
             {/* 100% Payout Breakdown for Hackathon Simplicity */}
-            <div className="mt-5 pt-4 border-t border-gray-100 text-left space-y-2.5 text-xs text-[#6B7F72]">
+            <div className="mt-5 pt-4 border-t border-white/10 text-left space-y-2.5 text-xs text-gray-400">
               <div className="flex items-center justify-between">
                 <span>Worker Payout:</span>
-                <span className="font-mono font-bold text-[#0F3822]">
+                <span className="font-mono font-bold text-emerald-400">
                   100% ({amountSol.toFixed(2)} SOL upon approval)
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Geofence Radius:</span>
-                <span className="font-semibold text-[#11291B]">Strict 200m Physical Radius</span>
+                <span className="font-semibold text-gray-200">Strict 200m Physical Radius</span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Hardware Proof:</span>
-                <span className="font-semibold text-[#1E5E38]">Biometric Gyro + SHA-256</span>
+                <span className="font-semibold text-emerald-400">Biometric Gyro + SHA-256</span>
               </div>
             </div>
           </div>
 
           {/* Quick Idea Prompts */}
-          <div className="bg-white rounded-3xl p-5 shadow-sm border border-emerald-950/5 space-y-2.5">
-            <div className="flex items-center space-x-1.5 text-xs font-bold text-[#11291B]">
-              <Sparkles className="w-4 h-4 text-[#7CB342]" />
+          <div className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-5 shadow-2xl border border-white/10 space-y-2.5">
+            <div className="flex items-center space-x-1.5 text-xs font-bold text-gray-200">
+              <Sparkles className="w-4 h-4 text-emerald-400" />
               <span>1-Click Prompt Ideas</span>
             </div>
             <div className="space-y-1.5">
@@ -180,7 +180,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                   type="button"
                   key={idx}
                   onClick={() => setQuestion(p)}
-                  className="w-full text-left p-2.5 rounded-2xl bg-[#F4F9F5] hover:bg-emerald-50 text-xs text-[#11291B] transition-colors leading-snug border border-emerald-950/5 font-medium"
+                  className="w-full text-left p-3 rounded-2xl bg-white/5 hover:bg-white/10 text-xs text-slate-200 hover:text-white transition-colors leading-snug border border-white/5 font-medium"
                 >
                   {p}
                 </button>
@@ -190,15 +190,15 @@ export const AskScreen: React.FC<AskScreenProps> = ({
         </div>
 
         {/* Right Column (7 cols on desktop): Free-Form Task Creation Form */}
-        <div className="lg:col-span-7 bg-white rounded-3xl p-6 shadow-sm border border-emerald-950/5">
-          <h2 className="text-lg font-bold text-[#11291B] tracking-tight mb-4">
+        <div className="lg:col-span-7 bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/10">
+          <h2 className="text-lg font-bold text-white tracking-tight mb-4">
             Create Physical Oracle Query
           </h2>
 
           <form onSubmit={handleLockBounty} className="space-y-5">
             {/* Free-form Question Textarea */}
             <div>
-              <label className="block text-xs font-bold text-[#6B7F72] uppercase tracking-wider mb-2">
+              <label className="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">
                 What ground truth do you want verified? (Free-form)
               </label>
               <textarea
@@ -206,33 +206,33 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                 onChange={(e) => setQuestion(e.target.value)}
                 rows={3}
                 placeholder="Ask any verifiable physical question (e.g. Is the coffee counter open? Are parking spots free? How long is the line?)"
-                className="w-full bg-[#F4F9F5] border border-gray-200 focus:border-[#0F3822] focus:bg-white rounded-2xl p-4 text-xs sm:text-sm text-[#11291B] font-medium outline-none transition-all placeholder:text-gray-400"
+                className="w-full bg-black/40 border border-white/10 focus:border-emerald-400/60 focus:ring-1 focus:ring-emerald-400/30 rounded-2xl p-4 text-xs sm:text-sm text-white font-medium outline-none transition-all placeholder:text-gray-500"
                 required
               />
             </div>
 
             {/* Target Location Configuration */}
             <div>
-              <label className="block text-xs font-bold text-[#6B7F72] uppercase tracking-wider mb-2">
+              <label className="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">
                 Target Spot & Coordinates (200m Geofence)
               </label>
 
               {/* Location Search Bar */}
               <div className="space-y-2">
                 <div className="relative flex items-center">
-                  <Search className="w-4 h-4 text-emerald-800/60 absolute left-3 pointer-events-none" />
+                  <Search className="w-4 h-4 text-gray-400 absolute left-3.5 pointer-events-none" />
                   <input
                     type="text"
                     value={locationSearchQuery}
                     onChange={(e) => setLocationSearchQuery(e.target.value)}
                     placeholder="Search any place or address (e.g. Kathmandu, Tokyo, Coffee Bar)..."
-                    className="w-full bg-[#F4F9F5] border border-gray-200 focus:border-[#0F3822] rounded-2xl pl-9 pr-24 py-2.5 text-xs text-[#11291B] outline-none"
+                    className="w-full bg-black/40 border border-white/10 focus:border-emerald-400/60 rounded-2xl pl-10 pr-24 py-2.5 text-xs text-white placeholder-gray-500 outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => handleSearchLocation()}
                     disabled={isSearchingLocation}
-                    className="absolute right-1.5 px-3 py-1 bg-[#0F3822] hover:bg-[#154A2E] text-white text-xs font-semibold rounded-xl transition-all disabled:opacity-50"
+                    className="absolute right-1.5 px-3 py-1 bg-white/10 hover:bg-white/20 border border-white/10 text-white text-xs font-semibold rounded-xl transition-all disabled:opacity-50"
                   >
                     {isSearchingLocation ? '...' : 'Search'}
                   </button>
@@ -240,15 +240,15 @@ export const AskScreen: React.FC<AskScreenProps> = ({
 
                 {/* Autocomplete Dropdown */}
                 {searchResults.length > 0 && (
-                  <div className="bg-white border border-emerald-950/10 rounded-2xl shadow-lg max-h-48 overflow-y-auto divide-y divide-gray-100">
+                  <div className="bg-slate-900/95 border border-white/10 rounded-2xl shadow-2xl max-h-48 overflow-y-auto divide-y divide-white/5 backdrop-blur-2xl">
                     {searchResults.map((item, idx) => (
                       <button
                         key={idx}
                         type="button"
                         onClick={() => handleSelectSearchResult(item)}
-                        className="w-full text-left px-3.5 py-2 hover:bg-[#F4F9F5] text-xs text-[#11291B] flex items-center space-x-2"
+                        className="w-full text-left px-3.5 py-2.5 hover:bg-white/5 text-xs text-gray-200 flex items-center space-x-2"
                       >
-                        <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                        <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                         <span className="truncate">{item.name}</span>
                       </button>
                     ))}
@@ -258,18 +258,18 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                 {/* Place Name and GPS Info */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                   <div>
-                    <label className="text-[11px] font-semibold text-[#6B7F72]">Place Name / Title</label>
+                    <label className="text-[11px] font-semibold text-gray-400">Place Name / Title</label>
                     <input
                       type="text"
                       value={placeName}
                       onChange={(e) => setPlaceName(e.target.value)}
                       placeholder="e.g. Starbucks Main Street"
-                      className="w-full bg-[#F4F9F5] border border-gray-200 rounded-xl px-3 py-2 text-xs font-medium text-[#11291B] outline-none"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs font-medium text-white placeholder-gray-500 outline-none focus:border-emerald-400/50"
                       required
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] font-semibold text-[#6B7F72]">Preset Quick Jumper</label>
+                    <label className="text-[11px] font-semibold text-gray-400">Preset Quick Jumper</label>
                     <select
                       onChange={(e) => {
                         const preset = JUDGE_PRESETS.find((p) => p.id === e.target.value);
@@ -279,18 +279,18 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                           setPlaceName(preset.name);
                         }
                       }}
-                      className="w-full bg-[#F4F9F5] border border-gray-200 rounded-xl px-3 py-2 text-xs font-medium text-[#11291B] outline-none"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs font-medium text-white outline-none cursor-pointer focus:border-emerald-400/50"
                     >
-                      <option value="">Select Popular Hub...</option>
+                      <option value="" className="bg-slate-900 text-gray-400">Select Popular Hub...</option>
                       {JUDGE_PRESETS.map((p) => (
-                        <option key={p.id} value={p.id}>{p.name}</option>
+                        <option key={p.id} value={p.id} className="bg-slate-900 text-white">{p.name}</option>
                       ))}
                     </select>
                   </div>
                 </div>
 
-                <div className="text-[11px] font-mono text-[#6B7F72] px-1">
-                  Selected GPS Pin: <strong>{targetLat.toFixed(5)}, {targetLng.toFixed(5)}</strong>
+                <div className="text-[11px] font-mono text-gray-400 px-1">
+                  Selected GPS Pin: <strong className="text-emerald-400">{targetLat.toFixed(5)}, {targetLng.toFixed(5)}</strong>
                 </div>
               </div>
             </div>
@@ -298,7 +298,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
             {/* Bounty Amount & Expiry */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[#6B7F72] uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">
                   Bounty Amount (SOL)
                 </label>
                 <div className="flex items-center space-x-2">
@@ -309,7 +309,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                     max="10.0"
                     value={amountSol}
                     onChange={(e) => setAmountSol(parseFloat(e.target.value) || 0.1)}
-                    className="w-full bg-[#F4F9F5] border border-gray-200 rounded-2xl px-4 py-2.5 text-xs text-[#11291B] font-mono font-bold outline-none"
+                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-2.5 text-xs text-emerald-400 font-mono font-bold outline-none focus:border-emerald-400/50"
                   />
                   <div className="flex space-x-1 shrink-0">
                     {[0.1, 0.25, 0.5].map((val) => (
@@ -317,10 +317,10 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                         type="button"
                         key={val}
                         onClick={() => setAmountSol(val)}
-                        className={`px-2 py-1 rounded-xl text-[11px] font-bold border transition-colors ${
+                        className={`px-2.5 py-1 rounded-xl text-[11px] font-bold border transition-colors ${
                           amountSol === val
-                            ? 'bg-[#0F3822] text-white border-[#0F3822]'
-                            : 'bg-white text-[#6B7F72] border-gray-200 hover:text-[#11291B]'
+                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-xs'
+                            : 'bg-white/5 text-gray-400 border-white/10 hover:text-white'
                         }`}
                       >
                         {val}
@@ -331,33 +331,33 @@ export const AskScreen: React.FC<AskScreenProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#6B7F72] uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1.5">
                   Time-to-Live Window
                 </label>
                 <select
                   value={expiryMinutes}
                   onChange={(e) => setExpiryMinutes(parseInt(e.target.value))}
-                  className="w-full bg-[#F4F9F5] border border-gray-200 rounded-2xl px-4 py-2.5 text-xs text-[#11291B] font-medium outline-none"
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-2.5 text-xs text-white font-medium outline-none cursor-pointer focus:border-emerald-400/50"
                 >
-                  <option value={15}>15 Minutes (High Priority)</option>
-                  <option value={30}>30 Minutes (Recommended)</option>
-                  <option value={60}>1 Hour</option>
-                  <option value={120}>2 Hours</option>
+                  <option value={15} className="bg-slate-900 text-white">15 Minutes (High Priority)</option>
+                  <option value={30} className="bg-slate-900 text-white">30 Minutes (Recommended)</option>
+                  <option value={60} className="bg-slate-900 text-white">1 Hour</option>
+                  <option value={120} className="bg-slate-900 text-white">2 Hours</option>
                 </select>
               </div>
             </div>
 
             {errorMsg && (
-              <p className="text-xs text-rose-600 font-medium px-1">{errorMsg}</p>
+              <p className="text-xs text-rose-400 font-medium px-1">{errorMsg}</p>
             )}
 
             {/* Primary Action Button */}
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-4 px-6 rounded-full bg-[#0F3822] hover:bg-[#154A2E] text-white font-semibold text-sm shadow-sm flex items-center justify-center space-x-2 transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full py-4 px-6 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-[0_0_25px_rgba(16,185,129,0.35)] flex items-center justify-center space-x-2 transition-all active:scale-[0.98] disabled:opacity-50"
             >
-              <ShieldCheck className="w-5 h-5 text-[#99E35E]" />
+              <ShieldCheck className="w-5 h-5 text-slate-950" />
               <span>
                 {isSubmitting ? 'Depositing to Solana Escrow...' : `Deposit ${amountSol} SOL & Create Task`}
               </span>

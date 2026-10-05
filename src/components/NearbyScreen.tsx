@@ -94,7 +94,7 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
         {/* Left Column (5 cols on desktop): Tactile Dial & Bounties Feed */}
         <div className="lg:col-span-5 space-y-5">
           {/* 1. Tactile Skeuomorphic Analog Proximity Gauge Card (Reference Screen 1) */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-emerald-950/5">
+          <div className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-6 shadow-2xl border border-white/10">
             <AnalogProximityDial
               distanceMeters={selectedBounty ? selectedBounty.distance_meters : 25}
               placeName={selectedBounty ? selectedBounty.place_name : 'Nearby Location'}
@@ -103,17 +103,17 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
 
           {/* 2. Segmented Filter Pills & Header */}
           <div className="flex items-center justify-between px-1">
-            <span className="text-xs font-bold text-[#6B7F72] uppercase tracking-wider">
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
               Nearby Truth Tasks
             </span>
 
-            <div className="bg-white border border-emerald-950/5 rounded-full p-1 shadow-xs flex space-x-1">
+            <div className="bg-black/40 border border-white/10 rounded-full p-1 shadow-inner flex space-x-1">
               <button
                 onClick={() => setFilter('all')}
                 className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
                   filter === 'all'
-                    ? 'bg-[#0F3822] text-white shadow-xs'
-                    : 'text-[#6B7F72] hover:text-[#11291B]'
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm'
+                    : 'text-gray-400 hover:text-white'
                 }`}
               >
                 All ({bounties.length})
@@ -122,8 +122,8 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
                 onClick={() => setFilter('in_range')}
                 className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
                   filter === 'in_range'
-                    ? 'bg-[#0F3822] text-white shadow-xs'
-                    : 'text-[#6B7F72] hover:text-[#11291B]'
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm'
+                    : 'text-gray-400 hover:text-white'
                 }`}
               >
                 In 200m ({inRangeCount})
@@ -132,8 +132,8 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
                 onClick={() => setFilter('open')}
                 className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
                   filter === 'open'
-                    ? 'bg-[#0F3822] text-white shadow-xs'
-                    : 'text-[#6B7F72] hover:text-[#11291B]'
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm'
+                    : 'text-gray-400 hover:text-white'
                 }`}
               >
                 Open
@@ -141,7 +141,7 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
             </div>
           </div>
 
-          {/* 3. Crisp White Bounties Cards List */}
+          {/* 3. Dark Glass Bounties Cards List */}
           <div className="space-y-3 max-h-[580px] overflow-y-auto pr-1">
             {filteredBounties.map((bounty) => {
               const isEligible = bounty.is_within_range;
@@ -152,10 +152,10 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
                 <div
                   key={bounty.id}
                   onClick={() => handleSelectBountyInternal(bounty.id)}
-                  className={`p-5 rounded-3xl bg-white shadow-sm border transition-all cursor-pointer flex flex-col gap-3 ${
+                  className={`p-5 rounded-3xl bg-slate-900/60 backdrop-blur-xl shadow-xl border transition-all cursor-pointer flex flex-col gap-3 ${
                     isSelected
-                      ? 'border-[#0F3822] ring-2 ring-[#0F3822]/10 shadow-md'
-                      : 'border-emerald-950/5 hover:border-emerald-950/15'
+                      ? 'border-emerald-500/80 ring-2 ring-emerald-500/20 shadow-2xl'
+                      : 'border-white/10 hover:border-white/20'
                   }`}
                 >
                   {/* Top Row: Distance Pill & SOL Reward Badge */}
@@ -163,30 +163,30 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
                     <span
                       className={`text-xs font-semibold px-2.5 py-0.5 rounded-full inline-flex items-center space-x-1.5 ${
                         isEligible
-                          ? 'bg-emerald-100 text-[#1E5E38]'
-                          : 'bg-gray-100 text-gray-600'
+                          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                          : 'bg-white/5 text-gray-400 border border-white/10'
                       }`}
                     >
                       <span
                         className={`w-1.5 h-1.5 rounded-full ${
-                          isEligible ? 'bg-[#7CB342] animate-pulse' : 'bg-gray-400'
+                          isEligible ? 'bg-emerald-400 animate-pulse' : 'bg-gray-500'
                         }`}
                       />
                       <span>{bounty.distance_meters}m away</span>
                     </span>
 
-                    <div className="flex items-center space-x-1 bg-[#E8F5E9] text-[#1E5E38] px-2.5 py-0.5 rounded-full text-xs font-bold font-mono">
-                      <Coins className="w-3.5 h-3.5 text-[#7CB342]" />
+                    <div className="flex items-center space-x-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full text-xs font-bold font-mono">
+                      <Coins className="w-3.5 h-3.5 text-emerald-400" />
                       <span>{bounty.amount_sol} SOL</span>
                     </div>
                   </div>
 
                   {/* Title & Question */}
                   <div>
-                    <h3 className="text-base font-bold text-[#11291B] tracking-tight">
+                    <h3 className="text-base font-bold text-white tracking-tight">
                       {bounty.place_name}
                     </h3>
-                    <p className="text-sm text-[#6B7F72] mt-0.5 leading-snug">
+                    <p className="text-sm text-gray-400 mt-0.5 leading-snug">
                       "{bounty.question}"
                     </p>
                   </div>
@@ -204,19 +204,19 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
                           `${bounty.place_name} (15m Geofence)`
                         );
                       }}
-                      className="text-[11px] px-2.5 py-1 rounded-full font-semibold bg-[#F4F9F5] hover:bg-[#E8F5E9] text-[#1E5E38] border border-emerald-950/10 transition-colors flex items-center space-x-1"
+                      className="text-[11px] px-2.5 py-1 rounded-full font-semibold bg-white/5 hover:bg-white/10 text-emerald-300 border border-white/10 transition-colors flex items-center space-x-1"
                       title="Move your GPS pin to test physical proximity verification"
                     >
                       <span>📍</span>
                       <span>Walk Inside Geofence (15m)</span>
                     </button>
 
-                    <span className="text-[11px] font-mono text-[#6B7F72]">
-                      Status: <strong className={isEligible ? 'text-[#1E5E38]' : 'text-gray-500'}>{isEligible ? 'In Range' : 'Out of Range'}</strong>
+                    <span className="text-[11px] font-mono text-gray-400">
+                      Status: <strong className={isEligible ? 'text-emerald-400' : 'text-gray-500'}>{isEligible ? 'In Range' : 'Out of Range'}</strong>
                     </span>
                   </div>
 
-                  {/* Deep Forest Green Primary CTA Button */}
+                  {/* CTA Button */}
                   {isOpen ? (
                     <button
                       onClick={(e) => {
@@ -226,8 +226,8 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
                       }}
                       className={`w-full py-3.5 px-6 rounded-full font-semibold text-sm shadow-sm flex items-center justify-center space-x-2 transition-all active:scale-[0.98] ${
                         isEligible
-                          ? 'bg-[#0F3822] hover:bg-[#154A2E] text-white shadow-md'
-                          : 'bg-emerald-50 hover:bg-emerald-100 text-[#0F3822] border border-emerald-200/60'
+                          ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-950/50'
+                          : 'bg-white/5 hover:bg-white/10 text-emerald-300 border border-white/10'
                       }`}
                     >
                       <span>{isEligible ? 'Snap Photo & Earn SOL' : 'View Details (Out of 200m)'}</span>
@@ -240,7 +240,7 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
                         handleSelectBountyInternal(bounty.id);
                         onSelectStateBounty(bounty.id);
                       }}
-                      className="w-full py-3 px-5 rounded-full font-semibold text-sm bg-emerald-50 hover:bg-emerald-100 text-[#0F3822] border border-emerald-200/60 flex items-center justify-center space-x-2 transition-all"
+                      className="w-full py-3 px-5 rounded-full font-semibold text-sm bg-white/5 hover:bg-white/10 text-emerald-300 border border-white/10 flex items-center justify-center space-x-2 transition-all"
                     >
                       <span>View Oracle Settlement</span>
                       <ArrowRight className="w-4 h-4" />
@@ -254,13 +254,13 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
 
         {/* Right Column (7 cols on desktop): Wide Interactive OpenSourceMap */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="bg-white rounded-3xl p-4 shadow-sm border border-emerald-950/5">
+          <div className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl p-4 shadow-2xl border border-white/10">
             <div className="flex items-center justify-between px-2 pb-3">
-              <div className="flex items-center space-x-2 text-sm font-bold text-[#11291B]">
-                <Navigation className="w-4 h-4 text-[#1E5E38]" />
+              <div className="flex items-center space-x-2 text-sm font-bold text-white">
+                <Navigation className="w-4 h-4 text-emerald-400" />
                 <span>OpenStreetMap 200m Geofence Radar</span>
               </div>
-              <span className="text-xs font-semibold text-[#1E5E38] bg-emerald-100 px-3 py-1 rounded-full">
+              <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
                 {inRangeCount} bounties inside 200m range
               </span>
             </div>
@@ -268,18 +268,18 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
             {/* Professional Location Search Bar */}
             <div className="relative mb-3">
               <form onSubmit={handleSearchSubmit} className="relative flex items-center">
-                <Search className="w-4 h-4 text-emerald-800/60 absolute left-3 pointer-events-none" />
+                <Search className="w-4 h-4 text-gray-400 absolute left-3 pointer-events-none" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search any city or address (e.g. Kathmandu, Tokyo, London)..."
-                  className="w-full bg-[#F4F9F5] text-xs text-[#11291B] font-medium pl-9 pr-20 py-2.5 rounded-2xl border border-emerald-950/10 focus:outline-none focus:ring-2 focus:ring-[#0F3822]/20 focus:border-[#0F3822] placeholder:text-gray-400"
+                  className="w-full bg-black/40 text-xs text-white font-medium pl-9 pr-24 py-2.5 rounded-2xl border border-white/10 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 placeholder:text-gray-500"
                 />
                 <button
                   type="submit"
                   disabled={isSearching}
-                  className="absolute right-1.5 px-3 py-1 bg-[#0F3822] hover:bg-[#154A2E] text-white text-xs font-semibold rounded-xl transition-all disabled:opacity-50"
+                  className="absolute right-1.5 px-3 py-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-semibold rounded-xl transition-all disabled:opacity-50 shadow-sm"
                 >
                   {isSearching ? 'Searching...' : 'Search'}
                 </button>
@@ -287,13 +287,13 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
 
               {/* Autocomplete / Search Results Dropdown */}
               {searchResults.length > 0 && (
-                <div className="absolute z-30 left-0 right-0 top-full mt-1.5 bg-white border border-emerald-950/10 rounded-2xl shadow-xl overflow-hidden max-h-56 overflow-y-auto">
-                  <div className="px-3 py-1.5 bg-emerald-50/70 border-b border-emerald-950/5 flex items-center justify-between text-[11px] text-[#1E5E38] font-bold">
+                <div className="absolute z-30 left-0 right-0 top-full mt-1.5 bg-slate-900/95 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden max-h-56 overflow-y-auto">
+                  <div className="px-3 py-1.5 bg-white/5 border-b border-white/10 flex items-center justify-between text-[11px] text-emerald-400 font-bold">
                     <span>Matching Locations</span>
                     <button
                       type="button"
                       onClick={() => setSearchResults([])}
-                      className="text-gray-400 hover:text-gray-600 text-xs"
+                      className="text-gray-400 hover:text-white text-xs"
                     >
                       ✕
                     </button>
@@ -303,9 +303,9 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
                       key={idx}
                       type="button"
                       onClick={() => handlePickSearchResult(item)}
-                      className="w-full text-left px-3.5 py-2.5 hover:bg-[#F4F9F5] text-xs text-[#11291B] border-b border-gray-100 last:border-b-0 flex items-start space-x-2 transition-colors"
+                      className="w-full text-left px-3.5 py-2.5 hover:bg-white/5 text-xs text-gray-200 border-b border-white/5 last:border-b-0 flex items-start space-x-2 transition-colors"
                     >
-                      <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
+                      <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
                       <span className="truncate">{item.name}</span>
                     </button>
                   ))}
@@ -324,17 +324,17 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
 
           {/* Quick Oracle Stats Strip */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-white p-4 rounded-2xl border border-emerald-950/5 shadow-xs text-center">
-              <span className="text-[11px] font-semibold text-[#6B7F72] uppercase block">Total Bounties</span>
-              <span className="text-xl font-extrabold text-[#11291B]">{bounties.length}</span>
+            <div className="bg-slate-900/60 backdrop-blur-xl p-4 rounded-2xl border border-white/10 shadow-xl text-center">
+              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">Total Bounties</span>
+              <span className="text-xl font-extrabold text-white">{bounties.length}</span>
             </div>
-            <div className="bg-white p-4 rounded-2xl border border-emerald-950/5 shadow-xs text-center">
-              <span className="text-[11px] font-semibold text-[#6B7F72] uppercase block">In 200m Range</span>
-              <span className="text-xl font-extrabold text-[#1E5E38]">{inRangeCount}</span>
+            <div className="bg-slate-900/60 backdrop-blur-xl p-4 rounded-2xl border border-white/10 shadow-xl text-center">
+              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">In 200m Range</span>
+              <span className="text-xl font-extrabold text-emerald-400">{inRangeCount}</span>
             </div>
-            <div className="bg-white p-4 rounded-2xl border border-emerald-950/5 shadow-xs text-center">
-              <span className="text-[11px] font-semibold text-[#6B7F72] uppercase block">Escrow Pool</span>
-              <span className="text-xl font-extrabold text-[#0F3822] font-mono">
+            <div className="bg-slate-900/60 backdrop-blur-xl p-4 rounded-2xl border border-white/10 shadow-xl text-center">
+              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">Escrow Pool</span>
+              <span className="text-xl font-extrabold text-emerald-400 font-mono">
                 {bounties.reduce((acc, b) => acc + b.amount_sol, 0).toFixed(2)} SOL
               </span>
             </div>

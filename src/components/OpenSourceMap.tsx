@@ -212,7 +212,7 @@ export const OpenSourceMap: React.FC<OpenSourceMapProps> = ({
   };
 
   return (
-    <div className="relative w-full rounded-3xl overflow-hidden border border-emerald-950/10 shadow-sm bg-white">
+    <div className="relative w-full rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-slate-950">
 
       {/* Responsive Height Container for Leaflet */}
       <div
@@ -222,8 +222,8 @@ export const OpenSourceMap: React.FC<OpenSourceMapProps> = ({
 
       {/* Floating Instruction Banner at Bottom */}
       <div className="absolute bottom-3.5 left-3.5 right-3.5 z-10 pointer-events-none flex flex-wrap items-center justify-between gap-2">
-        <div className="bg-white/95 backdrop-blur-md border border-emerald-950/10 px-3 py-1.5 rounded-full text-xs font-semibold text-[#11291B] flex items-center space-x-2 shadow-md">
-          <Move className="w-3.5 h-3.5 text-[#1E5E38] animate-pulse" />
+        <div className="bg-slate-900/90 backdrop-blur-md border border-white/15 px-3.5 py-1.5 rounded-full text-xs font-semibold text-emerald-300 flex items-center space-x-2 shadow-xl">
+          <Move className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
           <span>Drag the green pin or click anywhere to pinpoint your exact spot</span>
         </div>
       </div>

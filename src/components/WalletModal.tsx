@@ -149,29 +149,29 @@ export const WalletModal: React.FC<WalletModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn select-none">
-      <div className="relative w-full max-w-md bg-white border border-emerald-950/10 rounded-3xl p-6 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn select-none">
+      <div className="relative w-full max-w-md bg-slate-900/95 backdrop-blur-2xl border border-white/15 rounded-3xl p-6 shadow-2xl text-white">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-5">
+        <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
           <div className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-[#E8F5E9] flex items-center justify-center border border-[#8BC34A]/30">
-              <Wallet className="w-5 h-5 text-[#1E5E38]" />
+            <div className="w-9 h-9 rounded-2xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+              <Wallet className="w-5 h-5 text-emerald-400" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-base font-bold text-[#11291B]">Solana Devnet Wallet</h2>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#E8F5E9] text-[#1E5E38] border border-[#8BC34A]/40">
+                <h2 className="text-base font-bold text-white">Solana Devnet Wallet</h2>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                   Devnet
                 </span>
               </div>
-              <p className="text-xs text-[#6B7F72]">
+              <p className="text-xs text-gray-400">
                 {connected ? 'Real Phantom / Solana Wallet Connected' : 'Connect Phantom or use Demo Personas'}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition-colors"
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-gray-300 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -179,17 +179,17 @@ export const WalletModal: React.FC<WalletModalProps> = ({
 
         {/* SECTION 1: Connected Real Solana Wallet (Phantom / Solflare) */}
         {connected && publicKey ? (
-          <div className="mb-5 p-4 rounded-2xl bg-[#F4F9F5] border border-[#8BC34A]/40 space-y-3.5">
+          <div className="mb-5 p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#7CB342] animate-pulse" />
-                <span className="text-xs font-bold text-[#0F3822]">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-xs font-bold text-emerald-300">
                   {wallet?.adapter.name || 'Phantom'} (Active)
                 </span>
               </div>
               <button
                 onClick={() => disconnect()}
-                className="flex items-center space-x-1 text-xs text-red-600 hover:text-red-700 font-semibold transition-colors"
+                className="flex items-center space-x-1 text-xs text-rose-400 hover:text-rose-300 font-semibold transition-colors"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Disconnect</span>
@@ -197,23 +197,23 @@ export const WalletModal: React.FC<WalletModalProps> = ({
             </div>
 
             {/* Address & Solscan Link */}
-            <div className="p-2.5 bg-white rounded-xl border border-gray-200 flex items-center justify-between">
-              <div className="font-mono text-xs text-[#11291B] font-semibold truncate mr-2">
+            <div className="p-2.5 bg-black/40 rounded-xl border border-white/10 flex items-center justify-between">
+              <div className="font-mono text-xs text-emerald-300 font-semibold truncate mr-2">
                 {publicKey.toBase58().slice(0, 8)}...{publicKey.toBase58().slice(-8)}
               </div>
               <div className="flex items-center space-x-1 shrink-0">
                 <button
                   onClick={handleCopyAddress}
-                  className="p-1 rounded-md text-gray-500 hover:text-[#0F3822] hover:bg-gray-100 transition-colors"
+                  className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
                   title="Copy address"
                 >
-                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
                 <a
                   href={`https://solscan.io/account/${publicKey.toBase58()}?cluster=devnet`}
                   target="_blank"
                   rel="noreferrer"
-                  className="p-1 rounded-md text-gray-500 hover:text-[#0F3822] hover:bg-gray-100 transition-colors"
+                  className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
                   title="View on Solscan Devnet"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -224,15 +224,15 @@ export const WalletModal: React.FC<WalletModalProps> = ({
             {/* Devnet Balance Display */}
             <div className="flex items-center justify-between px-1">
               <div>
-                <span className="text-xs text-[#6B7F72]">Live Devnet Balance:</span>
-                <div className="text-lg font-bold font-mono text-[#0F3822]">
+                <span className="text-xs text-gray-400">Live Devnet Balance:</span>
+                <div className="text-lg font-bold font-mono text-emerald-400">
                   {realBalance !== null ? `${realBalance.toFixed(3)} SOL` : 'Fetching...'}
                 </div>
               </div>
               <button
                 onClick={fetchRealBalance}
                 disabled={isRefreshing}
-                className="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs font-semibold text-[#0F3822] hover:bg-gray-50 transition-colors"
+                className="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-white hover:bg-white/20 transition-colors"
                 title="Refresh balance from Solana RPC"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -242,19 +242,19 @@ export const WalletModal: React.FC<WalletModalProps> = ({
           </div>
         ) : (
           /* When NOT connected: Prominent Phantom / Solflare Connect Button */
-          <div className="mb-5 p-4 rounded-2xl bg-[#E8F5E9]/50 border border-[#8BC34A]/40 space-y-3 text-center">
+          <div className="mb-5 p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3 text-center">
             <div className="flex flex-col items-center justify-center space-y-1">
-              <div className="w-10 h-10 rounded-full bg-[#0F3822] text-[#99E35E] flex items-center justify-center shadow-sm">
+              <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shadow-sm">
                 <Wallet className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-bold text-[#0F3822]">Connect Browser Wallet</h3>
-              <p className="text-xs text-[#6B7F72]">
+              <h3 className="text-sm font-bold text-white">Connect Browser Wallet</h3>
+              <p className="text-xs text-gray-400">
                 Connect Phantom or Solflare to post bounties, stake, and receive payouts with real Devnet SOL.
               </p>
             </div>
 
             <div className="flex justify-center pt-1" onClick={() => onToggleDemoMode(false)}>
-              <WalletMultiButton className="!w-full !justify-center !h-10 !py-0 !px-4 !text-xs !font-bold !rounded-full !bg-[#0F3822] hover:!bg-[#154A2E] !shadow-sm" />
+              <WalletMultiButton className="!w-full !justify-center !h-10 !py-0 !px-4 !text-xs !font-bold !rounded-full !bg-gradient-to-r !from-emerald-600 !to-teal-600 hover:!from-emerald-500 hover:!to-teal-500 !shadow-lg !shadow-emerald-950/50" />
             </div>
           </div>
         )}
@@ -264,9 +264,9 @@ export const WalletModal: React.FC<WalletModalProps> = ({
           <button
             onClick={handleAirdrop}
             disabled={airdropping}
-            className="w-full py-3.5 px-4 rounded-full bg-[#0F3822] hover:bg-[#154A2E] text-white text-xs font-semibold flex items-center justify-center space-x-2 transition-all shadow-sm active:scale-[0.99] disabled:opacity-50"
+            className="w-full py-3.5 px-4 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-semibold flex items-center justify-center space-x-2 transition-all shadow-lg shadow-emerald-950/50 active:scale-[0.99] disabled:opacity-50"
           >
-            <Coins className="w-4 h-4 text-[#99E35E]" />
+            <Coins className="w-4 h-4 text-emerald-200" />
             <span>
               {airdropping
                 ? 'Requesting from Solana Faucet...'
@@ -280,10 +280,10 @@ export const WalletModal: React.FC<WalletModalProps> = ({
             <div
               className={`mt-2.5 p-2.5 rounded-xl text-xs font-medium text-center ${
                 statusMsg.type === 'success'
-                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                   : statusMsg.type === 'error'
-                  ? 'bg-red-50 text-red-800 border border-red-200'
-                  : 'bg-amber-50 text-amber-800 border border-amber-200'
+                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
               }`}
             >
               {statusMsg.text}
@@ -292,10 +292,10 @@ export const WalletModal: React.FC<WalletModalProps> = ({
         </div>
 
         {/* SECTION 3: Demo Personas (Collapsible Fallback for offline judging) */}
-        <div className="border-t border-gray-100 pt-3">
+        <div className="border-t border-white/10 pt-3">
           <button
             onClick={() => setShowDemoList(!showDemoList)}
-            className="w-full flex items-center justify-between text-xs font-semibold text-[#6B7F72] hover:text-[#0F3822] py-1 transition-colors"
+            className="w-full flex items-center justify-between text-xs font-semibold text-gray-400 hover:text-white py-1 transition-colors"
           >
             <span>Or Use Demo Personas (Offline / Fast Testing)</span>
             {showDemoList ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -315,21 +315,21 @@ export const WalletModal: React.FC<WalletModalProps> = ({
                     }}
                     className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all ${
                       isSelected
-                        ? 'bg-[#E8F5E9] border-[#8BC34A] shadow-xs'
-                        : 'bg-[#F4F9F5] border-gray-100 hover:border-gray-200'
+                        ? 'bg-emerald-500/20 border-emerald-500/50 shadow-sm text-white'
+                        : 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300'
                     }`}
                   >
                     <div>
-                      <div className="text-xs font-bold text-[#11291B]">{acc.name}</div>
-                      <div className="text-[10px] text-[#6B7F72] font-mono">{acc.address}</div>
+                      <div className="text-xs font-bold text-white">{acc.name}</div>
+                      <div className="text-[10px] text-gray-400 font-mono">{acc.address}</div>
                     </div>
 
                     <div className="text-right">
-                      <div className="text-xs font-bold text-[#1E5E38] font-mono">
+                      <div className="text-xs font-bold text-emerald-400 font-mono">
                         {acc.balanceSol.toFixed(2)} SOL
                       </div>
                       {isSelected && (
-                        <span className="text-[9px] font-bold text-[#1E5E38] flex items-center justify-end space-x-0.5">
+                        <span className="text-[9px] font-bold text-emerald-400 flex items-center justify-end space-x-0.5">
                           <Check className="w-2.5 h-2.5" />
                           <span>ACTIVE DEMO</span>
                         </span>
