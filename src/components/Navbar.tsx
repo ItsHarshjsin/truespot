@@ -76,6 +76,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'report', label: 'Report', icon: Camera, step: 3 },
     { id: 'verify', label: 'Verify', icon: CheckSquare, step: 4, badge: unverifiedCount },
     { id: 'state', label: 'State', icon: Coins, step: 5 },
+    { id: 'wallets', label: '3 Wallets', icon: Wallet, step: 6 },
   ];
 
   return (

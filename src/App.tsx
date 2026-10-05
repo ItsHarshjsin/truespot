@@ -19,6 +19,7 @@ import { AskScreen } from './components/AskScreen';
 import { ReportScreen } from './components/ReportScreen';
 import { VerifyScreen } from './components/VerifyScreen';
 import { StateScreen } from './components/StateScreen';
+import { ThreeWalletsHub } from './components/ThreeWalletsHub';
 import { WalletModal, DEMO_ACCOUNTS, DemoAccount } from './components/WalletModal';
 import { HowItWorksModal } from './components/HowItWorksModal';
 import { SupabaseModal } from './components/SupabaseModal';
@@ -72,11 +73,19 @@ export const App: React.FC = () => {
   // Adjust Wallet Balance Dynamically
   const adjustBalance = (
     amountDelta: number,
-    targetRole?: 'asker' | 'spotter' | 'verifier'
+    targetRole?: 'asker' | 'spotter' | 'verifier' | 'maker' | 'receiver' | 'escrow'
   ) => {
     setDemoAccounts((prev) => {
       const updated = prev.map((acc) => {
-        const isTarget = targetRole ? acc.role === targetRole : acc.id === activeDemoAccount.id;
+        const isTarget = targetRole
+          ? acc.role === targetRole ||
+            (targetRole === 'spotter' && acc.role === 'receiver') ||
+            (targetRole === 'receiver' && acc.role === 'spotter') ||
+            (targetRole === 'asker' && acc.role === 'maker') ||
+            (targetRole === 'maker' && acc.role === 'asker') ||
+            (targetRole === 'verifier' && acc.role === 'escrow') ||
+            (targetRole === 'escrow' && acc.role === 'verifier')
+          : acc.id === activeDemoAccount.id;
         if (isTarget) {
           const newBal = Math.max(0, parseFloat((acc.balanceSol + amountDelta).toFixed(3)));
           return { ...acc, balanceSol: newBal };
@@ -298,6 +307,7 @@ export const App: React.FC = () => {
                 <ReportScreen
                   bountyId={selectedBountyId}
                   userCoords={currentCoords}
+                  activeReporterWallet={activeDemoAccount.address}
                   onReportSubmitted={(bId) => {
                     setSelectedBountyId(bId);
                     refreshData();
@@ -327,6 +337,21 @@ export const App: React.FC = () => {
                   bountyId={selectedBountyId}
                   onSelectBounty={(id) => setSelectedBountyId(id)}
                   onAdjustBalance={adjustBalance}
+                  onShowToast={showToast}
+                />
+              )}
+
+              {activeTab === 'wallets' && (
+                <ThreeWalletsHub
+                  activeDemoAccount={activeDemoAccount}
+                  onSelectDemoAccount={setActiveDemoAccount}
+                  demoAccounts={demoAccounts}
+                  onAdjustBalance={adjustBalance}
+                  onNavigateToReport={(bId) => {
+                    setSelectedBountyId(bId);
+                    setActiveTab('report');
+                  }}
+                  onNavigateToAsk={() => setActiveTab('ask')}
                   onShowToast={showToast}
                 />
               )}

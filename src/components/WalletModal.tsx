@@ -19,32 +19,32 @@ import {
 export interface DemoAccount {
   id: string;
   name: string;
-  role: 'spotter' | 'asker' | 'verifier';
+  role: 'receiver' | 'maker' | 'escrow' | 'spotter' | 'asker' | 'verifier';
   address: string;
   balanceSol: number;
 }
 
 export const DEMO_ACCOUNTS: DemoAccount[] = [
   {
-    id: 'spotter',
-    name: 'Mobile Spotter (Reporter)',
-    role: 'spotter',
-    address: 'Spot7r...9Xkl',
+    id: 'receiver',
+    name: '1. Task Receiver (Field Worker & Earner)',
+    role: 'receiver',
+    address: 'Worker9Xkl...88Qv',
     balanceSol: 2.45,
   },
   {
-    id: 'asker',
-    name: 'Place Inquirer (Asker)',
-    role: 'asker',
-    address: 'Ask3r...4Wqz',
-    balanceSol: 1.80,
+    id: 'maker',
+    name: '2. Task Maker (Creator & Escrow Depositor)',
+    role: 'maker',
+    address: 'Maker3r...4Wqz',
+    balanceSol: 5.50,
   },
   {
-    id: 'verifier',
-    name: 'Consensus Auditor (Verifier)',
-    role: 'verifier',
-    address: 'V3rif...1Klm',
-    balanceSol: 0.95,
+    id: 'escrow',
+    name: '3. Escrow Vault (Solana Program & Oracle)',
+    role: 'escrow',
+    address: 'Escrow9WzD...AWWM',
+    balanceSol: 14.80,
   },
 ];
 

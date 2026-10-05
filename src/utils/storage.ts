@@ -430,6 +430,10 @@ class HybridStore {
     return newReport;
   }
 
+  public async getReports(): Promise<Report[]> {
+    return this.reports;
+  }
+
   public async getReportsForBounty(bountyId: string): Promise<Report[]> {
     return this.reports.filter((r) => r.bounty_id === bountyId);
   }
