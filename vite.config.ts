@@ -13,6 +13,9 @@ export default defineConfig({
       buffer: 'buffer'
     }
   },
+  optimizeDeps: {
+    include: ['canvas-confetti', 'set-cookie-parser', 'buffer']
+  },
   server: {
     port: 5173,
     host: true
