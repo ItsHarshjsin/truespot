@@ -1,168 +1,101 @@
 -- ==============================================================================
--- TRUESPOT: DECENTRALIZED PHYSICAL ORACLE DATABASE SCHEMA (POSTGRESQL + POSTGIS)
--- Colosseum Solana Hackathon Build
+-- TRUESPOT: DECENTRALIZED PHYSICAL VERIFICATION PROTOCOL (POSTGRESQL + POSTGIS)
+-- Solana Devnet Physical Reality Oracle Migration
 -- ==============================================================================
 
--- 1. Enable PostGIS Extension for high-precision geospatial calculations
 CREATE EXTENSION IF NOT EXISTS postgis;
 
--- 2. Drop existing tables if re-running
-DROP FUNCTION IF EXISTS get_nearby_bounties(DOUBLE PRECISION, DOUBLE PRECISION);
-DROP TABLE IF EXISTS verifications CASCADE;
-DROP TABLE IF EXISTS reports CASCADE;
-DROP TABLE IF EXISTS bounties CASCADE;
-
--- 3. Bounties Table: Physical queries escrowed on Solana Devnet
-CREATE TABLE bounties (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    question TEXT NOT NULL,
-    place_name TEXT NOT NULL,
-    lat DOUBLE PRECISION NOT NULL,
-    lng DOUBLE PRECISION NOT NULL,
-    amount_sol NUMERIC NOT NULL DEFAULT 0.1,
-    status TEXT NOT NULL DEFAULT 'OPEN' CHECK (status IN ('OPEN', 'ANSWERED', 'PAID', 'EXPIRED')),
-    asker_wallet TEXT NOT NULL,
-    escrow_tx TEXT,
-    payout_tx TEXT,
-    bounty_type TEXT NOT NULL DEFAULT 'BOOLEAN' CHECK (bounty_type IN ('BOOLEAN', 'DATA_COLLECTION', 'AI_VISION')),
-    max_spotters INTEGER NOT NULL DEFAULT 1,
-    rich_instructions TEXT,
-    reference_media_url TEXT,
-    created_at TIMESTAMPTZ DEFAULT now(),
-    expires_at TIMESTAMPTZ NOT NULL,
-    location GEOGRAPHY(POINT, 4326) GENERATED ALWAYS AS (ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography) STORED
+-- 1. QUERIES: Time-bounded, economically funded requests for physical ground truth
+CREATE TABLE IF NOT EXISTS queries (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  query_id_hex TEXT UNIQUE NOT NULL,
+  creator_wallet TEXT NOT NULL,
+  question TEXT NOT NULL,
+  place_name TEXT NOT NULL,
+  location GEOGRAPHY(Point, 4326) NOT NULL,
+  radius_meters INT DEFAULT 200,
+  escrow_lamports BIGINT NOT NULL,
+  validity_seconds BIGINT NOT NULL,
+  expiry_timestamp TIMESTAMPTZ NOT NULL,
+  reference_media_url TEXT,
+  status TEXT DEFAULT 'OPEN' CHECK (status IN ('OPEN', 'IN_REVIEW', 'RESOLVED', 'EXPIRED', 'CANCELLED')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Spatial index on geography point for sub-millisecond 200m bounding-box queries
-CREATE INDEX IF NOT EXISTS idx_bounties_location ON bounties USING GIST(location);
-CREATE INDEX IF NOT EXISTS idx_bounties_status ON bounties(status);
-
--- 4. Reports Table: Hardware-attested physical observations
-CREATE TABLE reports (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    bounty_id UUID NOT NULL REFERENCES bounties(id) ON DELETE CASCADE,
-    photo_url TEXT NOT NULL,
-    fingerprint TEXT NOT NULL, -- 64-char SHA-256 (Image + Lat + Lng + Timestamp)
-    gps_lat DOUBLE PRECISION NOT NULL,
-    gps_lng DOUBLE PRECISION NOT NULL,
-    gps_accuracy DOUBLE PRECISION DEFAULT 5.0,
-    reporter_wallet TEXT NOT NULL,
-    answer_text TEXT NOT NULL,
-    gyro_variance DOUBLE PRECISION,
-    blockhash_stamp TEXT,
-    memo_signature TEXT,
-    media_type TEXT DEFAULT 'image',
-    ai_confidence_score JSONB,
-    observed_at TIMESTAMPTZ DEFAULT now(),
-    location GEOGRAPHY(POINT, 4326) GENERATED ALWAYS AS (ST_SetSRID(ST_MakePoint(gps_lng, gps_lat), 4326)::geography) STORED
+-- 2. OBSERVATIONS: Physical evidence submitted by field contributors
+CREATE TABLE IF NOT EXISTS observations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  query_id_hex TEXT REFERENCES queries(query_id_hex) ON DELETE CASCADE,
+  contributor_wallet TEXT NOT NULL,
+  media_url TEXT NOT NULL,
+  sha256_hash TEXT NOT NULL,
+  observed_location GEOGRAPHY(Point, 4326) NOT NULL,
+  distance_meters NUMERIC NOT NULL,
+  client_timestamp TIMESTAMPTZ NOT NULL,
+  quality_report JSONB NOT NULL,
+  ai_evaluation JSONB,
+  status TEXT DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'ACCEPTED', 'REJECTED')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_reports_bounty_id ON reports(bounty_id);
+-- 3. PUBLISHED ANSWERS: Final, machine-readable truth states exposed to AI agents & markets
+CREATE TABLE IF NOT EXISTS published_answers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  query_id_hex TEXT UNIQUE REFERENCES queries(query_id_hex) ON DELETE CASCADE,
+  status TEXT NOT NULL CHECK (status IN ('RESOLVED', 'CONFLICTING', 'STALE', 'INCONCLUSIVE')),
+  verdict TEXT NOT NULL,
+  confidence_score NUMERIC NOT NULL,
+  summary TEXT NOT NULL,
+  evidence_hashes TEXT[] NOT NULL,
+  settlement_signature TEXT,
+  freshness_expires_at TIMESTAMPTZ NOT NULL,
+  published_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Spatial & Filter Indices
+CREATE INDEX IF NOT EXISTS idx_queries_geo ON queries USING GIST(location);
+CREATE INDEX IF NOT EXISTS idx_observations_geo ON observations USING GIST(observed_location);
+CREATE INDEX IF NOT EXISTS idx_queries_status ON queries(status);
+CREATE INDEX IF NOT EXISTS idx_observations_query ON observations(query_id_hex);
 
 -- Storage bucket configuration for heavy media evidence
 INSERT INTO storage.buckets (id, name, public) 
-VALUES ('truespot_evidence', 'truespot_evidence', true) 
+VALUES ('truespot_evidence', 'truespot_evidence', true)
 ON CONFLICT (id) DO NOTHING;
 
--- 5. Verifications Table: Staked Schelling-point consensus votes
-CREATE TABLE verifications (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    report_id UUID NOT NULL REFERENCES reports(id) ON DELETE CASCADE,
-    verifier_wallet TEXT NOT NULL,
-    agreed BOOLEAN NOT NULL,
-    stake_sol NUMERIC NOT NULL DEFAULT 0.01,
-    created_at TIMESTAMPTZ DEFAULT now()
-);
+-- Storage Policies
+DROP POLICY IF EXISTS "Public Evidence Access" ON storage.objects;
+CREATE POLICY "Public Evidence Access" ON storage.objects FOR SELECT USING (bucket_id = 'truespot_evidence');
 
-CREATE INDEX IF NOT EXISTS idx_verifications_report_id ON verifications(report_id);
+DROP POLICY IF EXISTS "Public Evidence Upload" ON storage.objects;
+CREATE POLICY "Public Evidence Upload" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'truespot_evidence');
 
--- 6. High-Performance PostGIS Spatial Radius RPC Function: get_nearby_bounties
--- Returns OPEN bounties within strict 200 meters of the caller's coordinates
-CREATE OR REPLACE FUNCTION get_nearby_bounties(
-    user_lat DOUBLE PRECISION,
-    user_lng DOUBLE PRECISION
-)
-RETURNS TABLE (
-    id UUID,
-    question TEXT,
-    place_name TEXT,
-    lat DOUBLE PRECISION,
-    lng DOUBLE PRECISION,
-    amount_sol NUMERIC,
-    status TEXT,
-    asker_wallet TEXT,
-    created_at TIMESTAMPTZ,
-    expires_at TIMESTAMPTZ,
-    distance_meters DOUBLE PRECISION
-) 
-LANGUAGE sql
-STABLE
-AS $$
-    SELECT 
-        b.id,
-        b.question,
-        b.place_name,
-        b.lat,
-        b.lng,
-        b.amount_sol,
-        b.status,
-        b.asker_wallet,
-        b.created_at,
-        b.expires_at,
-        ST_Distance(
-            b.location,
-            ST_SetSRID(ST_MakePoint(user_lng, user_lat), 4326)::geography
-        ) AS distance_meters
-    FROM bounties b
-    WHERE 
-        b.status = 'OPEN'
-        AND b.expires_at > now()
-        AND ST_DWithin(
-            b.location,
-            ST_SetSRID(ST_MakePoint(user_lng, user_lat), 4326)::geography,
-            200 -- Strict 200m physical oracle geofence
-        )
-    ORDER BY distance_meters ASC;
-$$;
+-- Row Level Security
+ALTER TABLE queries ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Queries" ON queries;
+CREATE POLICY "Public Read Queries" ON queries FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Insert Queries" ON queries;
+CREATE POLICY "Public Insert Queries" ON queries FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public Update Queries" ON queries;
+CREATE POLICY "Public Update Queries" ON queries FOR UPDATE USING (true);
 
--- 7. Supabase Storage bucket for photo evidence
-INSERT INTO storage.buckets (id, name, public) 
-VALUES ('bounty-evidence', 'bounty-evidence', true)
-ON CONFLICT (id) DO NOTHING;
+ALTER TABLE observations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Observations" ON observations;
+CREATE POLICY "Public Read Observations" ON observations FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Insert Observations" ON observations;
+CREATE POLICY "Public Insert Observations" ON observations FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public Update Observations" ON observations;
+CREATE POLICY "Public Update Observations" ON observations FOR UPDATE USING (true);
 
--- Public read access policy for storage
-DROP POLICY IF EXISTS "Public Read Evidence" ON storage.objects;
-CREATE POLICY "Public Read Evidence" 
-ON storage.objects FOR SELECT 
-USING (bucket_id = 'bounty-evidence');
+ALTER TABLE published_answers ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Answers" ON published_answers;
+CREATE POLICY "Public Read Answers" ON published_answers FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Insert Answers" ON published_answers;
+CREATE POLICY "Public Insert Answers" ON published_answers FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public Update Answers" ON published_answers;
+CREATE POLICY "Public Update Answers" ON published_answers FOR UPDATE USING (true);
 
--- Authenticated/Anon upload policy for photo reports
-DROP POLICY IF EXISTS "Public Upload Evidence" ON storage.objects;
-CREATE POLICY "Public Upload Evidence" 
-ON storage.objects FOR INSERT 
-WITH CHECK (bucket_id = 'bounty-evidence');
-
--- 8. Row Level Security (RLS) Policies for Public DePIN Oracle Access
-ALTER TABLE bounties ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Public Read Bounties" ON bounties;
-CREATE POLICY "Public Read Bounties" ON bounties FOR SELECT USING (true);
-DROP POLICY IF EXISTS "Public Insert Bounties" ON bounties;
-CREATE POLICY "Public Insert Bounties" ON bounties FOR INSERT WITH CHECK (true);
-DROP POLICY IF EXISTS "Public Update Bounties" ON bounties;
-CREATE POLICY "Public Update Bounties" ON bounties FOR UPDATE USING (true);
-
-ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Public Read Reports" ON reports;
-CREATE POLICY "Public Read Reports" ON reports FOR SELECT USING (true);
-DROP POLICY IF EXISTS "Public Insert Reports" ON reports;
-CREATE POLICY "Public Insert Reports" ON reports FOR INSERT WITH CHECK (true);
-DROP POLICY IF EXISTS "Public Update Reports" ON reports;
-CREATE POLICY "Public Update Reports" ON reports FOR UPDATE USING (true);
-
-ALTER TABLE verifications ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Public Read Verifications" ON verifications;
-CREATE POLICY "Public Read Verifications" ON verifications FOR SELECT USING (true);
-DROP POLICY IF EXISTS "Public Insert Verifications" ON verifications;
-CREATE POLICY "Public Insert Verifications" ON verifications FOR INSERT WITH CHECK (true);
-DROP POLICY IF EXISTS "Public Update Verifications" ON verifications;
-CREATE POLICY "Public Update Verifications" ON verifications FOR UPDATE USING (true);
+-- Enable Realtime for all tables
+ALTER PUBLICATION supabase_realtime ADD TABLE queries;
+ALTER PUBLICATION supabase_realtime ADD TABLE observations;
+ALTER PUBLICATION supabase_realtime ADD TABLE published_answers;

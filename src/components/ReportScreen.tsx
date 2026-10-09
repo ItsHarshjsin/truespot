@@ -640,7 +640,7 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
               </div>
               <div className="text-[11px] font-mono text-[#858585] space-y-0.5">
                 <div>• Gyroscope Human Tremor: {telemetry.gyroVariance}g</div>
-                <div>• Devnet Blockhash: {telemetry.blockhash.slice(0, 16)}...</div>
+                <div>• Devnet Blockhash: {telemetry.blockhash ? telemetry.blockhash.slice(0, 16) : 'LiveDevnetNonce'}...</div>
                 <div>• GPS Fix: {telemetry.lat.toFixed(4)}, {telemetry.lng.toFixed(4)}</div>
                 <div>• SHA-256: {fingerprint.slice(0, 20)}...</div>
               </div>

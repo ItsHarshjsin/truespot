@@ -179,3 +179,9 @@
   background: #27272a !important;
   border-color: #a3e635 !important;
 }
+
+/* Inverted Dark Leaflet Map Tiles */
+.dark-leaflet-tiles {
+  filter: brightness(0.65) invert(1) contrast(2.4) hue-rotate(190deg) saturate(0.25) brightness(0.75);
+}
+

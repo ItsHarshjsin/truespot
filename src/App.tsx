@@ -20,17 +20,18 @@ import { JUDGE_PRESETS } from './utils/mockLocations';
 import { getRealDeviceGps } from './utils/evidence';
 import { hybridStore } from './utils/storage';
 
-import { JudgeDeck } from './components/JudgeDeck';
 import { Navbar } from './components/Navbar';
-import { MakerPortal } from './components/MakerPortal';
-import { ReceiverPortal } from './components/ReceiverPortal';
-import { ThreeWalletsHub } from './components/ThreeWalletsHub';
+import { LiveRealityMap } from './components/LiveRealityMap';
+import { QueryStudio } from './components/QueryStudio';
+import { EvidenceExplorer } from './components/EvidenceExplorer';
+import { ProtocolExplorer } from './components/ProtocolExplorer';
+import { JudgeDeck } from './components/JudgeDeck';
 import { WalletModal, DEMO_ACCOUNTS, DemoAccount } from './components/WalletModal';
 import { HowItWorksModal } from './components/HowItWorksModal';
 import { SupabaseModal } from './components/SupabaseModal';
 import { ToastContainer, ToastMessage } from './components/Toast';
 
-import { Shield, Compass, Lock, AlertCircle } from 'lucide-react';
+import { Radio, PlusCircle, FileCheck2, Code2, AlertCircle } from 'lucide-react';
 
 const AppContent: React.FC = () => {
   const navigate = useNavigate();
@@ -72,22 +73,10 @@ const AppContent: React.FC = () => {
   };
 
   // Adjust Wallet Balance Dynamically
-  const adjustBalance = (
-    amountDelta: number,
-    targetRole?: 'asker' | 'spotter' | 'verifier' | 'maker' | 'receiver' | 'escrow'
-  ) => {
+  const adjustBalance = (amountDelta: number) => {
     setDemoAccounts((prev) => {
       const updated = prev.map((acc) => {
-        const isTarget = targetRole
-          ? acc.role === targetRole ||
-            (targetRole === 'spotter' && acc.role === 'receiver') ||
-            (targetRole === 'receiver' && acc.role === 'spotter') ||
-            (targetRole === 'asker' && acc.role === 'maker') ||
-            (targetRole === 'maker' && acc.role === 'asker') ||
-            (targetRole === 'verifier' && acc.role === 'escrow') ||
-            (targetRole === 'escrow' && acc.role === 'verifier')
-          : acc.id === activeDemoAccount.id;
-        if (isTarget) {
+        if (acc.id === activeDemoAccount.id) {
           const newBal = Math.max(0, parseFloat((acc.balanceSol + amountDelta).toFixed(3)));
           return { ...acc, balanceSol: newBal };
         }
@@ -109,22 +98,17 @@ const AppContent: React.FC = () => {
     typeof window !== 'undefined' ? localStorage.getItem('truespot_locked_coords') : null;
   const initialCoords: Coordinates = savedCoordsStr
     ? JSON.parse(savedCoordsStr)
-    : { lat: 27.7172, lng: 85.324, accuracy: 5.0 };
+    : { lat: 37.7785, lng: -122.3999, accuracy: 5.0 };
 
   const [currentCoords, setCurrentCoords] = useState<Coordinates>(initialCoords);
   const [locationName, setLocationName] = useState<string>(
-    savedCoordsStr ? 'Saved Device Location' : 'Live Device GPS'
+    savedCoordsStr ? 'Saved Device Location' : 'San Francisco Ground Station'
   );
   const [gpsError, setGpsError] = useState<string | null>(null);
   const [isSimulated, setIsSimulated] = useState<boolean>(false);
-  const [unverifiedCount, setUnverifiedCount] = useState<number>(1);
 
   useEffect(() => {
     fetchDeviceGps(false);
-    const unsub = hybridStore.subscribeBountiesRealtime(() => {
-      refreshData();
-    });
-    return () => unsub();
   }, []);
 
   const fetchDeviceGps = async (isUserInitiated: boolean = false) => {
@@ -138,109 +122,75 @@ const AppContent: React.FC = () => {
       setIsSimulated(false);
       setGpsError(null);
 
-      localStorage.setItem('truespot_locked_coords', JSON.stringify(coords));
-      hybridStore.seedBountiesAroundUser(fix.lat, fix.lng);
-      refreshData();
-      showToast('GPS Fix Acquired', `Locked live coordinates: ±${fix.accuracy}m accuracy`, 'info');
-    } catch (err: any) {
-      console.warn('Real device GPS error:', err.message);
+      try {
+        localStorage.setItem('truespot_locked_coords', JSON.stringify(coords));
+      } catch (e) {}
+
       if (isUserInitiated) {
-        setGpsError(err.message || 'Unable to retrieve device GPS');
+        showToast('Real GPS Acquired', `Location calibrated (±${fix.accuracy}m)`, 'success');
+      }
+    } catch (err: any) {
+      if (isUserInitiated) {
+        setGpsError(err.message);
+        showToast('GPS Signal Warning', err.message, 'warning');
       }
     }
   };
 
-  const refreshData = async () => {
-    const bounties = await hybridStore.getBounties();
-    const answered = bounties.filter((b) => b.status === 'ANSWERED').length;
-    setUnverifiedCount(answered);
-  };
-
   const handleSetUserLocation = (lat: number, lng: number, name?: string) => {
-    const coords = { lat, lng, accuracy: 3.0 };
+    const coords: Coordinates = { lat, lng, accuracy: 5.0 };
     setCurrentCoords(coords);
-    setLocationName(`📍 ${name || 'Pinned Spot'}`);
-    setIsSimulated(false);
-    setGpsError(null);
+    setLocationName(name || `Pin (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+    setIsSimulated(true);
 
-    localStorage.setItem('truespot_locked_coords', JSON.stringify(coords));
-    hybridStore.seedBountiesAroundUser(lat, lng);
-    refreshData();
+    try {
+      localStorage.setItem('truespot_locked_coords', JSON.stringify(coords));
+    } catch (e) {}
+
+    showToast('GPS Relocated', `Calibrated to ${name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`}`, 'info');
   };
 
-  const handleSelectPreset = (presetId: string) => {
+  const handleSelectJudgePreset = (presetId: string) => {
     const preset = JUDGE_PRESETS.find((p) => p.id === presetId);
     if (preset) {
-      const coords = { lat: preset.lat, lng: preset.lng, accuracy: 4.0 };
-      setCurrentCoords(coords);
-      setLocationName(preset.name);
-      setIsSimulated(true);
-      setGpsError(null);
-      hybridStore.seedBountiesAroundUser(preset.lat, preset.lng);
-      refreshData();
-      showToast('Location Jumped', `Simulating physical location in ${preset.name}`, 'info');
-    }
-  };
-
-  const handleResetDemoState = async () => {
-    if (window.confirm('Reset all active tasks and reports to a clean initial state?')) {
-      await hybridStore.resetStateToZero();
-      hybridStore.seedBountiesAroundUser(currentCoords.lat, currentCoords.lng);
-      refreshData();
-      showToast('State Cleared', 'Reset all test tasks and reports to clean initial state', 'info');
+      handleSetUserLocation(preset.lat, preset.lng, preset.name);
+      hybridStore.resetToCoordinates(preset.lat, preset.lng);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-[#F5F5F5] flex flex-col font-sans selection:bg-[#A8FF00] selection:text-black relative overflow-x-hidden">
-      {/* Subtle Ambient Radial Glow */}
-      <div className="ambient-glow" />
-
-      {/* Global Floating Toast Notifications */}
+    <div className="min-h-screen bg-[#050505] text-[#F5F5F5] font-sans flex flex-col relative selection:bg-[#A8FF00] selection:text-black">
+      {/* Toast Notification Container */}
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
 
-      {/* 1. Full-Width Web Navbar with hard route toggle */}
+      {/* 1. Header Navigation with 4 Core Protocol Hubs */}
       <Navbar
-        unverifiedCount={unverifiedCount}
-        canGoBack={false}
+        unverifiedCount={1}
         onOpenWalletModal={() => setWalletModalOpen(true)}
         onOpenHowItWorks={() => setHowItWorksOpen(true)}
         onOpenSupabaseModal={() => setSupabaseModalOpen(true)}
         isSupabaseConnected={hybridStore.isConnectedToSupabase}
         activeDemoAccount={activeDemoAccount}
         isUsingDemo={isUsingDemo}
-        onResetDemoState={handleResetDemoState}
       />
 
-      {/* 2. Web Toolbar: Real Device GPS, Preset Jumper, and Devnet Airdrop */}
+      {/* Judge Location Simulation Ribbon */}
       <JudgeDeck
         currentLocationName={locationName}
         isSimulated={isSimulated}
-        onSelectPreset={handleSelectPreset}
+        onSelectPreset={handleSelectJudgePreset}
         onUseLiveGps={() => fetchDeviceGps(true)}
-        onRefreshData={() => {
-          refreshData();
-          showToast('Oracle Refreshed', 'Synced state with hybrid storage', 'info');
-        }}
-        onManualCoords={handleSetUserLocation}
-        onAirdropDemo={() => {
-          adjustBalance(1.0);
-          showToast(
-            'Devnet Airdrop',
-            `Added +1.00 SOL to ${activeDemoAccount.name.split(' ')[0]}`,
-            'reward'
-          );
-        }}
+        onRefreshData={() => {}}
       />
 
-      {/* Browser Permission Guidance Banner if blocked */}
+      {/* GPS Error Alert */}
       {gpsError && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-2">
-          <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 flex items-center justify-between shadow-lg backdrop-blur-md">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2">
+          <div className="bg-amber-950/40 border border-amber-500/30 rounded-2xl p-3 flex items-center justify-between text-xs text-amber-200">
             <div className="flex items-center space-x-2">
               <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
               <span className="font-medium leading-tight">
-                Device location blocked by browser: Click the 🔒 lock icon in your address bar → Allow Location.
+                Device location: Click the 🔒 lock icon in your address bar → Allow Location.
               </span>
             </div>
             <div className="flex items-center space-x-2 shrink-0 ml-3">
@@ -262,59 +212,69 @@ const AppContent: React.FC = () => {
         </div>
       )}
 
-      {/* 3. Main Web Application Content with Isolated React Router Endpoints */}
+      {/* 2. Main Protocol Content with the Four Dedicated Routes */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Routes>
-          {/* Route 1: /maker (Task Creator) */}
+          {/* Hub 1: /map — Live Reality Map */}
           <Route
-            path="/maker"
+            path="/map"
             element={
-              <MakerPortal
+              <LiveRealityMap
                 userCoords={currentCoords}
-                activeAccount={activeDemoAccount}
-                onAdjustBalance={adjustBalance}
-                onShowToast={showToast}
-                onNavigateToRadar={() => navigate('/spotter')}
-              />
-            }
-          />
-
-          {/* Route 2: /spotter (Field Earner) */}
-          <Route
-            path="/spotter"
-            element={
-              <ReceiverPortal
-                userCoords={currentCoords}
-                activeAccount={activeDemoAccount}
                 onSetUserLocation={handleSetUserLocation}
                 onShowToast={showToast}
+                contributorWallet={activeDemoAccount.address}
               />
             }
           />
 
-          {/* Route 3: /vault (Consensus/Escrow) */}
+          {/* Hub 2: /studio — Query Studio (Creation & Escrow) */}
           <Route
-            path="/vault"
+            path="/studio"
             element={
-              <ThreeWalletsHub
-                activeDemoAccount={activeDemoAccount}
-                onSelectDemoAccount={setActiveDemoAccount}
-                demoAccounts={demoAccounts}
+              <QueryStudio
+                userCoords={currentCoords}
+                creatorWallet={activeDemoAccount.address}
+                creatorBalanceSol={activeDemoAccount.balanceSol}
                 onAdjustBalance={adjustBalance}
-                onNavigateToReport={() => navigate('/spotter')}
-                onNavigateToAsk={() => navigate('/maker')}
                 onShowToast={showToast}
               />
             }
           />
 
-          {/* Fallback & Redirects */}
-          <Route path="/" element={<Navigate to="/maker" replace />} />
-          <Route path="*" element={<Navigate to="/maker" replace />} />
+          {/* Hub 3: /explorer — Evidence Explorer (Maker Review & Audit Hub) */}
+          <Route
+            path="/explorer"
+            element={
+              <EvidenceExplorer
+                onShowToast={showToast}
+                onAdjustBalance={adjustBalance}
+              />
+            }
+          />
+
+          {/* Hub 4: /developers — Protocol Explorer & Open API */}
+          <Route
+            path="/developers"
+            element={
+              <ProtocolExplorer
+                onShowToast={showToast}
+              />
+            }
+          />
+
+          {/* Backward compatibility aliases */}
+          <Route path="/maker" element={<Navigate to="/studio" replace />} />
+          <Route path="/spotter" element={<Navigate to="/map" replace />} />
+          <Route path="/vault" element={<Navigate to="/developers" replace />} />
+
+          {/* Fallback & Root */}
+          <Route path="/" element={<Navigate to="/map" replace />} />
+          <Route path="*" element={<Navigate to="/map" replace />} />
         </Routes>
       </main>
 
-      {/* 4. Desktop Web Footer - Benchmark Dark Mode */}
+      {/* 3. Desktop Web Footer */}
       <footer className="w-full bg-[#0B0B0B] border-t border-white/[0.07] py-6 mt-12 text-xs text-[#858585] select-none relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center space-x-2.5">
@@ -323,25 +283,26 @@ const AppContent: React.FC = () => {
             </div>
             <span className="font-bold text-[#F5F5F5] tracking-tight">TrueSpot V2 Protocol</span>
             <span>•</span>
-            <span className="text-[#858585]">Physical Verification Network on Solana Devnet</span>
+            <span className="text-[#858585]">Decentralized Physical Verification Oracle on Solana Devnet</span>
           </div>
 
           <div className="flex items-center space-x-4 text-[11px] font-medium text-[#858585]">
-            <span>Decentralized Escrow</span>
+            <span>97.5% Contributor / 2.5% Treasury</span>
             <span>•</span>
-            <span>200m Proximity Geofence</span>
+            <span>Anchor PDA Escrow</span>
             <span>•</span>
-            <span className="font-mono text-[#A8FF00] font-semibold">Vault: 9WzD...AWWM</span>
+            <span className="font-mono text-[#A8FF00] font-semibold">TrUEspot...1111</span>
           </div>
         </div>
       </footer>
 
-      {/* Mobile Bottom Floating Navigation Bar - Hard React Router Links */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#121212]/95 backdrop-blur-2xl border-t border-zinc-800 px-4 py-2 flex items-center justify-around select-none">
+      {/* 4. Mobile Bottom Floating Navigation Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0B0B0B]/95 backdrop-blur-2xl border-t border-white/10 px-4 py-2 flex items-center justify-around select-none">
         {[
-          { path: '/maker', label: 'Maker', icon: Shield },
-          { path: '/spotter', label: 'Spotter', icon: Compass },
-          { path: '/vault', label: 'Vault', icon: Lock },
+          { path: '/map', label: 'Map', icon: Radio },
+          { path: '/studio', label: 'Studio', icon: PlusCircle },
+          { path: '/explorer', label: 'Explorer', icon: FileCheck2 },
+          { path: '/developers', label: 'API', icon: Code2 },
         ].map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname.startsWith(item.path);
@@ -385,7 +346,7 @@ const AppContent: React.FC = () => {
       <HowItWorksModal
         isOpen={howItWorksOpen}
         onClose={() => setHowItWorksOpen(false)}
-        onStartDemo={() => navigate('/spotter')}
+        onStartDemo={() => navigate('/map')}
       />
 
       {/* Supabase PostgreSQL + PostGIS Configuration Modal */}
@@ -393,7 +354,6 @@ const AppContent: React.FC = () => {
         isOpen={supabaseModalOpen}
         onClose={() => setSupabaseModalOpen(false)}
         onConfigSaved={() => {
-          refreshData();
           showToast(
             'Database Configured',
             'Live PostgreSQL PostGIS connection verified',
