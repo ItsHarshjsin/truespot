@@ -43,11 +43,12 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
 
   useEffect(() => {
     loadData();
-    const unsub = hybridStore.subscribeToChanges(() => {
+    const unsub = hybridStore.subscribeBountiesRealtime(() => {
       loadData();
     });
     return () => unsub();
   }, []);
+
 
   const totalSettledEarnings = bounties
     .filter((b) => b.status === 'PAID')

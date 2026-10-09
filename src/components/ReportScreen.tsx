@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { Bounty, Coordinates, SensorTelemetry } from '../types';
+import { Bounty, Coordinates, SensorTelemetry, AiConfidenceResult } from '../types';
 import { hybridStore } from '../utils/storage';
 import {
-  getCoordinates,
   generateFingerprint,
   measureDeviceTremor,
   generateSyntheticCameraFrame,
@@ -17,6 +16,16 @@ import {
   ShieldCheck,
   CheckCircle2,
   Sparkles,
+  FileText,
+  Eye,
+  Bot,
+  Video,
+  FileCheck2,
+  X,
+  Compass,
+  Upload,
+  AlertCircle,
+  HelpCircle,
 } from 'lucide-react';
 
 interface ReportScreenProps {
@@ -38,6 +47,7 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
 }) => {
   const { publicKey, sendTransaction } = useWallet();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const heavyMediaInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
@@ -45,11 +55,19 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
   const [bountiesList, setBountiesList] = useState<Bounty[]>([]);
   const [selectedBountyId, setSelectedBountyId] = useState<string>(bountyId || '');
 
+  // Mission Briefing Modal State (Requirement 4)
+  const [showMissionBriefing, setShowMissionBriefing] = useState<boolean>(true);
+
   // Evidence state
   const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
+  const [mediaType, setMediaType] = useState<'image' | 'video' | 'audio'>('image');
   const [fingerprint, setFingerprint] = useState<string | null>(null);
   const [telemetry, setTelemetry] = useState<SensorTelemetry | null>(null);
-  const [answerText, setAnswerText] = useState('YES, actively open with short wait');
+  const [answerText, setAnswerText] = useState('YES, verified present and active');
+
+  // AI Vision Pre-Check State (Requirement 4)
+  const [isScanningAi, setIsScanningAi] = useState<boolean>(false);
+  const [aiConfidence, setAiConfidence] = useState<AiConfidenceResult | null>(null);
 
   // WebRTC Live Camera State
   const [isStreaming, setIsStreaming] = useState(false);
@@ -65,8 +83,33 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
     };
   }, []);
 
+  useEffect(() => {
+    hybridStore.getBounties().then((list) => {
+      setBountiesList(list);
+      const target = list.find((b) => b.id === (bountyId || selectedBountyId)) || list[0];
+      if (target) {
+        setBounty(target);
+        setSelectedBountyId(target.id);
+        setShowMissionBriefing(true);
+      }
+    });
+  }, [bountyId]);
+
+  const handleSelectBounty = (id: string) => {
+    setSelectedBountyId(id);
+    const target = bountiesList.find((b) => b.id === id);
+    if (target) {
+      setBounty(target);
+      setShowMissionBriefing(true);
+      setPhotoDataUrl(null);
+      setFingerprint(null);
+      setAiConfidence(null);
+    }
+  };
+
   const startCameraStream = async () => {
     setErrorMsg(null);
+    setShowMissionBriefing(false);
     try {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
@@ -90,7 +133,7 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
     } catch (err: any) {
       console.warn('WebRTC camera error:', err);
       setErrorMsg(
-        'Unable to access browser camera directly. You can use Upload or Quick Capture below.'
+        'Unable to access browser camera directly. You can use Heavy Media Upload or Simulate Frame below.'
       );
       setIsStreaming(false);
     }
@@ -123,42 +166,31 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Draw video frame
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Overlay Tactical Cryptographic Watermark
-    ctx.fillStyle = 'rgba(15, 56, 34, 0.75)';
+    // Overlay Cryptographic Watermark
+    ctx.fillStyle = 'rgba(5, 5, 5, 0.85)';
     ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
 
-    ctx.fillStyle = '#99E35E';
+    ctx.fillStyle = '#A8FF00';
     ctx.font = 'bold 16px monospace';
-    ctx.fillText(`TRUESPOT LIVE ATTESTATION • ${bounty.place_name.toUpperCase()}`, 20, canvas.height - 44);
+    ctx.fillText(`TRUESPOT DEPIN ORACLE • ${bounty.place_name.toUpperCase()}`, 20, canvas.height - 44);
 
     ctx.fillStyle = '#FFFFFF';
     ctx.font = '12px monospace';
-    ctx.fillText(`GPS: ${userCoords.lat.toFixed(5)}, ${userCoords.lng.toFixed(5)} • UTC: ${new Date().toISOString()}`, 20, canvas.height - 20);
+    ctx.fillText(`GPS: ${userCoords.lat.toFixed(5)}, ${userCoords.lng.toFixed(5)} • BLOCKHASH STAMP • ${new Date().toISOString()}`, 20, canvas.height - 20);
 
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
     setPhotoDataUrl(dataUrl);
+    setMediaType('image');
     stopCameraStream();
+
     await runHardwareTelemetry(dataUrl);
-  };
 
-  useEffect(() => {
-    hybridStore.getBounties().then((list) => {
-      setBountiesList(list);
-      const target = list.find((b) => b.id === (bountyId || selectedBountyId)) || list[0];
-      if (target) {
-        setBounty(target);
-        setSelectedBountyId(target.id);
-      }
-    });
-  }, [bountyId]);
-
-  const handleSelectBounty = (id: string) => {
-    setSelectedBountyId(id);
-    const target = bountiesList.find((b) => b.id === id);
-    if (target) setBounty(target);
+    // If bounty requires AI Vision, trigger AI Vision Pre-Check
+    if (bounty.bounty_type === 'AI_VISION') {
+      await triggerAiVision(dataUrl);
+    }
   };
 
   const runHardwareTelemetry = async (photoBytesOrString: string | Uint8Array) => {
@@ -168,23 +200,17 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
       const activeLng = userCoords.lng || 85.324;
       const timestamp = new Date().toISOString();
 
-      // Quick devnet blockhash with instant fallback
       let devnetBlockhash = '8Zk9jNm' + Math.random().toString(36).substring(2, 9);
       try {
         const bhPromise = getRecentDevnetBlockhash();
         const timeoutPromise = new Promise<string>((_, reject) => setTimeout(() => reject('timeout'), 800));
         devnetBlockhash = await Promise.race([bhPromise, timeoutPromise]);
-      } catch (e) {
-        // Fallback already assigned
-      }
+      } catch (e) {}
 
-      // Fast tremor measurement
       let tremor = { variance: 0.048, isHuman: true };
       try {
         tremor = await measureDeviceTremor(300);
-      } catch (e) {
-        // Fallback tremor variance
-      }
+      } catch (e) {}
 
       const hash = await generateFingerprint(
         photoBytesOrString,
@@ -221,23 +247,72 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
     }
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Heavy Media File Upload Pipeline (images, videos, audio clips)
+  const handleHeavyMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !bounty) return;
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const dataUrl = reader.result as string;
-      setPhotoDataUrl(dataUrl);
+    setShowMissionBriefing(false);
+    setMeasuringSensors(true);
 
-      const arrayBuffer = await file.arrayBuffer();
-      await runHardwareTelemetry(new Uint8Array(arrayBuffer));
-    };
-    reader.readAsDataURL(file);
+    try {
+      // 1. Upload to Supabase truespot_evidence bucket and calculate true SHA-256
+      const uploadResult = await hybridStore.uploadMediaFile(file, bounty.id);
+      setPhotoDataUrl(uploadResult.publicUrl);
+      setMediaType(uploadResult.mediaType);
+      setFingerprint(uploadResult.sha256);
+
+      // 2. Compute live sensor telemetry
+      await runHardwareTelemetry(uploadResult.publicUrl);
+
+      // 3. AI Vision Pre-Check if designated
+      if (bounty.bounty_type === 'AI_VISION') {
+        await triggerAiVision(uploadResult.publicUrl);
+      }
+
+      if (onShowToast) {
+        onShowToast(
+          'Media Uploaded to truespot_evidence',
+          `SHA-256: ${uploadResult.sha256.slice(0, 16)}... (${uploadResult.mediaType})`,
+          'info'
+        );
+      }
+    } catch (err: any) {
+      console.warn('Heavy media pipeline failed:', err);
+      setErrorMsg(err.message || 'Media upload failed');
+    } finally {
+      setMeasuringSensors(false);
+    }
+  };
+
+  // Trigger AI Vision Pre-Check (Requirement 4)
+  const triggerAiVision = async (mediaUrl: string) => {
+    if (!bounty) return;
+    setIsScanningAi(true);
+    try {
+      const result = await hybridStore.runAiVisionPreCheck(
+        mediaUrl,
+        bounty.question,
+        bounty.rich_instructions || ''
+      );
+      setAiConfidence(result);
+      if (onShowToast) {
+        onShowToast(
+          `AI Vision Verified: ${result.score}% Match`,
+          result.reasoning,
+          'success'
+        );
+      }
+    } catch (err) {
+      console.warn('AI Vision pre-check warning:', err);
+    } finally {
+      setIsScanningAi(false);
+    }
   };
 
   const handleGenerateFrame = async () => {
     if (!bounty) return;
+    setShowMissionBriefing(false);
     setMeasuringSensors(true);
 
     const blockhash = '8Zk9jNm' + Math.random().toString(36).substring(2, 9);
@@ -251,7 +326,12 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
     );
 
     setPhotoDataUrl(frame);
+    setMediaType('image');
     await runHardwareTelemetry(frame);
+
+    if (bounty.bounty_type === 'AI_VISION') {
+      await triggerAiVision(frame);
+    }
   };
 
   const handleSubmitReport = async () => {
@@ -261,7 +341,7 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
     }
 
     if (!photoDataUrl) {
-      setErrorMsg('Please capture or select photo evidence first.');
+      setErrorMsg('Please capture or select heavy media evidence first.');
       return;
     }
 
@@ -285,7 +365,7 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
         timestamp: new Date().toISOString(),
       };
 
-      const memoText = `TRUESPOT:v1:${bounty.id}:${activeFingerprint.slice(0, 16)}:${activeTelemetry.lat.toFixed(4)},${activeTelemetry.lng.toFixed(4)}`;
+      const memoText = `TRUESPOT:v2:${bounty.id}:${activeFingerprint.slice(0, 16)}:${activeTelemetry.lat.toFixed(4)},${activeTelemetry.lng.toFixed(4)}`;
       let onChainMemoSig = '';
 
       if (publicKey && sendTransaction) {
@@ -300,6 +380,7 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
         ? publicKey.toBase58().slice(0, 4) + '...' + publicKey.toBase58().slice(-4)
         : activeReporterWallet || 'Worker9Xkl...88Qv';
 
+      // Save ONLY lightweight URL, SHA-256 hash, gyro variance, and AI JSON score (Requirement 4)
       const newReport = await hybridStore.submitReport({
         bounty_id: bounty.id,
         photo_url: photoDataUrl,
@@ -312,6 +393,8 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
         gyro_variance: activeTelemetry.gyroVariance,
         blockhash_stamp: activeTelemetry.blockhash,
         memo_signature: onChainMemoSig || undefined,
+        media_type: mediaType,
+        ai_confidence_score: aiConfidence,
       });
 
       if (onShowToast) {
@@ -341,30 +424,131 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
   }
 
   return (
-    <div className="space-y-6 pb-6 max-w-5xl mx-auto">
-      {/* Hidden Mobile Camera Input */}
+    <div className="space-y-6 pb-6 max-w-5xl mx-auto relative">
+      {/* Heavy Media Input (video, image, audio) with environment capture */}
+      <input
+        type="file"
+        accept="video/*,image/*,audio/*"
+        capture="environment"
+        id="heavy-media-file"
+        ref={heavyMediaInputRef}
+        onChange={handleHeavyMediaUpload}
+        className="hidden"
+      />
+
       <input
         type="file"
         accept="image/*"
         capture="environment"
         id="camera-file"
         ref={fileInputRef}
-        onChange={handleFileChange}
+        onChange={handleHeavyMediaUpload}
         className="hidden"
       />
 
+      {/* ========================================================= */}
+      {/* 1. MISSION BRIEFING MODAL (Requirement 4)                */}
+      {/* ========================================================= */}
+      {showMissionBriefing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+          <div className="bg-[#0B0B0B] border border-white/[0.1] rounded-[24px] max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
+            <button
+              onClick={() => setShowMissionBriefing(false)}
+              className="absolute top-4 right-4 w-7 h-7 rounded-full bg-[#141414] hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center text-xs transition-colors cursor-pointer"
+            >
+              ✕
+            </button>
+
+            {/* Header */}
+            <div className="space-y-1.5">
+              <div className="flex items-center space-x-2">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#A8FF00]/15 text-[#A8FF00] border border-[#A8FF00]/30 font-mono">
+                  {bounty.bounty_type || 'BOOLEAN'} MISSION
+                </span>
+                {bounty.max_spotters && bounty.max_spotters > 1 && (
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#4285FF]/15 text-[#4285FF] border border-[#4285FF]/30">
+                    Swarm Quorum: {bounty.max_spotters} Spotters
+                  </span>
+                )}
+              </div>
+              <h2 className="text-lg font-bold text-white tracking-tight">
+                {bounty.place_name}
+              </h2>
+              <div className="text-xs text-[#A8FF00] font-mono font-bold">
+                Reward: {bounty.amount_sol} SOL ({bounty.max_spotters && bounty.max_spotters > 1 ? `${(bounty.amount_sol / bounty.max_spotters).toFixed(3)} SOL per spotter` : '100% Payout'})
+              </div>
+            </div>
+
+            {/* Target Question */}
+            <div className="p-3 rounded-xl bg-[#101010] border border-white/[0.06] text-xs text-[#F5F5F5] font-medium leading-relaxed">
+              <span className="text-[#858585] block text-[10px] uppercase font-bold mb-0.5">Verification Query:</span>
+              "{bounty.question}"
+            </div>
+
+            {/* Reference Media Benchmark Image (if provided) */}
+            {bounty.reference_media_url && (
+              <div className="space-y-1">
+                <span className="text-[10px] uppercase tracking-wider font-bold text-[#858585] flex items-center space-x-1.5">
+                  <Eye className="w-3 h-3 text-[#A8FF00]" />
+                  <span>Reference Target Benchmark</span>
+                </span>
+                <div className="rounded-xl overflow-hidden aspect-video max-h-48 bg-black border border-[#A8FF00]/30">
+                  <img
+                    src={bounty.reference_media_url}
+                    alt="Target Benchmark"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Markdown Rich Instructions */}
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase tracking-wider font-bold text-[#858585] flex items-center space-x-1.5">
+                <FileText className="w-3 h-3 text-[#A8FF00]" />
+                <span>Field Operator Briefing</span>
+              </span>
+              <div className="p-3 rounded-xl bg-[#101010] border border-white/[0.06] text-xs text-zinc-300 font-sans leading-relaxed whitespace-pre-line max-h-36 overflow-y-auto">
+                {bounty.rich_instructions || (
+                  <p>Walk within 200m radius of the venue. Capture photo/video proof showing active status. Biometric tremor telemetry and Devnet blockhash will be stamped automatically.</p>
+                )}
+              </div>
+            </div>
+
+            {/* Action CTA */}
+            <div className="pt-2">
+              <button
+                onClick={() => setShowMissionBriefing(false)}
+                className="w-full py-3.5 px-5 rounded-full bg-gradient-to-r from-[#A8FF00] to-[#34D399] hover:brightness-105 text-black font-extrabold text-xs tracking-wide shadow-xl shadow-[#A8FF00]/25 flex items-center justify-center space-x-2 transition-all cursor-pointer"
+              >
+                <span>Accept Mission & Open Sensor Capture</span>
+                <span className="text-base font-mono">→</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Grid View */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         
-        {/* Left Column (5 cols on desktop): Spot Details & Observed Truth Input */}
+        {/* Left Column: Spot Details & Observed Truth Input */}
         <div className="lg:col-span-5 space-y-4">
-          {/* 1. Target Bounty Header Card */}
+          {/* Target Bounty Header Card */}
           <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-3 shadow-xl">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#A8FF00]/10 text-[#A8FF00] border border-[#A8FF00]/30">
-                Target Spot
-              </span>
+              <div className="flex items-center space-x-1.5">
+                <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#A8FF00]/10 text-[#A8FF00] border border-[#A8FF00]/30">
+                  {bounty.bounty_type || 'BOOLEAN'} Spot
+                </span>
+                {bounty.max_spotters && bounty.max_spotters > 1 && (
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#4285FF]/15 text-[#4285FF] border border-[#4285FF]/30 font-bold">
+                    Swarm: {bounty.max_spotters}
+                  </span>
+                )}
+              </div>
               <span className="text-xs font-bold font-mono text-[#A8FF00] bg-[#101010] border border-white/[0.07] px-2.5 py-0.5 rounded-full">
-                Reward: {bounty.amount_sol} SOL
+                {bounty.amount_sol} SOL
               </span>
             </div>
 
@@ -375,25 +559,36 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
               "{bounty.question}"
             </p>
 
-            {bountiesList.length > 1 && (
-              <div className="mt-2.5 pt-2.5 border-t border-white/[0.06] flex items-center space-x-2">
-                <span className="text-xs text-[#858585]">Switch:</span>
-                <select
-                  value={selectedBountyId}
-                  onChange={(e) => handleSelectBounty(e.target.value)}
-                  className="bg-[#101010] text-xs text-[#F5F5F5] font-medium border border-white/[0.08] rounded-full px-3 py-1 outline-none focus:border-[#A8FF00] cursor-pointer"
-                >
-                  {bountiesList.map((b) => (
-                    <option key={b.id} value={b.id} className="bg-zinc-900 text-white">
-                      {b.place_name} ({b.amount_sol} SOL)
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+            <div className="flex items-center justify-between pt-2 border-t border-white/[0.06]">
+              <button
+                type="button"
+                onClick={() => setShowMissionBriefing(true)}
+                className="text-xs text-[#A8FF00] hover:underline flex items-center space-x-1 font-semibold cursor-pointer"
+              >
+                <FileCheck2 className="w-3.5 h-3.5" />
+                <span>Mission Briefing</span>
+              </button>
+
+              {bountiesList.length > 1 && (
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs text-[#858585]">Switch:</span>
+                  <select
+                    value={selectedBountyId}
+                    onChange={(e) => handleSelectBounty(e.target.value)}
+                    className="bg-[#101010] text-xs text-[#F5F5F5] font-medium border border-white/[0.08] rounded-full px-3 py-1 outline-none focus:border-[#A8FF00] cursor-pointer"
+                  >
+                    {bountiesList.map((b) => (
+                      <option key={b.id} value={b.id} className="bg-zinc-900 text-white">
+                        {b.place_name} ({b.amount_sol} SOL)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* 2. Observed Answer Selection */}
+          {/* Observed Answer Selection */}
           <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-3 shadow-xl">
             <label className="block text-[10px] font-bold text-[#858585] uppercase tracking-wider">
               Observed Place Truth
@@ -431,7 +626,7 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
             />
           </div>
 
-          {/* 3. Hardware Telemetry Card */}
+          {/* Hardware & Telemetry Card */}
           {telemetry && fingerprint && (
             <div className="p-4 bg-[#0B0B0B] rounded-[20px] border border-[#A8FF00]/30 text-xs text-[#A8FF00] space-y-2 shadow-inner">
               <div className="flex items-center justify-between font-bold">
@@ -447,33 +642,90 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                 <div>• Gyroscope Human Tremor: {telemetry.gyroVariance}g</div>
                 <div>• Devnet Blockhash: {telemetry.blockhash.slice(0, 16)}...</div>
                 <div>• GPS Fix: {telemetry.lat.toFixed(4)}, {telemetry.lng.toFixed(4)}</div>
+                <div>• SHA-256: {fingerprint.slice(0, 20)}...</div>
               </div>
+            </div>
+          )}
+
+          {/* AI Vision Pre-Check HUD Card (Requirement 4) */}
+          {isScanningAi && (
+            <div className="p-4 bg-[#0B0B0B] rounded-[20px] border border-purple-500/40 text-xs text-purple-300 space-y-2 animate-pulse">
+              <div className="flex items-center space-x-2 font-bold text-white">
+                <Bot className="w-4 h-4 text-purple-400 animate-spin" />
+                <span>Running AI Computer Vision Pre-Check...</span>
+              </div>
+              <p className="text-[11px] text-zinc-400">
+                Segmenting physical objects, verifying target landmarks against Maker instructions.
+              </p>
+            </div>
+          )}
+
+          {aiConfidence && (
+            <div className="p-4 bg-[#0B0B0B] rounded-[20px] border border-[#A8FF00]/40 text-xs space-y-2.5 shadow-xl">
+              <div className="flex items-center justify-between">
+                <span className="flex items-center space-x-1.5 font-bold text-white">
+                  <Bot className="w-4 h-4 text-[#A8FF00]" />
+                  <span>AI Vision Pre-Check Verified</span>
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-black bg-[#A8FF00] text-black shadow-sm">
+                  {aiConfidence.score}% Score
+                </span>
+              </div>
+
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {aiConfidence.detected_objects.map((obj, idx) => (
+                  <span
+                    key={idx}
+                    className="px-2 py-0.5 rounded-md bg-[#141414] border border-white/[0.08] text-[10px] text-zinc-300 font-mono"
+                  >
+                    ✓ {obj}
+                  </span>
+                ))}
+              </div>
+
+              <p className="text-[11px] text-[#858585] leading-snug">
+                {aiConfidence.reasoning}
+              </p>
             </div>
           )}
         </div>
 
-        {/* Right Column (7 cols on desktop): Camera Viewfinder & Submission */}
+        {/* Right Column: Viewfinder & Heavy Media Submissions */}
         <div className="lg:col-span-7 bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-4 shadow-xl">
-          <label className="block text-[10px] font-bold text-[#858585] uppercase tracking-wider">
-            Physical Camera Verification
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-[10px] font-bold text-[#858585] uppercase tracking-wider">
+              Physical Media Verification Pipeline
+            </label>
+            <span className="text-[10px] text-[#A8FF00] font-mono">
+              Bucket: truespot_evidence
+            </span>
+          </div>
 
           {photoDataUrl ? (
             <div className="relative rounded-xl overflow-hidden border border-[#A8FF00]/50 bg-black aspect-video flex items-center justify-center shadow-lg">
-              <img
-                src={photoDataUrl}
-                alt="Captured Evidence"
-                className="w-full h-full object-contain"
-              />
+              {mediaType === 'video' ? (
+                <video
+                  src={photoDataUrl}
+                  controls
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <img
+                  src={photoDataUrl}
+                  alt="Captured Evidence"
+                  className="w-full h-full object-contain"
+                />
+              )}
               <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-white flex items-center space-x-1.5 border border-white/10 shadow-sm">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#A8FF00]" />
-                <span>Hardware Verified Frame</span>
+                <span>Heavy Media Loaded ({mediaType.toUpperCase()})</span>
               </div>
               <button
                 onClick={() => {
                   setPhotoDataUrl(null);
                   setFingerprint(null);
                   setTelemetry(null);
+                  setAiConfidence(null);
                 }}
                 className="absolute top-3 right-3 bg-[#101010] hover:bg-zinc-800 text-white text-xs px-3 py-1 rounded-full font-semibold border border-white/15 backdrop-blur-md transition-colors cursor-pointer"
               >
@@ -490,12 +742,10 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                 className="w-full h-full object-cover"
               />
 
-              {/* Viewfinder Target Label */}
               <div className="absolute top-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-mono text-[#A8FF00] border border-[#A8FF00]/40">
                 LIVE SENSOR STREAM • {bounty.place_name}
               </div>
 
-              {/* Controls Toolbar at Bottom of Viewfinder */}
               <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between px-2">
                 <button
                   type="button"
@@ -505,7 +755,6 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                   Flip ({facingMode === 'environment' ? 'Rear' : 'Front'})
                 </button>
 
-                {/* Shutter Button */}
                 <button
                   type="button"
                   onClick={captureLiveFrame}
@@ -530,10 +779,10 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                 <Camera className="w-6 h-6" />
               </div>
               <h3 className="text-sm font-bold text-[#F5F5F5] mb-1">
-                Live Evidence Capture
+                Heavy Media & Sensor Capture
               </h3>
               <p className="text-xs text-[#858585] max-w-sm mx-auto mb-4 leading-relaxed">
-                Requires real camera with involuntary hand-tremor biometric verification and Solana blockhash nonce.
+                Accepts video clips, photos, and audio recordings. Uploads directly to Supabase storage with SHA-256 computation and AI Vision pre-check.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-2.5 max-w-md mx-auto">
@@ -543,15 +792,16 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
                   className="flex-1 py-2.5 px-4 rounded-full bg-gradient-to-r from-[#A8FF00] to-[#34D399] hover:brightness-105 text-black text-xs font-extrabold flex items-center justify-center space-x-1.5 transition-all shadow-md shadow-[#A8FF00]/15 cursor-pointer"
                 >
                   <Camera className="w-3.5 h-3.5 text-black" />
-                  <span>Start Viewfinder</span>
+                  <span>Open Camera</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => heavyMediaInputRef.current?.click()}
                   className="flex-1 py-2.5 px-4 rounded-full bg-[#18181b] hover:bg-zinc-800 text-[#858585] hover:text-white border border-white/[0.07] text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all cursor-pointer"
                 >
-                  <span>Upload File</span>
+                  <Upload className="w-3.5 h-3.5 text-[#A8FF00]" />
+                  <span>Upload Media</span>
                 </button>
 
                 <button
@@ -566,7 +816,6 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
             </div>
           )}
 
-          {/* Telemetry Indicator */}
           {measuringSensors && (
             <p className="text-xs font-semibold text-[#A8FF00] text-center animate-pulse">
               Analyzing accelerometer tremor & stamping live Solana blockhash...
@@ -575,7 +824,6 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
 
           {errorMsg && <p className="text-xs text-rose-400 font-medium px-2">{errorMsg}</p>}
 
-          {/* Primary Submit Button */}
           <div className="pt-1">
             <button
               onClick={handleSubmitReport}
@@ -583,7 +831,7 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
               className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-[#A8FF00] to-[#34D399] hover:brightness-105 text-black font-extrabold text-xs tracking-wide shadow-xl shadow-[#A8FF00]/25 flex items-center justify-center space-x-2 transition-all active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4 text-black" />
-              <span>{submitting ? 'Submitting to Solana...' : 'Submit Evidence & Claim Bounty'}</span>
+              <span>{submitting ? 'Recording on Solana Devnet...' : 'Submit Evidence & Claim Bounty'}</span>
               <span className="font-mono text-xs">↗</span>
             </button>
           </div>

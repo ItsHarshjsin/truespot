@@ -87,9 +87,16 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
   useEffect(() => {
     loadAllData();
     fetchLiveSolanaData();
+    const unsub = hybridStore.subscribeBountiesRealtime(() => {
+      loadAllData();
+    });
     const interval = setInterval(fetchLiveSolanaData, 15000);
-    return () => clearInterval(interval);
+    return () => {
+      unsub();
+      clearInterval(interval);
+    };
   }, []);
+
 
   const q = searchQuery.toLowerCase().trim();
   const filteredBounties = bounties.filter((b) => {

@@ -24,6 +24,10 @@ CREATE TABLE bounties (
     asker_wallet TEXT NOT NULL,
     escrow_tx TEXT,
     payout_tx TEXT,
+    bounty_type TEXT NOT NULL DEFAULT 'BOOLEAN' CHECK (bounty_type IN ('BOOLEAN', 'DATA_COLLECTION', 'AI_VISION')),
+    max_spotters INTEGER NOT NULL DEFAULT 1,
+    rich_instructions TEXT,
+    reference_media_url TEXT,
     created_at TIMESTAMPTZ DEFAULT now(),
     expires_at TIMESTAMPTZ NOT NULL,
     location GEOGRAPHY(POINT, 4326) GENERATED ALWAYS AS (ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography) STORED
@@ -47,11 +51,18 @@ CREATE TABLE reports (
     gyro_variance DOUBLE PRECISION,
     blockhash_stamp TEXT,
     memo_signature TEXT,
+    media_type TEXT DEFAULT 'image',
+    ai_confidence_score JSONB,
     observed_at TIMESTAMPTZ DEFAULT now(),
     location GEOGRAPHY(POINT, 4326) GENERATED ALWAYS AS (ST_SetSRID(ST_MakePoint(gps_lng, gps_lat), 4326)::geography) STORED
 );
 
 CREATE INDEX IF NOT EXISTS idx_reports_bounty_id ON reports(bounty_id);
+
+-- Storage bucket configuration for heavy media evidence
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('truespot_evidence', 'truespot_evidence', true) 
+ON CONFLICT (id) DO NOTHING;
 
 -- 5. Verifications Table: Staked Schelling-point consensus votes
 CREATE TABLE verifications (

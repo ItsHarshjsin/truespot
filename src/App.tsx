@@ -1,5 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from 'react-router-dom';
+import {
   ConnectionProvider,
   WalletProvider,
 } from '@solana/wallet-adapter-react';
@@ -22,15 +30,11 @@ import { HowItWorksModal } from './components/HowItWorksModal';
 import { SupabaseModal } from './components/SupabaseModal';
 import { ToastContainer, ToastMessage } from './components/Toast';
 
-import { Shield, Compass, Camera, AlertCircle } from 'lucide-react';
+import { Shield, Compass, Lock, AlertCircle } from 'lucide-react';
 
-export const App: React.FC = () => {
-  const endpoint = useMemo(() => clusterApiUrl('devnet'), []);
-  const wallets = useMemo(() => [], []);
-
-  // Top-level Two-Portal Switcher: 'maker' | 'receiver' | 'escrow'
-  const [activeTab, setActiveTab] = useState<string>('maker');
-  const [selectedBountyId, setSelectedBountyId] = useState<string | undefined>(undefined);
+const AppContent: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Modals state
   const [walletModalOpen, setWalletModalOpen] = useState<boolean>(false);
@@ -117,11 +121,10 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     fetchDeviceGps(false);
-    hybridStore.setupRealtimeChannel();
-    const unsubscribe = hybridStore.subscribeToChanges(() => {
+    const unsub = hybridStore.subscribeBountiesRealtime(() => {
       refreshData();
     });
-    return () => unsubscribe();
+    return () => unsub();
   }, []);
 
   const fetchDeviceGps = async (isUserInitiated: boolean = false) => {
@@ -188,215 +191,231 @@ export const App: React.FC = () => {
     }
   };
 
-  // Step / Portal information
-  const stepMap: { [key: string]: { num: number; title: string; prev?: string } } = {
-    maker: { num: 1, title: 'Task Maker Portal', prev: undefined },
-    receiver: { num: 2, title: 'Field Receiver Portal', prev: undefined },
-    escrow: { num: 3, title: 'Escrow Protocol', prev: undefined },
-  };
+  return (
+    <div className="min-h-screen bg-[#050505] text-[#F5F5F5] flex flex-col font-sans selection:bg-[#A8FF00] selection:text-black relative overflow-x-hidden">
+      {/* Subtle Ambient Radial Glow */}
+      <div className="ambient-glow" />
 
-  const currentStep = stepMap[activeTab] || stepMap.maker;
+      {/* Global Floating Toast Notifications */}
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+
+      {/* 1. Full-Width Web Navbar with hard route toggle */}
+      <Navbar
+        unverifiedCount={unverifiedCount}
+        canGoBack={false}
+        onOpenWalletModal={() => setWalletModalOpen(true)}
+        onOpenHowItWorks={() => setHowItWorksOpen(true)}
+        onOpenSupabaseModal={() => setSupabaseModalOpen(true)}
+        isSupabaseConnected={hybridStore.isConnectedToSupabase}
+        activeDemoAccount={activeDemoAccount}
+        isUsingDemo={isUsingDemo}
+        onResetDemoState={handleResetDemoState}
+      />
+
+      {/* 2. Web Toolbar: Real Device GPS, Preset Jumper, and Devnet Airdrop */}
+      <JudgeDeck
+        currentLocationName={locationName}
+        isSimulated={isSimulated}
+        onSelectPreset={handleSelectPreset}
+        onUseLiveGps={() => fetchDeviceGps(true)}
+        onRefreshData={() => {
+          refreshData();
+          showToast('Oracle Refreshed', 'Synced state with hybrid storage', 'info');
+        }}
+        onManualCoords={handleSetUserLocation}
+        onAirdropDemo={() => {
+          adjustBalance(1.0);
+          showToast(
+            'Devnet Airdrop',
+            `Added +1.00 SOL to ${activeDemoAccount.name.split(' ')[0]}`,
+            'reward'
+          );
+        }}
+      />
+
+      {/* Browser Permission Guidance Banner if blocked */}
+      {gpsError && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-2">
+          <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 flex items-center justify-between shadow-lg backdrop-blur-md">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+              <span className="font-medium leading-tight">
+                Device location blocked by browser: Click the 🔒 lock icon in your address bar → Allow Location.
+              </span>
+            </div>
+            <div className="flex items-center space-x-2 shrink-0 ml-3">
+              <button
+                onClick={() => fetchDeviceGps(true)}
+                className="px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 text-xs font-bold hover:bg-amber-400/30 transition-colors shrink-0 cursor-pointer"
+              >
+                Retry GPS
+              </button>
+              <button
+                onClick={() => setGpsError(null)}
+                className="w-6 h-6 rounded-full hover:bg-amber-400/20 flex items-center justify-center text-amber-300 transition-colors cursor-pointer"
+                title="Dismiss"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. Main Web Application Content with Isolated React Router Endpoints */}
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <Routes>
+          {/* Route 1: /maker (Task Creator) */}
+          <Route
+            path="/maker"
+            element={
+              <MakerPortal
+                userCoords={currentCoords}
+                activeAccount={activeDemoAccount}
+                onAdjustBalance={adjustBalance}
+                onShowToast={showToast}
+                onNavigateToRadar={() => navigate('/spotter')}
+              />
+            }
+          />
+
+          {/* Route 2: /spotter (Field Earner) */}
+          <Route
+            path="/spotter"
+            element={
+              <ReceiverPortal
+                userCoords={currentCoords}
+                activeAccount={activeDemoAccount}
+                onSetUserLocation={handleSetUserLocation}
+                onShowToast={showToast}
+              />
+            }
+          />
+
+          {/* Route 3: /vault (Consensus/Escrow) */}
+          <Route
+            path="/vault"
+            element={
+              <ThreeWalletsHub
+                activeDemoAccount={activeDemoAccount}
+                onSelectDemoAccount={setActiveDemoAccount}
+                demoAccounts={demoAccounts}
+                onAdjustBalance={adjustBalance}
+                onNavigateToReport={() => navigate('/spotter')}
+                onNavigateToAsk={() => navigate('/maker')}
+                onShowToast={showToast}
+              />
+            }
+          />
+
+          {/* Fallback & Redirects */}
+          <Route path="/" element={<Navigate to="/maker" replace />} />
+          <Route path="*" element={<Navigate to="/maker" replace />} />
+        </Routes>
+      </main>
+
+      {/* 4. Desktop Web Footer - Benchmark Dark Mode */}
+      <footer className="w-full bg-[#0B0B0B] border-t border-white/[0.07] py-6 mt-12 text-xs text-[#858585] select-none relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-6 h-6 rounded-full bg-[#A8FF00] text-black flex items-center justify-center font-black text-xs shadow-sm">
+              T
+            </div>
+            <span className="font-bold text-[#F5F5F5] tracking-tight">TrueSpot V2 Protocol</span>
+            <span>•</span>
+            <span className="text-[#858585]">Physical Verification Network on Solana Devnet</span>
+          </div>
+
+          <div className="flex items-center space-x-4 text-[11px] font-medium text-[#858585]">
+            <span>Decentralized Escrow</span>
+            <span>•</span>
+            <span>200m Proximity Geofence</span>
+            <span>•</span>
+            <span className="font-mono text-[#A8FF00] font-semibold">Vault: 9WzD...AWWM</span>
+          </div>
+        </div>
+      </footer>
+
+      {/* Mobile Bottom Floating Navigation Bar - Hard React Router Links */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#121212]/95 backdrop-blur-2xl border-t border-zinc-800 px-4 py-2 flex items-center justify-around select-none">
+        {[
+          { path: '/maker', label: 'Maker', icon: Shield },
+          { path: '/spotter', label: 'Spotter', icon: Compass },
+          { path: '/vault', label: 'Vault', icon: Lock },
+        ].map((item) => {
+          const Icon = item.icon;
+          const isActive = location.pathname.startsWith(item.path);
+          return (
+            <button
+              key={item.path}
+              onClick={() => navigate(item.path)}
+              className={`relative flex flex-col items-center py-1 px-3 rounded-2xl text-[11px] font-semibold transition-all cursor-pointer ${
+                isActive ? 'text-[#A8FF00] font-bold' : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <div className={`p-1.5 rounded-full ${isActive ? 'bg-[#A8FF00]/20 text-[#A8FF00] shadow-sm' : ''}`}>
+                <Icon className="w-4 h-4" />
+              </div>
+              <span className="mt-0.5">{item.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Wallet Modal */}
+      <WalletModal
+        isOpen={walletModalOpen}
+        onClose={() => setWalletModalOpen(false)}
+        activeDemoAccount={activeDemoAccount}
+        onSelectDemoAccount={setActiveDemoAccount}
+        isUsingDemo={isUsingDemo}
+        onToggleDemoMode={setIsUsingDemo}
+        demoAccounts={demoAccounts}
+        onAirdropDemo={() => {
+          adjustBalance(1.0);
+          showToast(
+            'Devnet Airdrop',
+            `Added +1.00 SOL to ${activeDemoAccount.name.split(' ')[0]}`,
+            'reward'
+          );
+        }}
+      />
+
+      {/* How It Works Modal */}
+      <HowItWorksModal
+        isOpen={howItWorksOpen}
+        onClose={() => setHowItWorksOpen(false)}
+        onStartDemo={() => navigate('/spotter')}
+      />
+
+      {/* Supabase PostgreSQL + PostGIS Configuration Modal */}
+      <SupabaseModal
+        isOpen={supabaseModalOpen}
+        onClose={() => setSupabaseModalOpen(false)}
+        onConfigSaved={() => {
+          refreshData();
+          showToast(
+            'Database Configured',
+            'Live PostgreSQL PostGIS connection verified',
+            'success'
+          );
+        }}
+      />
+    </div>
+  );
+};
+
+export const App: React.FC = () => {
+  const endpoint = useMemo(() => clusterApiUrl('devnet'), []);
+  const wallets = useMemo(() => [], []);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          {/* Full Web Application Canvas - CoinVex Benchmark Aesthetic */}
-          <div className="min-h-screen bg-[#050505] text-[#F5F5F5] flex flex-col font-sans selection:bg-[#A8FF00] selection:text-black relative overflow-x-hidden">
-            {/* Subtle Ambient Radial Glow */}
-            <div className="ambient-glow" />
-
-            {/* Global Floating Toast Notifications */}
-            <ToastContainer toasts={toasts} onDismiss={dismissToast} />
-
-            {/* 1. Full-Width Web Navbar with brand logo, workflow tabs, and wallet persona */}
-            <Navbar
-              title={currentStep.title}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              unverifiedCount={unverifiedCount}
-              canGoBack={false}
-              onOpenWalletModal={() => setWalletModalOpen(true)}
-              onOpenHowItWorks={() => setHowItWorksOpen(true)}
-              onOpenSupabaseModal={() => setSupabaseModalOpen(true)}
-              isSupabaseConnected={hybridStore.isConnectedToSupabase}
-              activeDemoAccount={activeDemoAccount}
-              isUsingDemo={isUsingDemo}
-              onResetDemoState={handleResetDemoState}
-            />
-
-            {/* 2. Web Toolbar: Real Device GPS, Preset Jumper, and Devnet Airdrop */}
-            <JudgeDeck
-              currentLocationName={locationName}
-              isSimulated={isSimulated}
-              onSelectPreset={handleSelectPreset}
-              onUseLiveGps={() => fetchDeviceGps(true)}
-              onRefreshData={() => {
-                refreshData();
-                showToast('Oracle Refreshed', 'Synced state with hybrid storage', 'info');
-              }}
-              onManualCoords={handleSetUserLocation}
-              onAirdropDemo={() => {
-                adjustBalance(1.0);
-                showToast(
-                  'Devnet Airdrop',
-                  `Added +1.00 SOL to ${activeDemoAccount.name.split(' ')[0]}`,
-                  'reward'
-                );
-              }}
-            />
-
-            {/* Browser Permission Guidance Banner if blocked */}
-            {gpsError && (
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-2">
-                <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 flex items-center justify-between shadow-lg backdrop-blur-md">
-                  <div className="flex items-center space-x-2">
-                    <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span className="font-medium leading-tight">
-                      Device location blocked by browser: Click the 🔒 lock icon in your address bar → Allow Location.
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2 shrink-0 ml-3">
-                    <button
-                      onClick={() => fetchDeviceGps(true)}
-                      className="px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 text-xs font-bold hover:bg-amber-400/30 transition-colors shrink-0"
-                    >
-                      Retry GPS
-                    </button>
-                    <button
-                      onClick={() => setGpsError(null)}
-                      className="w-6 h-6 rounded-full hover:bg-amber-400/20 flex items-center justify-center text-amber-300 transition-colors"
-                      title="Dismiss"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* 3. Main Web Application Two-Portal Content */}
-            <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-              {(activeTab === 'maker' || activeTab === 'ask') && (
-                <MakerPortal
-                  userCoords={currentCoords}
-                  activeAccount={activeDemoAccount}
-                  onAdjustBalance={adjustBalance}
-                  onShowToast={showToast}
-                  onNavigateToRadar={() => setActiveTab('receiver')}
-                />
-              )}
-
-              {(activeTab === 'receiver' || activeTab === 'nearby' || activeTab === 'report' || activeTab === 'verify' || activeTab === 'state') && (
-                <ReceiverPortal
-                  userCoords={currentCoords}
-                  activeAccount={activeDemoAccount}
-                  onSetUserLocation={handleSetUserLocation}
-                  onShowToast={showToast}
-                />
-              )}
-
-              {(activeTab === 'escrow' || activeTab === 'wallets') && (
-                <ThreeWalletsHub
-                  activeDemoAccount={activeDemoAccount}
-                  onSelectDemoAccount={setActiveDemoAccount}
-                  demoAccounts={demoAccounts}
-                  onAdjustBalance={adjustBalance}
-                  onNavigateToReport={() => setActiveTab('receiver')}
-                  onNavigateToAsk={() => setActiveTab('maker')}
-                  onShowToast={showToast}
-                />
-              )}
-            </main>
-
-            {/* 4. Desktop Web Footer - Benchmark Dark Mode */}
-            <footer className="w-full bg-[#0B0B0B] border-t border-white/[0.07] py-6 mt-12 text-xs text-[#858585] select-none relative z-10">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div className="flex items-center space-x-2.5">
-                  <div className="w-6 h-6 rounded-full bg-[#A8FF00] text-black flex items-center justify-center font-black text-xs shadow-sm">
-                    T
-                  </div>
-                  <span className="font-bold text-[#F5F5F5] tracking-tight">TrueSpot Protocol</span>
-                  <span>•</span>
-                  <span className="text-[#858585]">Physical Verification Network on Solana Devnet</span>
-                </div>
-
-                <div className="flex items-center space-x-4 text-[11px] font-medium text-[#858585]">
-                  <span>Decentralized Escrow</span>
-                  <span>•</span>
-                  <span>200m Proximity Geofence</span>
-                  <span>•</span>
-                  <span className="font-mono text-[#A8FF00] font-semibold">Vault: 9WzD...AWWM</span>
-                </div>
-              </div>
-            </footer>
-
-            {/* Mobile Bottom Floating Navigation Bar - Neon Dark Mode */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#121212]/95 backdrop-blur-2xl border-t border-zinc-800 px-4 py-2 flex items-center justify-around select-none">
-              {[
-                { id: 'maker', label: 'Task Maker', icon: Shield },
-                { id: 'receiver', label: 'Field Receiver', icon: Compass },
-                { id: 'escrow', label: 'Escrow Vault', icon: Camera },
-              ].map((item) => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => setActiveTab(item.id)}
-                    className={`relative flex flex-col items-center py-1 px-3 rounded-2xl text-[11px] font-semibold transition-all ${
-                      isActive ? 'text-lime-400 font-bold' : 'text-zinc-400 hover:text-white'
-                    }`}
-                  >
-                    <div className={`p-1.5 rounded-full ${isActive ? 'bg-lime-400/20 text-lime-400 shadow-sm' : ''}`}>
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <span className="mt-0.5">{item.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Wallet Modal */}
-            <WalletModal
-              isOpen={walletModalOpen}
-              onClose={() => setWalletModalOpen(false)}
-              activeDemoAccount={activeDemoAccount}
-              onSelectDemoAccount={setActiveDemoAccount}
-              isUsingDemo={isUsingDemo}
-              onToggleDemoMode={setIsUsingDemo}
-              demoAccounts={demoAccounts}
-              onAirdropDemo={() => {
-                adjustBalance(1.0);
-                showToast(
-                  'Devnet Airdrop',
-                  `Added +1.00 SOL to ${activeDemoAccount.name.split(' ')[0]}`,
-                  'reward'
-                );
-              }}
-            />
-
-            {/* How It Works Modal */}
-            <HowItWorksModal
-              isOpen={howItWorksOpen}
-              onClose={() => setHowItWorksOpen(false)}
-              onStartDemo={() => setActiveTab('nearby')}
-            />
-
-            {/* Supabase PostgreSQL + PostGIS Configuration Modal */}
-            <SupabaseModal
-              isOpen={supabaseModalOpen}
-              onClose={() => setSupabaseModalOpen(false)}
-              onConfigSaved={() => {
-                refreshData();
-                showToast(
-                  'Database Configured',
-                  'Live PostgreSQL PostGIS connection verified',
-                  'success'
-                );
-              }}
-            />
-          </div>
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>

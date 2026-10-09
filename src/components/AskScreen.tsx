@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { Coordinates } from '../types';
+import { Coordinates, BountyType } from '../types';
 import { JUDGE_PRESETS } from '../utils/mockLocations';
 import { lockBountyOnChain } from '../utils/solana';
 import { hybridStore } from '../utils/storage';
@@ -13,8 +13,16 @@ import {
   Coins,
   TrendingUp,
   Activity,
-  Users,
   Compass,
+  Sliders,
+  ChevronDown,
+  ChevronUp,
+  Upload,
+  Eye,
+  Bot,
+  Users,
+  FileText,
+  Image as ImageIcon,
 } from 'lucide-react';
 
 interface AskScreenProps {
@@ -35,11 +43,22 @@ export const AskScreen: React.FC<AskScreenProps> = ({
   onNavigateToRadar,
 }) => {
   const { publicKey, sendTransaction } = useWallet();
+  const refFileInputRef = useRef<HTMLInputElement>(null);
 
   const [question, setQuestion] = useState('Is the main entrance open and are there people waiting right now?');
   const [placeName, setPlaceName] = useState('Nearby Venue / Spot');
   const [amountSol, setAmountSol] = useState(0.20);
   const [expiryMinutes, setExpiryMinutes] = useState(30);
+
+  // Advanced Options State (TrueSpot V2 Requirements)
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [bountyType, setBountyType] = useState<BountyType>('BOOLEAN');
+  const [maxSpotters, setMaxSpotters] = useState<number>(1);
+  const [richInstructions, setRichInstructions] = useState<string>(
+    '### Verification Instructions\n- Approach within 200m geofence.\n- Ensure current conditions match target prompt.\n- Avoid recording faces or license plates.'
+  );
+  const [referenceMediaUrl, setReferenceMediaUrl] = useState<string>('');
+  const [isUploadingRef, setIsUploadingRef] = useState(false);
 
   // Flow chart timeframe
   const [chartTimeframe, setChartTimeframe] = useState<'week' | 'month'>('week');
@@ -52,14 +71,13 @@ export const AskScreen: React.FC<AskScreenProps> = ({
   const [searchResults, setSearchResults] = useState<{ name: string; lat: number; lng: number }[]>([]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [txSignature, setTxSignature] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const QUICK_PROMPTS = [
-    '☕ Is the walk-in coffee counter open with a short wait line?',
-    '⚡ Are EV charging stalls currently free and unoccupied?',
-    '📦 Is this specific product currently on the store shelves?',
-    '🚗 Is parking space available at this lot right now?',
+    { text: '☕ Is the walk-in coffee counter open with a short wait line?', type: 'BOOLEAN' as BountyType, spotters: 1 },
+    { text: '⚡ Are EV charging stalls currently free and unoccupied?', type: 'AI_VISION' as BountyType, spotters: 1 },
+    { text: '📦 Is this specific product currently on the store shelves?', type: 'DATA_COLLECTION' as BountyType, spotters: 3 },
+    { text: '🚗 Is parking space available at this lot right now?', type: 'BOOLEAN' as BountyType, spotters: 2 },
   ];
 
   const handleSearchLocation = async (e?: React.FormEvent) => {
@@ -84,6 +102,24 @@ export const AskScreen: React.FC<AskScreenProps> = ({
     setLocationSearchQuery(res.name.split(',')[0]);
   };
 
+  const handleRefImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingRef(true);
+    try {
+      const result = await hybridStore.uploadMediaFile(file, 'ref_asset');
+      setReferenceMediaUrl(result.publicUrl);
+      if (onShowToast) {
+        onShowToast('Reference Media Loaded', `Uploaded ${file.name} for field spotter comparison`, 'info');
+      }
+    } catch (err) {
+      console.warn('Reference upload error:', err);
+    } finally {
+      setIsUploadingRef(false);
+    }
+  };
+
   const handleLockBounty = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!question.trim()) {
@@ -93,12 +129,10 @@ export const AskScreen: React.FC<AskScreenProps> = ({
 
     setIsSubmitting(true);
     setErrorMsg(null);
-    setTxSignature(null);
 
     try {
       // 1. Lock funds into Solana Devnet Escrow Vault
       const txSig = await lockBountyOnChain(sendTransaction, publicKey, amountSol);
-      setTxSignature(txSig);
 
       if (onAdjustBalance) {
         onAdjustBalance(-amountSol, 'asker');
@@ -117,7 +151,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
         ? publicKey.toBase58().slice(0, 4) + '...' + publicKey.toBase58().slice(-4)
         : makerWallet || 'Maker3r...4Wqz';
 
-      // 2. Persist Bounty Record to Supabase / LocalStore
+      // 2. Persist Bounty Record to Supabase / LocalStore with TrueSpot V2 Fields
       const newBounty = await hybridStore.createBounty({
         question: question.trim(),
         place_name: placeName.trim() || 'Physical Location',
@@ -128,6 +162,10 @@ export const AskScreen: React.FC<AskScreenProps> = ({
         asker_wallet: creatorAddress,
         expires_at: expiresAt,
         escrow_tx: txSig,
+        bounty_type: bountyType,
+        max_spotters: maxSpotters,
+        rich_instructions: richInstructions.trim() || undefined,
+        reference_media_url: referenceMediaUrl || undefined,
       });
 
       setTimeout(() => {
@@ -196,7 +234,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
               </div>
             </div>
 
-            {/* Stacked Featured Cards (EXACT CoinVex Crypto & Stocks style) */}
+            {/* Stacked Featured Cards */}
             <div className="space-y-2.5 pt-1">
               {/* 1. Neon Green Gradient Card (Worker Payout) */}
               <div className="fintech-card-green p-4 relative overflow-hidden">
@@ -208,7 +246,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                     <span className="text-[11px] font-bold uppercase tracking-wider text-black/90">Worker Payout</span>
                   </div>
                   <span className="text-[10px] font-mono font-extrabold bg-black/15 px-2 py-0.5 rounded-full text-black">
-                    100%
+                    {maxSpotters > 1 ? `Swarm (${maxSpotters})` : '100%'}
                   </span>
                 </div>
                 <div className="text-2xl font-black tracking-tight my-0.5 text-black">
@@ -216,9 +254,9 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                 </div>
                 <div className="flex items-center justify-between text-[10px] font-semibold pt-1">
                   <span className="bg-black text-[#A8FF00] px-2 py-0.5 rounded-full font-mono font-bold">
-                    ↗ Instant Release
+                    ↗ {maxSpotters > 1 ? `${(amountSol / maxSpotters).toFixed(3)} SOL each` : 'Instant Release'}
                   </span>
-                  <span className="text-black/75">Upon Approval</span>
+                  <span className="text-black/75">Upon Consensus</span>
                 </div>
               </div>
 
@@ -229,14 +267,14 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                     <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center font-bold text-[10px]">
                       🛡️
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-purple-100">Verification Proof</span>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-purple-100">Type: {bountyType}</span>
                   </div>
                   <span className="text-[10px] font-mono font-bold bg-white/20 px-2 py-0.5 rounded-full text-white">
                     SHA-256
                   </span>
                 </div>
                 <div className="text-xl font-black tracking-tight my-0.5 text-white">
-                  Biometric Gyro
+                  {bountyType === 'AI_VISION' ? 'AI Pre-Check' : bountyType === 'DATA_COLLECTION' ? 'Heavy Media' : 'Boolean Oracle'}
                 </div>
                 <div className="text-[10px] text-purple-200 truncate">
                   Physical tremor + Solana devnet blockhash
@@ -256,10 +294,17 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                 <button
                   type="button"
                   key={idx}
-                  onClick={() => setQuestion(p)}
-                  className="w-full text-left p-2.5 bg-[#101010] hover:bg-[#161616] border border-white/[0.06] hover:border-white/15 text-[11px] text-[#858585] hover:text-[#F5F5F5] rounded-xl transition-all leading-snug font-medium"
+                  onClick={() => {
+                    setQuestion(p.text);
+                    setBountyType(p.type);
+                    setMaxSpotters(p.spotters);
+                  }}
+                  className="w-full text-left p-2.5 bg-[#101010] hover:bg-[#161616] border border-white/[0.06] hover:border-white/15 text-[11px] text-[#858585] hover:text-[#F5F5F5] rounded-xl transition-all leading-snug font-medium flex items-center justify-between group cursor-pointer"
                 >
-                  {p}
+                  <span className="truncate pr-2">{p.text}</span>
+                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-black text-[#A8FF00] border border-[#A8FF00]/30 shrink-0">
+                    {p.type.slice(0, 4)}
+                  </span>
                 </button>
               ))}
             </div>
@@ -270,7 +315,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
         {/* COLUMN 2: Activity Flow (Wave Chart) + Analytics Matrix   */}
         {/* ========================================================= */}
         <div className="lg:col-span-4 space-y-4">
-          {/* Card 1: Flowing Dual Wave Ribbon Chart (CoinVex Cashflow) */}
+          {/* Card 1: Flowing Dual Wave Ribbon Chart */}
           <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-3 shadow-xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
@@ -314,24 +359,20 @@ export const AskScreen: React.FC<AskScreenProps> = ({
             <div className="w-full pt-1">
               <svg viewBox="0 0 400 130" className="w-full h-28 overflow-visible">
                 <defs>
-                  {/* Neon Lime Gradient */}
                   <linearGradient id="limeRibbon" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#A8FF00" stopOpacity="0.32" />
                     <stop offset="100%" stopColor="#A8FF00" stopOpacity="0.0" />
                   </linearGradient>
-                  {/* Cyan Blue Gradient */}
                   <linearGradient id="blueRibbon" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#4285FF" stopOpacity="0.25" />
                     <stop offset="100%" stopColor="#4285FF" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
 
-                {/* Subtle horizontal grid lines */}
                 <line x1="0" y1="30" x2="400" y2="30" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
                 <line x1="0" y1="70" x2="400" y2="70" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
                 <line x1="0" y1="110" x2="400" y2="110" stroke="rgba(255,255,255,0.04)" />
 
-                {/* Curve 1: Blue Ribbon Wave */}
                 <path
                   d="M 0 95 C 60 115, 120 40, 200 65 C 280 90, 330 35, 400 50 L 400 110 L 0 110 Z"
                   fill="url(#blueRibbon)"
@@ -344,7 +385,6 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                   strokeOpacity="0.7"
                 />
 
-                {/* Curve 2: Lime Green Ribbon Wave */}
                 <path
                   d="M 0 80 C 70 50, 130 100, 210 45 C 280 15, 340 70, 400 30 L 400 110 L 0 110 Z"
                   fill="url(#limeRibbon)"
@@ -356,12 +396,10 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                   strokeWidth="2.5"
                 />
 
-                {/* Highlight Point on Lime Curve */}
                 <circle cx="210" cy="45" r="4.5" fill="#A8FF00" />
                 <circle cx="210" cy="45" r="8" fill="#A8FF00" fillOpacity="0.25" />
               </svg>
 
-              {/* Day Labels */}
               <div className="flex justify-between text-[10px] text-[#858585] font-mono px-1 pt-1">
                 <span>Mon</span>
                 <span>Tue</span>
@@ -386,7 +424,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
             </div>
           </div>
 
-          {/* Card 2: 7-Day Matrix Heatmap (CoinVex Weekly Analytics) */}
+          {/* Card 2: 7-Day Matrix Heatmap */}
           <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-3 shadow-xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
@@ -398,7 +436,6 @@ export const AskScreen: React.FC<AskScreenProps> = ({
               </span>
             </div>
 
-            {/* 7 Columns Matrix with Rounded Capsules */}
             <div className="grid grid-cols-7 gap-1.5 pt-2">
               {[
                 { day: 'Mon', caps: ['bg-[#4285FF]', 'bg-[#A8FF00]', 'bg-[#18181b]'] },
@@ -425,7 +462,6 @@ export const AskScreen: React.FC<AskScreenProps> = ({
               ))}
             </div>
 
-            {/* Summary Micro-Strip */}
             <div className="flex items-center justify-between text-[11px] text-[#858585] pt-1 border-t border-white/[0.06]">
               <span>Avg Settle: <strong className="text-[#F5F5F5]">3.4 min</strong></span>
               <span>Consensus: <strong className="text-[#A8FF00]">99.4%</strong></span>
@@ -442,7 +478,6 @@ export const AskScreen: React.FC<AskScreenProps> = ({
           <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-4 shadow-xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2.5">
-                {/* Overlapping Avatar Circles Stack */}
                 <div className="flex -space-x-2 overflow-hidden">
                   <div className="w-7 h-7 rounded-full bg-[#8B4DFF] text-white flex items-center justify-center text-[10px] font-bold border-2 border-[#0B0B0B]">
                     S1
@@ -467,7 +502,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                 <button
                   type="button"
                   onClick={onNavigateToRadar}
-                  className="px-3 py-1 rounded-full bg-[#A8FF00] hover:bg-[#bef264] text-black text-[11px] font-bold transition-all shadow-sm flex items-center space-x-1"
+                  className="px-3 py-1 rounded-full bg-[#A8FF00] hover:bg-[#bef264] text-black text-[11px] font-bold transition-all shadow-sm flex items-center space-x-1 cursor-pointer"
                 >
                   <Compass className="w-3 h-3" />
                   <span>Radar</span>
@@ -479,9 +514,14 @@ export const AskScreen: React.FC<AskScreenProps> = ({
           {/* Roomy, Clean CoinVex Task Dispatch Form Card */}
           <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-4 shadow-xl">
             <div>
-              <h2 className="text-[16px] font-bold text-[#F5F5F5] tracking-tight">
-                Create Verification Query
-              </h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-[16px] font-bold text-[#F5F5F5] tracking-tight">
+                  Create Verification Query
+                </h2>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#A8FF00]/10 text-[#A8FF00] border border-[#A8FF00]/30">
+                  {bountyType}
+                </span>
+              </div>
               <p className="text-[11px] text-[#858585] mt-0.5">
                 Lock escrow on Solana Devnet to request verifiable physical proof
               </p>
@@ -524,7 +564,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                       type="button"
                       onClick={() => handleSearchLocation()}
                       disabled={isSearchingLocation}
-                      className="absolute right-1 px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-[#F5F5F5] text-[10px] font-semibold rounded-full transition-all disabled:opacity-50"
+                      className="absolute right-1 px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-[#F5F5F5] text-[10px] font-semibold rounded-full transition-all disabled:opacity-50 cursor-pointer"
                     >
                       {isSearchingLocation ? '...' : 'Search'}
                     </button>
@@ -603,7 +643,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                           type="button"
                           key={val}
                           onClick={() => setAmountSol(val)}
-                          className={`px-2 py-1 rounded-full text-[10px] font-bold transition-colors ${
+                          className={`px-2 py-1 rounded-full text-[10px] font-bold transition-colors cursor-pointer ${
                             amountSol === val
                               ? 'bg-[#A8FF00] text-black font-extrabold shadow-sm'
                               : 'bg-[#101010] text-[#858585] hover:text-white border border-white/[0.06]'
@@ -630,6 +670,153 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                     <option value={60} className="bg-zinc-900 text-white">1 Hour</option>
                   </select>
                 </div>
+              </div>
+
+              {/* ========================================================= */}
+              {/* ADVANCED BOUNTY CUSTOMIZATION TOGGLE (TrueSpot V2)       */}
+              {/* ========================================================= */}
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  className="w-full py-2 px-3 rounded-xl bg-[#101010] hover:bg-[#141414] border border-white/[0.08] text-xs font-semibold text-[#858585] hover:text-[#F5F5F5] flex items-center justify-between transition-all cursor-pointer"
+                >
+                  <span className="flex items-center space-x-2">
+                    <Sliders className="w-3.5 h-3.5 text-[#A8FF00]" />
+                    <span>Advanced Oracle Parameters</span>
+                    {(maxSpotters > 1 || bountyType !== 'BOOLEAN' || referenceMediaUrl) && (
+                      <span className="w-2 h-2 rounded-full bg-[#A8FF00]" />
+                    )}
+                  </span>
+                  {showAdvanced ? (
+                    <ChevronUp className="w-4 h-4 text-zinc-400" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-zinc-400" />
+                  )}
+                </button>
+
+                {showAdvanced && (
+                  <div className="mt-2.5 p-4 rounded-xl bg-[#0e0e0e] border border-white/[0.08] space-y-3.5 animate-fadeIn">
+                    {/* 1. Bounty Types Dropdown */}
+                    <div>
+                      <label className="block text-[10px] font-bold text-[#858585] uppercase tracking-wider mb-1 flex items-center justify-between">
+                        <span>Bounty Verification Type</span>
+                        <span className="text-[#A8FF00] font-mono text-[9px] lowercase">DePIN protocol mode</span>
+                      </label>
+                      <select
+                        value={bountyType}
+                        onChange={(e) => setBountyType(e.target.value as BountyType)}
+                        className="w-full bg-[#141414] border border-white/[0.08] focus:border-[#A8FF00] rounded-xl px-3 py-2 text-xs font-semibold text-[#F5F5F5] outline-none cursor-pointer"
+                      >
+                        <option value="BOOLEAN" className="bg-zinc-900 text-white">
+                          Boolean Truth (Yes / No physical state)
+                        </option>
+                        <option value="DATA_COLLECTION" className="bg-zinc-900 text-white">
+                          Data Collection (Heavy media & photo required)
+                        </option>
+                        <option value="AI_VISION" className="bg-zinc-900 text-white">
+                          AI Vision Pre-Check (Automated Computer Vision object test)
+                        </option>
+                      </select>
+                      <p className="text-[10px] text-[#666666] mt-1">
+                        {bountyType === 'BOOLEAN' && 'Field worker answers with verified binary truth and camera proof.'}
+                        {bountyType === 'DATA_COLLECTION' && 'Requires full photo/video evidence stored to truespot_evidence bucket.'}
+                        {bountyType === 'AI_VISION' && 'Scans captured image with AI vision API and assigns structured confidence score.'}
+                      </p>
+                    </div>
+
+                    {/* 2. Swarm Consensus (max_spotters) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-[#858585] uppercase tracking-wider flex items-center space-x-1.5">
+                          <Users className="w-3 h-3 text-[#A8FF00]" />
+                          <span>Swarm Consensus (Max Spotters)</span>
+                        </label>
+                        <span className="text-[10px] font-mono font-bold text-[#A8FF00]">
+                          {maxSpotters} {maxSpotters === 1 ? 'Worker' : 'Independent Workers'}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="range"
+                          min="1"
+                          max="5"
+                          step="1"
+                          value={maxSpotters}
+                          onChange={(e) => setMaxSpotters(parseInt(e.target.value) || 1)}
+                          className="w-full accent-[#A8FF00] bg-zinc-800 h-1.5 rounded-lg cursor-pointer"
+                        />
+                        <span className="w-8 text-center text-xs font-mono font-bold text-white bg-[#141414] py-1 rounded border border-white/[0.07]">
+                          {maxSpotters}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-[#666666] mt-1">
+                        {maxSpotters === 1
+                          ? 'Single worker claim: 100% payout to first valid submitter.'
+                          : `Multi-agent quorum: requires ${maxSpotters} independent spotters to submit proof before escrow payout is released proportionally.`}
+                      </p>
+                    </div>
+
+                    {/* 3. Rich Markdown Instructions */}
+                    <div>
+                      <label className="block text-[10px] font-bold text-[#858585] uppercase tracking-wider mb-1 flex items-center space-x-1.5">
+                        <FileText className="w-3 h-3 text-[#A8FF00]" />
+                        <span>Rich Field Instructions (Markdown)</span>
+                      </label>
+                      <textarea
+                        value={richInstructions}
+                        onChange={(e) => setRichInstructions(e.target.value)}
+                        rows={3}
+                        placeholder="Detailed Markdown steps for the field worker..."
+                        className="w-full bg-[#141414] border border-white/[0.08] focus:border-[#A8FF00] rounded-xl p-2.5 text-xs font-mono text-[#F5F5F5] outline-none placeholder:text-[#555555]"
+                      />
+                    </div>
+
+                    {/* 4. Reference Image Upload */}
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={refFileInputRef}
+                        onChange={handleRefImageUpload}
+                        className="hidden"
+                      />
+                      <label className="block text-[10px] font-bold text-[#858585] uppercase tracking-wider mb-1 flex items-center space-x-1.5">
+                        <ImageIcon className="w-3 h-3 text-[#A8FF00]" />
+                        <span>Reference Image / Benchmark Object</span>
+                      </label>
+
+                      {referenceMediaUrl ? (
+                        <div className="relative rounded-xl overflow-hidden border border-[#A8FF00]/40 aspect-video max-h-36 bg-black flex items-center justify-center">
+                          <img
+                            src={referenceMediaUrl}
+                            alt="Reference Target"
+                            className="w-full h-full object-contain"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setReferenceMediaUrl('')}
+                            className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/80 text-rose-300 text-[10px] font-bold border border-rose-500/30 hover:bg-black cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          <button
+                            type="button"
+                            onClick={() => refFileInputRef.current?.click()}
+                            disabled={isUploadingRef}
+                            className="flex-1 py-2 px-3 rounded-xl bg-[#141414] hover:bg-[#1a1a1a] border border-dashed border-white/[0.1] hover:border-white/20 text-xs font-medium text-zinc-300 flex items-center justify-center space-x-1.5 transition-all cursor-pointer"
+                          >
+                            <Upload className="w-3.5 h-3.5 text-[#A8FF00]" />
+                            <span>{isUploadingRef ? 'Uploading...' : 'Upload Reference Image'}</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Error Message */}

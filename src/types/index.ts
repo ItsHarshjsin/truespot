@@ -1,5 +1,14 @@
 export type BountyStatus = 'OPEN' | 'ANSWERED' | 'PAID' | 'EXPIRED';
 
+export type BountyType = 'BOOLEAN' | 'DATA_COLLECTION' | 'AI_VISION';
+
+export interface AiConfidenceResult {
+  verified: boolean;
+  score: number; // 0 - 100
+  detected_objects: string[];
+  reasoning: string;
+}
+
 export interface Bounty {
   id: string;
   question: string;
@@ -14,6 +23,10 @@ export interface Bounty {
   category?: 'queue' | 'stock' | 'open' | 'ev' | 'custom';
   escrow_tx?: string;
   payout_tx?: string;
+  bounty_type?: BountyType;
+  max_spotters?: number;
+  rich_instructions?: string;
+  reference_media_url?: string;
 }
 
 export interface Report {
@@ -30,6 +43,8 @@ export interface Report {
   gyro_variance?: number;
   blockhash_stamp?: string;
   memo_signature?: string;
+  media_type?: 'image' | 'video' | 'audio';
+  ai_confidence_score?: AiConfidenceResult | null;
 }
 
 export interface Verification {
