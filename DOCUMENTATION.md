@@ -378,3 +378,58 @@ npm run build
 
 ---
 *TrueSpot — Physical Ground Truth for the Solana Ecosystem.*
+
+---
+
+## 🏛️ TrueSpot V2 Architecture (Colosseum Hackathon Edition)
+
+### 1. Isolated Role-Based Routing
+The monolithic interface has been refactored into three dedicated React Router routes:
+- **/maker (Task Creator):**
+  - Advanced Bounty Creation Console with toggleable parameters.
+  - Financial telemetry, active escrow volume, and historical task records.
+  - **Worker Evidence Awaiting Approval** queue with swarm consensus progress tracking.
+- **/spotter (Field Earner):**
+  - Mobile-optimized **200m Proximity Radar** displaying active local geofenced missions.
+  - **Mission Briefing Modal** with Markdown instructions and reference image benchmarks.
+  - **Submit Evidence Viewfinder** supporting heavy media upload (images, videos, audio) and AI Vision pre-checks.
+  - **My Earnings Gallery** displaying confirmed payouts and cryptographic receipts.
+- **/vault (Consensus & Escrow):**
+  - Global settlement ledger tracking locked and settled devnet SOL.
+  - Real-time Solana Devnet slot height and RPC latency telemetry.
+  - Multi-wallet persona switcher and devnet faucet airdrop controls.
+
+### 2. Advanced Bounty Customization
+- **Bounty Types:**
+  - \BOOLEAN\: Binary physical truth (Yes/No).
+  - \DATA_COLLECTION\: Full photo/video documentation uploaded to storage.
+  - \AI_VISION\: Automated computer vision pre-check verifying physical landmarks.
+- **Swarm Consensus (\max_spotters\):**
+  - Multi-agent quorum parameter requiring \\$ independent field spotters to submit proofs before consensus is reached.
+  - Progress bar dynamically tracks consensus ratio (\ / N\$).
+- **Rich Instructions & Reference Asset:**
+  - Full Markdown field instructions.
+  - Dedicated reference image upload for visual comparison.
+
+### 3. Heavy Media Pipeline & AI Vision Pre-Check
+- **Zero-Direct-DB Media Storage:**
+  - Media blobs are uploaded directly to the Supabase \	ruespot_evidence\ storage bucket.
+  - Only the lightweight public URL, SHA-256 hash, GPS coordinates, and biometric gyro variance are stored in PostgreSQL.
+- **AI Computer Vision Pre-Check:**
+  - Automated vision heuristic analyzes target imagery for requested object classes (e.g. queue stanchions, EV chargers, inventory shelves).
+  - Produces structured JSON output (\AiConfidenceResult\) with match percentage, detected tags, and model reasoning.
+
+### 4. Automated Multi-Agent Solana Settlement
+- **Batched Proportional Payouts:**
+  - When quorum consensus is reached, the Maker clicks **"Confirm Truth & Release Payout"**.
+  - Executes \settleOraclePayout\ via \@solana/web3.js\ and \@solana/wallet-adapter-react\.
+  - Distributes escrowed Devnet SOL proportionally across all verified spotters in a single atomic transaction.
+- **On-Chain SPL Memo Recording:**
+  - Stabs all attestations' SHA-256 hashes into the Solana SPL Memo program (\MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr\).
+- **Confirmation & Visual Feedback:**
+  - Updates task status to \PAID\.
+  - Triggers a full \canvas-confetti\ celebration.
+
+### 5. WebSocket Quota Protection (Free Tier Optimized)
+- Explicit channel cleanup via \supabase.removeChannel(channel)\ in all component \useEffect\ return functions.
+- Prevents connection leaks and guarantees stability under Supabase Free Tier limits (max 200 concurrent WebSockets).
