@@ -110,7 +110,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-[#050505]/95 backdrop-blur-2xl border-b border-white/[0.08] select-none">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full h-full flex items-center justify-between">
+      <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
         {/* Left: Mobile Menu Toggle + Brand Identity + Role Switcher */}
         <div className="flex items-center space-x-3 sm:space-x-4">
           {/* Mobile Sidebar Hamburger Toggle */}

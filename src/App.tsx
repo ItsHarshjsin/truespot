@@ -381,7 +381,7 @@ const AppContent: React.FC = () => {
 
       {/* 2. Global Layout Container with Vertical Left Sidebar & Content */}
       <div className="pt-16 min-h-screen bg-[#050505] flex flex-col">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex-1 flex">
+        <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 flex-1 flex">
           {/* Left Vertical Sidebar */}
           <SidebarNav
             userMode={userMode}
@@ -391,7 +391,7 @@ const AppContent: React.FC = () => {
           />
 
           {/* Content Area aligned with sidebar and top navbar */}
-          <div className="flex-1 min-w-0 pl-0 lg:pl-6 py-6 flex flex-col justify-between">
+          <div className="flex-1 min-w-0 pl-0 lg:pl-8 xl:pl-10 py-6 flex flex-col justify-between">
             <div>
               {/* 2. Subheader Toolbar: Real Device GPS, Preset Jumper & Devnet +1 SOL Airdrop */}
               {isLocationView && (

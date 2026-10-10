@@ -194,7 +194,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
 
                   <div className="flex flex-col min-w-0">
                     <span
-                      className={`text-xs font-semibold truncate ${
+                      className={`text-xs font-semibold whitespace-nowrap ${
                         isActive ? 'text-white' : 'text-zinc-300'
                       }`}
                     >
@@ -208,12 +208,12 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
 
                 {/* Subtle Badges / Indicators */}
                 {item.hasBadge && (
-                  <span className="ml-1.5 px-1.5 py-0.5 rounded bg-[#141414] text-[#A8FF00] text-[9px] font-bold font-mono border border-[#A8FF00]/30 shrink-0">
+                  <span className="ml-2 px-1.5 py-0.5 rounded bg-[#141414] text-[#A8FF00] text-[9px] font-bold font-mono border border-[#A8FF00]/30 shrink-0">
                     {item.badgeText}
                   </span>
                 )}
                 {item.hasPulse && !item.hasBadge && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00] shrink-0 ml-1.5" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00] shrink-0 ml-2" />
                 )}
               </button>
             );
@@ -263,7 +263,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
       )}
 
       {/* Desktop In-Flow Sticky Sidebar: Aligned strictly with TopNavbar container */}
-      <aside className="hidden lg:flex flex-col w-56 xl:w-60 shrink-0 border-r border-white/[0.08] pr-4 py-6 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto justify-between select-none">
+      <aside className="hidden lg:flex flex-col w-64 xl:w-72 shrink-0 border-r border-white/[0.08] pr-5 py-6 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto justify-between select-none">
         {renderContent(false)}
       </aside>
     </>

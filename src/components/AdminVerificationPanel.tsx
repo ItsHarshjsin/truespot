@@ -502,7 +502,7 @@ export const AdminVerificationPanel: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6 select-none max-w-7xl mx-auto">
+    <div className="w-full space-y-6 select-none">
       {/* Header Banner */}
       <div className="bg-[#0B0B0B] border border-white/[0.08] rounded-[24px] p-6 sm:p-8 relative overflow-hidden shadow-2xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">

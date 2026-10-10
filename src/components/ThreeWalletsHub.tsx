@@ -170,7 +170,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
   };
 
   return (
-    <div className="space-y-5 pb-12 max-w-7xl mx-auto">
+    <div className="w-full space-y-5 pb-12">
       {/* Top Banner: Protocol Summary */}
       <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 sm:p-6 text-[#F5F5F5] relative overflow-hidden shadow-xl">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">

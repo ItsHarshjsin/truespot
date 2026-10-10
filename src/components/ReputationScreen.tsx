@@ -64,7 +64,7 @@ export const ReputationScreen: React.FC<ReputationScreenProps> = ({
     : 98.6;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="w-full space-y-6">
       {/* Top Banner / Hero Header */}
       <div className="bg-[#0B0B0B] border border-white/[0.08] rounded-[24px] p-6 sm:p-8 relative overflow-hidden shadow-2xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-[#A8FF00]/5 rounded-full blur-3xl pointer-events-none" />
