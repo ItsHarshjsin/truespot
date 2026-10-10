@@ -46,7 +46,14 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
   };
 
   const fetchNearby = async () => {
-    const nearby = await hybridStore.getNearbyBounties(userCoords.lat, userCoords.lng, 200);
+    let nearby = await hybridStore.getNearbyBounties(userCoords.lat, userCoords.lng, 200);
+
+    // Auto-relocate demo bounties if all existing seeds are across the globe (> 500km away)
+    if (nearby.length > 0 && nearby.every((b) => b.distance_meters > 500000)) {
+      hybridStore.resetToCoordinates(userCoords.lat, userCoords.lng);
+      nearby = await hybridStore.getNearbyBounties(userCoords.lat, userCoords.lng, 200);
+    }
+
     setBounties(nearby);
     if (nearby.length > 0 && !selectedBountyId) {
       handleSelectBountyInternal(nearby[0].id);
@@ -98,6 +105,15 @@ export const NearbyScreen: React.FC<NearbyScreenProps> = ({
             <AnalogProximityDial
               distanceMeters={selectedBounty ? selectedBounty.distance_meters : 25}
               placeName={selectedBounty ? selectedBounty.place_name : 'Nearby Location'}
+              onSpawnNearbyBounties={() => {
+                hybridStore.resetToCoordinates(userCoords.lat, userCoords.lng);
+                fetchNearby();
+              }}
+              onRelocateToBounty={() => {
+                if (selectedBounty) {
+                  onSetUserLocation(selectedBounty.lat + 0.0001, selectedBounty.lng + 0.0001, selectedBounty.place_name);
+                }
+              }}
             />
           </div>
 

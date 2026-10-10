@@ -1,28 +1,39 @@
 import React from 'react';
+import { Sparkles, Navigation } from 'lucide-react';
 
 interface AnalogProximityDialProps {
   distanceMeters: number;
   placeName: string;
+  onRelocateToBounty?: () => void;
+  onSpawnNearbyBounties?: () => void;
 }
 
 export const AnalogProximityDial: React.FC<AnalogProximityDialProps> = ({
   distanceMeters,
   placeName,
+  onRelocateToBounty,
+  onSpawnNearbyBounties,
 }) => {
-  // Clamp distance between 0 and 250 meters for rotation angle (-60deg to +60deg)
+  // Clamp distance between 0 and 200 meters for rotation angle (-50deg to +50deg)
   const clampedDist = Math.min(Math.max(distanceMeters, 0), 200);
   const needleRotation = -50 + (clampedDist / 200) * 100;
   const isWithinGeofence = distanceMeters <= 200;
 
+  // Format large distances cleanly
+  const isKm = distanceMeters >= 1000;
+  const formattedDistance = isKm
+    ? (distanceMeters / 1000).toLocaleString(undefined, { maximumFractionDigits: 1 })
+    : Math.round(distanceMeters).toLocaleString();
+  const unitLabel = isKm ? 'km' : 'meters';
+
   return (
     <div className="flex flex-col items-center justify-center py-2 select-none">
-      {/* Tactile Skeuomorphic Scale Dial (Reference Screen 1) */}
+      {/* Tactile Skeuomorphic Scale Dial (CoinVex Radar Style) */}
       <div className="relative w-56 h-32 flex items-center justify-center">
         {/* Outer Mint Curved Bezel */}
         <div className="absolute inset-0 rounded-t-[50px] rounded-b-[30px] bg-slate-900/90 border-2 border-emerald-500/30 shadow-2xl flex items-center justify-center overflow-hidden">
           {/* Inner Cream Face */}
           <div className="w-[86%] h-[84%] rounded-t-[40px] rounded-b-[20px] bg-black/60 border border-white/10 relative flex flex-col items-center justify-start pt-2">
-            
             {/* Scale Tick Marks */}
             <div className="w-full flex justify-between px-5 text-[10px] font-mono text-emerald-400/80 font-semibold">
               <span>0m</span>
@@ -44,7 +55,7 @@ export const AnalogProximityDial: React.FC<AnalogProximityDialProps> = ({
               ))}
             </div>
 
-            {/* Rotating Orange Needle */}
+            {/* Rotating Needle */}
             <div
               className="absolute bottom-1 left-1/2 w-1 h-16 origin-bottom -translate-x-1/2 transition-transform duration-700 ease-out"
               style={{
@@ -66,12 +77,12 @@ export const AnalogProximityDial: React.FC<AnalogProximityDialProps> = ({
       </div>
 
       {/* Hero Large Numeric Display */}
-      <div className="text-center mt-3">
+      <div className="text-center mt-3 w-full">
         <div className="flex items-baseline justify-center space-x-2">
-          <span className="text-5xl font-extrabold tracking-tight text-white font-mono">
-            {distanceMeters}
+          <span className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white font-mono">
+            {formattedDistance}
           </span>
-          <span className="text-xl font-bold text-gray-400">meters</span>
+          <span className="text-lg sm:text-xl font-bold text-gray-400">{unitLabel}</span>
         </div>
 
         {/* Status Pill */}
@@ -88,13 +99,47 @@ export const AnalogProximityDial: React.FC<AnalogProximityDialProps> = ({
                 isWithinGeofence ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
               }`}
             />
-            <span>{isWithinGeofence ? 'WITHIN 200M GEOFENCE' : 'OUTSIDE 200M ZONE'}</span>
+            <span>
+              {isWithinGeofence
+                ? 'WITHIN 200M GEOFENCE'
+                : isKm
+                ? `OUTSIDE ZONE (${formattedDistance} km)`
+                : 'OUTSIDE 200M ZONE'}
+            </span>
           </span>
         </div>
 
-        <p className="text-xs text-gray-400 mt-1 truncate max-w-xs mx-auto">
+        <p className="text-xs text-gray-400 mt-1 truncate max-w-xs mx-auto px-2">
           Nearest spot: <strong className="text-white">{placeName}</strong>
         </p>
+
+        {/* Quick Proximity Helper Actions if Outside Zone */}
+        {!isWithinGeofence && (onSpawnNearbyBounties || onRelocateToBounty) && (
+          <div className="mt-3 pt-3 border-t border-white/[0.08] flex items-center justify-center gap-2 px-2">
+            {onSpawnNearbyBounties && (
+              <button
+                type="button"
+                onClick={onSpawnNearbyBounties}
+                className="py-1.5 px-3 rounded-full bg-[#A8FF00]/15 hover:bg-[#A8FF00]/25 text-[#A8FF00] border border-[#A8FF00]/30 text-[11px] font-bold flex items-center justify-center space-x-1 transition-all cursor-pointer shadow-sm"
+                title="Spawn test bounties near your device GPS"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Spawn at My GPS</span>
+              </button>
+            )}
+            {onRelocateToBounty && (
+              <button
+                type="button"
+                onClick={onRelocateToBounty}
+                className="py-1.5 px-3 rounded-full bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 text-[11px] font-semibold flex items-center justify-center space-x-1 transition-all cursor-pointer shadow-sm"
+                title="Jump directly inside 200m geofence"
+              >
+                <Navigation className="w-3.5 h-3.5 text-[#00F0FF]" />
+                <span>Jump Inside (15m)</span>
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

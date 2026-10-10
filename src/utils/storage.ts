@@ -873,10 +873,25 @@ class HybridStore {
   }
 
   public resetToCoordinates(userLat: number, userLng: number) {
-    this.queries[0].lat = userLat + 0.0002;
-    this.queries[0].lng = userLng + 0.0001;
-    this.queries[1].lat = userLat - 0.0003;
-    this.queries[1].lng = userLng - 0.0002;
+    const localTemplates = [
+      { dLat: 0.00025, dLng: 0.00015, place: 'Local Coffee & Beverage Counter', question: 'How long is the walk-in coffee line right now?' },
+      { dLat: -0.00035, dLng: 0.00035, place: 'Main Entrance & Accessibility Ramp', question: 'Is the main entrance open and accessible right now?' },
+      { dLat: 0.0005, dLng: -0.0003, place: 'EV Charging Hub / Parking Area', question: 'Are charging stalls vacant and operational right now?' },
+      { dLat: -0.00025, dLng: -0.0003, place: 'Central Retail & Pharmacy Counter', question: 'Is the store open and operating normally?' },
+    ];
+
+    this.queries = this.queries.map((q, idx) => {
+      const tmpl = localTemplates[idx % localTemplates.length];
+      return {
+        ...q,
+        lat: userLat + tmpl.dLat,
+        lng: userLng + tmpl.dLng,
+        place_name: tmpl.place,
+        question: tmpl.question,
+      };
+    });
+
+    this.bounties = this.queries as any;
     this.persist();
     this.notifyListeners();
   }
