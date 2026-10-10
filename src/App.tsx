@@ -224,6 +224,25 @@ const AppContent: React.FC = () => {
     }
   };
 
+  const getPageTitle = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return 'Dashboard';
+      case 'radar':
+        return 'Analytics & Radar';
+      case 'vault':
+        return 'Escrow Vault';
+      case 'explorer':
+        return 'Evidence Explorer';
+      case 'developers':
+        return 'Protocol & API';
+      case 'admin':
+        return 'Admin Diagnostics';
+      default:
+        return 'Dashboard';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#050505] text-[#F5F5F5] font-sans flex flex-col relative selection:bg-[#A8FF00] selection:text-black">
       {/* Toast Notification Container */}
@@ -244,6 +263,7 @@ const AppContent: React.FC = () => {
 
       {/* 2. Subheader Toolbar: Real Device GPS, Preset Jumper & Devnet +1 SOL Airdrop */}
       <JudgeDeck
+        pageTitle={getPageTitle()}
         currentLocationName={locationName}
         isSimulated={isSimulated}
         onSelectPreset={handleSelectJudgePreset}

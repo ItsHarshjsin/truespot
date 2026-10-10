@@ -82,22 +82,12 @@ export const Navbar: React.FC<NavbarProps> = ({
       : 'Loading...'
     : `${activeDemoAccount.balanceSol.toFixed(2)} SOL`;
 
-  // Protocol Navigation Portals (matching previous CoinVex UI + required additions)
-  const hubs = [
-    { path: '/dashboard', key: 'dashboard', label: 'Dashboard', icon: PlusCircle, badge: 0 },
-    { path: '/radar', key: 'radar', label: 'Analytics & Radar', icon: Compass, badge: unverifiedCount },
-    { path: '/explorer', key: 'explorer', label: 'Evidence Explorer', icon: FileCheck2, badge: unverifiedCount },
-    { path: '/vault', key: 'vault', label: 'Escrow Vault', icon: Lock, badge: 0 },
-    { path: '/developers', key: 'developers', label: 'Developers', icon: Code2, badge: 0 },
-    { path: '/admin', key: 'admin', label: 'Admin', icon: ShieldCheck, badge: 0 },
-  ];
-
   const isHubActive = (hubKey: string) => {
     const p = location.pathname;
     if (hubKey === 'dashboard') return p === '/' || p === '/dashboard' || p === '/maker' || p === '/studio';
     if (hubKey === 'radar') return p === '/radar' || p === '/nearby' || p === '/map' || p === '/spotter';
-    if (hubKey === 'explorer') return p === '/explorer';
     if (hubKey === 'vault') return p === '/vault' || p === '/escrow' || p === '/wallets';
+    if (hubKey === 'explorer') return p === '/explorer';
     if (hubKey === 'developers') return p === '/developers';
     if (hubKey === 'admin') return p === '/admin';
     return false;
@@ -110,13 +100,13 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2 select-none relative z-40">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-3">
         {/* Left: CoinVex Minimalist Brand Identity */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3 shrink-0">
           {canGoBack && onBack && (
             <button
               onClick={onBack}
-              className="w-8 h-8 rounded-full bg-[#101010] border border-white/10 flex items-center justify-center text-white hover:text-[#A8FF00] transition-colors"
+              className="w-8 h-8 rounded-full bg-[#101010] border border-white/10 flex items-center justify-center text-white hover:text-[#A8FF00] transition-colors cursor-pointer"
               title="Go back"
             >
               <ChevronLeft className="w-4 h-4 text-zinc-300" />
@@ -136,41 +126,101 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Center: CoinVex Floating Pill Switcher for Protocol Portals */}
-        <nav className="hidden lg:flex items-center bg-[#0D0D0D] p-1 rounded-full border border-white/[0.08] shadow-inner space-x-0.5">
-          {hubs.map((hub) => {
-            const active = isHubActive(hub.key);
-            const Icon = hub.icon;
+        {/* Center: Structured CoinVex Navigation (Primary Workspaces + Protocol Tools) */}
+        <nav className="hidden md:flex items-center bg-[#0D0D0D] p-1 rounded-full border border-white/[0.08] shadow-inner space-x-1">
+          {/* Primary Workspaces (from screenshots) */}
+          <button
+            onClick={() => handleNavigate('/dashboard', 'dashboard')}
+            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
+              isHubActive('dashboard')
+                ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/60 shadow-sm shadow-[#A8FF00]/10'
+                : 'text-[#858585] hover:text-white'
+            }`}
+          >
+            <PlusCircle className={`w-3.5 h-3.5 ${isHubActive('dashboard') ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
+            <span>Dashboard</span>
+          </button>
 
-            return (
-              <button
-                key={hub.key}
-                onClick={() => handleNavigate(hub.path, hub.key)}
-                className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
-                  active
-                    ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/50 shadow-sm shadow-[#A8FF00]/10'
-                    : 'text-[#858585] hover:text-white'
-                }`}
-              >
-                <Icon className={`w-3.5 h-3.5 ${active ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
-                <span>{hub.label}</span>
-                {hub.badge > 0 && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00] animate-pulse" />
-                )}
-              </button>
-            );
-          })}
+          <button
+            onClick={() => handleNavigate('/radar', 'radar')}
+            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
+              isHubActive('radar')
+                ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/60 shadow-sm shadow-[#A8FF00]/10'
+                : 'text-[#858585] hover:text-white'
+            }`}
+          >
+            <Compass className={`w-3.5 h-3.5 ${isHubActive('radar') ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
+            <span>Analytics &amp; Radar</span>
+            {unverifiedCount > 0 && (
+              <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00] animate-pulse" />
+            )}
+          </button>
+
+          <button
+            onClick={() => handleNavigate('/vault', 'vault')}
+            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
+              isHubActive('vault')
+                ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/60 shadow-sm shadow-[#A8FF00]/10'
+                : 'text-[#858585] hover:text-white'
+            }`}
+          >
+            <Lock className={`w-3.5 h-3.5 ${isHubActive('vault') ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
+            <span>Escrow Vault</span>
+          </button>
+
+          {/* Elegant Divider between Workspaces and Protocol Tools */}
+          <div className="h-4 w-px bg-white/[0.12] mx-0.5" />
+
+          {/* Protocol Verification & Tools */}
+          <button
+            onClick={() => handleNavigate('/explorer', 'explorer')}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
+              isHubActive('explorer')
+                ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/60 shadow-sm shadow-[#A8FF00]/10'
+                : 'text-[#858585] hover:text-white'
+            }`}
+            title="Verifier Review Queue"
+          >
+            <FileCheck2 className={`w-3.5 h-3.5 ${isHubActive('explorer') ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
+            <span>Explorer</span>
+          </button>
+
+          <button
+            onClick={() => handleNavigate('/developers', 'developers')}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
+              isHubActive('developers')
+                ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/60 shadow-sm shadow-[#A8FF00]/10'
+                : 'text-[#858585] hover:text-white'
+            }`}
+            title="Open API & Documentation"
+          >
+            <Code2 className={`w-3.5 h-3.5 ${isHubActive('developers') ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
+            <span>Developers</span>
+          </button>
+
+          <button
+            onClick={() => handleNavigate('/admin', 'admin')}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
+              isHubActive('admin')
+                ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/60 shadow-sm shadow-[#A8FF00]/10'
+                : 'text-[#858585] hover:text-white'
+            }`}
+            title="System Diagnostics & Verification"
+          >
+            <ShieldCheck className={`w-3.5 h-3.5 ${isHubActive('admin') ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
+            <span>Admin</span>
+          </button>
         </nav>
 
         {/* Right: User Greeting, Purple Avatar, Balance Pill & Modals */}
-        <div className="flex items-center space-x-3">
-          {/* User Greeting & Purple Avatar (CoinVex Signature) */}
+        <div className="flex items-center space-x-2.5 shrink-0">
+          {/* User Greeting & Purple Avatar (CoinVex Signature from Screenshot) */}
           <div
             onClick={onOpenWalletModal}
-            className="flex items-center space-x-2.5 cursor-pointer hover:opacity-90 transition-opacity"
+            className="flex items-center space-x-2 cursor-pointer hover:opacity-90 transition-opacity"
             title="Switch User / Persona"
           >
-            <span className="text-xs text-zinc-300 font-medium hidden sm:inline">
+            <span className="text-xs text-zinc-300 font-medium hidden xl:inline">
               Hi, {displayWalletName}
             </span>
             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 border border-purple-400/30 flex items-center justify-center text-xs font-bold text-white shadow-sm overflow-hidden">
@@ -178,8 +228,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Quick Balance Pill */}
-          <div className="hidden sm:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#101010] border border-white/[0.07] text-xs font-mono">
+          {/* Quick Balance Pill (from Screenshot: • 4.58 SOL) */}
+          <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#101010] border border-white/[0.07] text-xs font-mono">
             <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00] animate-pulse" />
             <span className="text-[#A8FF00] font-bold">{displayBalance}</span>
           </div>

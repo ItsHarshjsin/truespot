@@ -5,6 +5,7 @@ import { requestDevnetAirdrop } from '../utils/solana';
 import { Navigation, Coins, Edit3, RotateCcw } from 'lucide-react';
 
 interface JudgeDeckProps {
+  pageTitle?: string;
   currentLocationName: string;
   isSimulated: boolean;
   onSelectPreset: (presetId: string) => void;
@@ -15,6 +16,7 @@ interface JudgeDeckProps {
 }
 
 export const JudgeDeck: React.FC<JudgeDeckProps> = ({
+  pageTitle = 'Dashboard',
   currentLocationName,
   isSimulated,
   onSelectPreset,
@@ -74,7 +76,7 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
         {/* Left: CoinVex Large Dashboard Title & Date */}
         <div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#F5F5F5] tracking-tight">
-            Dashboard
+            {pageTitle}
           </h1>
           <div className="flex items-center space-x-2 text-xs text-[#858585] mt-1 font-medium">
             <span>25 January 2025</span>
