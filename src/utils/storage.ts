@@ -101,39 +101,52 @@ class HybridStore {
 
   private initLocalData() {
     try {
+      const STORAGE_VERSION = 'v2.1.0';
+      const storedVersion = typeof window !== 'undefined' ? localStorage.getItem('truespot_version') : null;
+      if (storedVersion !== STORAGE_VERSION) {
+        // Upgrade / Clean slate: Purge old legacy keys and start fresh
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('truespot_queries_v2');
+          localStorage.removeItem('truespot_observations_v2');
+          localStorage.removeItem('truespot_published_answers_v2');
+          localStorage.removeItem('truespot_bounties');
+          localStorage.removeItem('truespot_reports');
+          localStorage.removeItem('truespot_verifications');
+          localStorage.removeItem('truespot_escrow_events');
+          localStorage.removeItem('truespot_demo_accounts');
+          localStorage.setItem('truespot_version', STORAGE_VERSION);
+        }
+        this.queries = [];
+        this.observations = [];
+        this.publishedAnswers = [];
+        this.bounties = [];
+        this.reports = [];
+        this.verifications = [];
+        return;
+      }
+
       const savedQueries = localStorage.getItem('truespot_queries_v2');
       if (savedQueries) {
         this.queries = JSON.parse(savedQueries);
       } else {
-        this.queries = [...DEFAULT_SEED_QUERIES];
+        this.queries = [];
       }
 
       const savedObs = localStorage.getItem('truespot_observations_v2');
       if (savedObs) {
         this.observations = JSON.parse(savedObs);
       } else {
-        this.observations = [...DEFAULT_SEED_OBSERVATIONS];
+        this.observations = [];
       }
 
       const savedAnswers = localStorage.getItem('truespot_published_answers_v2');
       if (savedAnswers) {
         this.publishedAnswers = JSON.parse(savedAnswers);
       } else {
-        this.publishedAnswers = [...DEFAULT_SEED_ANSWERS];
+        this.publishedAnswers = [];
       }
 
-      // Merge legacy bounties from localStorage that are not yet in this.queries
-      try {
-        const legacyBountiesStr = localStorage.getItem('truespot_bounties');
-        if (legacyBountiesStr) {
-          const legacyBounties: any[] = JSON.parse(legacyBountiesStr);
-          legacyBounties.forEach((lb) => {
-            if (!this.queries.some((q) => q.id === lb.id || q.query_id_hex === lb.query_id_hex)) {
-              this.queries.push(lb);
-            }
-          });
-        }
-      } catch (e) {}
+      this.bounties = this.queries as any;
 
       // Self-heal and link: Ensure every observation maps to a valid query
       this.observations.forEach((obs) => {

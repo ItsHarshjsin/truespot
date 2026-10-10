@@ -86,15 +86,40 @@ const AppContent: React.FC = () => {
   });
 
   // Dynamic Demo Accounts & Wallet State (persisted to localStorage)
-  const savedAccountsStr =
-    typeof window !== 'undefined' ? localStorage.getItem('truespot_demo_accounts') : null;
-  const initialAccounts: DemoAccount[] = savedAccountsStr
-    ? JSON.parse(savedAccountsStr)
-    : DEMO_ACCOUNTS;
+  const initialAccounts: DemoAccount[] = (() => {
+    if (typeof window !== 'undefined') {
+      const version = localStorage.getItem('truespot_version');
+      if (version === 'v2.1.0') {
+        const saved = localStorage.getItem('truespot_demo_accounts');
+        if (saved) {
+          try {
+            return JSON.parse(saved);
+          } catch (e) {}
+        }
+      }
+    }
+    return DEMO_ACCOUNTS;
+  })();
 
   const [demoAccounts, setDemoAccounts] = useState<DemoAccount[]>(initialAccounts);
   const [activeDemoAccount, setActiveDemoAccount] = useState<DemoAccount>(initialAccounts[0]);
   const [isUsingDemo, setIsUsingDemo] = useState<boolean>(true);
+
+  // Dynamic count of pending submissions for sidebar badge
+  const [unverifiedCount, setUnverifiedCount] = useState(0);
+
+  useEffect(() => {
+    const updatePending = async () => {
+      try {
+        const obs = await hybridStore.getObservations();
+        const pending = obs.filter((o) => o.status === 'PENDING').length;
+        setUnverifiedCount(pending);
+      } catch (e) {}
+    };
+    updatePending();
+    const unsub = hybridStore.subscribeToChanges(updatePending);
+    return () => unsub();
+  }, []);
 
   // Active Tab synchronized with routes
   const [activeTab, setActiveTab] = useState<string>('bounties');
@@ -187,17 +212,16 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const handleResetDemoState = () => {
+  const handleResetDemoState = async () => {
     try {
-      localStorage.removeItem('truespot_demo_accounts');
-      localStorage.removeItem('truespot_locked_coords');
-      localStorage.removeItem('truespot_admin_auth');
+      localStorage.clear();
+      localStorage.setItem('truespot_version', 'v2.1.0');
     } catch (e) {}
     setDemoAccounts(DEMO_ACCOUNTS);
     setActiveDemoAccount(DEMO_ACCOUNTS[0]);
     setIsAdmin(false);
-    hybridStore.reset();
-    showToast('Demo State Reset', 'Restored sample bounties, reset wallets and local storage', 'info');
+    await hybridStore.wipeAllData();
+    showToast('Clean Slate Initialized', 'Wiped all protocol state, initialized 1.00 SOL wallets and zeroed metrics', 'info');
   };
 
   /**
@@ -385,7 +409,7 @@ const AppContent: React.FC = () => {
           {/* Left Vertical Sidebar */}
           <SidebarNav
             userMode={userMode}
-            unverifiedCount={1}
+            unverifiedCount={unverifiedCount}
             mobileOpen={mobileSidebarOpen}
             onCloseMobile={() => setMobileSidebarOpen(false)}
           />
