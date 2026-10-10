@@ -559,23 +559,23 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
               "{bounty.question}"
             </p>
 
-            <div className="flex items-center justify-between pt-2 border-t border-white/[0.06]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-white/[0.06]">
               <button
                 type="button"
                 onClick={() => setShowMissionBriefing(true)}
-                className="text-xs text-[#A8FF00] hover:underline flex items-center space-x-1 font-semibold cursor-pointer"
+                className="text-xs text-[#A8FF00] hover:underline flex items-center space-x-1 font-semibold cursor-pointer shrink-0"
               >
                 <FileCheck2 className="w-3.5 h-3.5" />
                 <span>Mission Briefing</span>
               </button>
 
               {bountiesList.length > 1 && (
-                <div className="flex items-center space-x-2">
-                  <span className="text-xs text-[#858585]">Switch:</span>
+                <div className="flex items-center space-x-2 min-w-0 max-w-full sm:max-w-[240px]">
+                  <span className="text-xs text-[#858585] shrink-0">Switch:</span>
                   <select
                     value={selectedBountyId}
                     onChange={(e) => handleSelectBounty(e.target.value)}
-                    className="bg-[#101010] text-xs text-[#F5F5F5] font-medium border border-white/[0.08] rounded-full px-3 py-1 outline-none focus:border-[#A8FF00] cursor-pointer"
+                    className="w-full min-w-0 bg-[#101010] text-xs text-[#F5F5F5] font-medium border border-white/[0.08] rounded-full px-2.5 py-1 outline-none focus:border-[#A8FF00] cursor-pointer truncate"
                   >
                     {bountiesList.map((b) => (
                       <option key={b.id} value={b.id} className="bg-zinc-900 text-white">
@@ -616,14 +616,17 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
               ))}
             </div>
 
-            <input
-              type="text"
-              value={answerText}
-              onChange={(e) => setAnswerText(e.target.value)}
-              placeholder="Observation details..."
-              className="w-full bg-[#101010] border border-white/[0.08] focus:border-[#A8FF00] rounded-xl px-3.5 py-2 text-xs text-[#F5F5F5] placeholder-[#555555] outline-none transition-all"
-              required
-            />
+            <div className="space-y-1 pt-1">
+              <span className="text-[10px] text-[#858585] font-semibold block">Observation Detail / Custom Note:</span>
+              <input
+                type="text"
+                value={answerText}
+                onChange={(e) => setAnswerText(e.target.value)}
+                placeholder="Observation details..."
+                className="w-full bg-[#101010] border border-white/[0.08] focus:border-[#A8FF00] rounded-xl px-3.5 py-2 text-xs text-[#F5F5F5] placeholder-[#555555] outline-none transition-all"
+                required
+              />
+            </div>
           </div>
 
           {/* Hardware & Telemetry Card */}

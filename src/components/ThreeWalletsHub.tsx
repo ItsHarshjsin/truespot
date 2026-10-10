@@ -228,29 +228,31 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
       </div>
 
       {/* 3 Dedicated Role Tab Navigators */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Role 1: Maker / Asker Tab */}
         <button
           onClick={() => setSelectedRoleView('maker')}
-          className={`p-4 rounded-[18px] text-left transition-all relative overflow-hidden cursor-pointer ${
+          className={`p-4 sm:p-5 rounded-[20px] text-left transition-all relative overflow-hidden cursor-pointer flex flex-col justify-between h-full ${
             selectedRoleView === 'maker'
               ? 'bg-[#0B0B0B] border border-[#A8FF00] shadow-[0_0_15px_rgba(168,255,0,0.15)]'
               : 'bg-[#0B0B0B] border border-white/[0.07] hover:border-white/15'
           }`}
         >
-          <div className="flex items-center justify-between mb-2">
-            <div className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center font-extrabold shadow-sm">
-              <Coins className="w-4 h-4 text-black" />
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center font-extrabold shadow-sm">
+                <Coins className="w-4 h-4 text-black" />
+              </div>
+              <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-[#101010] text-[#A8FF00] border border-white/[0.07]">
+                {makerAccount.balanceSol.toFixed(2)} SOL
+              </span>
             </div>
-            <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-[#101010] text-[#A8FF00] border border-white/[0.07]">
-              {makerAccount.balanceSol.toFixed(2)} SOL
-            </span>
+            <h3 className="text-sm font-bold text-[#F5F5F5]">1. Task Maker Portal</h3>
+            <p className="text-[11px] text-[#858585] mt-0.5 leading-snug">
+              Creates verification tasks, locks escrow, and reviews submitted evidence.
+            </p>
           </div>
-          <h3 className="text-sm font-bold text-[#F5F5F5]">1. Task Maker Portal</h3>
-          <p className="text-[11px] text-[#858585] mt-0.5 leading-snug">
-            Creates verification tasks, locks escrow, and reviews submitted evidence.
-          </p>
-          <div className="mt-2.5 pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-[10px] text-[#858585] font-mono">
+          <div className="mt-3 pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-[10px] text-[#858585] font-mono">
             <span>{makerAccount.address}</span>
             {activeDemoAccount.id === makerAccount.id ? (
               <span className="text-[#A8FF00] font-bold font-sans">Active Role ✓</span>
@@ -272,25 +274,27 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
         {/* Role 2: Receiver / Worker Tab */}
         <button
           onClick={() => setSelectedRoleView('receiver')}
-          className={`p-4 rounded-[18px] text-left transition-all relative overflow-hidden cursor-pointer ${
+          className={`p-4 sm:p-5 rounded-[20px] text-left transition-all relative overflow-hidden cursor-pointer flex flex-col justify-between h-full ${
             selectedRoleView === 'receiver'
               ? 'bg-[#0B0B0B] border border-[#A8FF00] shadow-[0_0_15px_rgba(168,255,0,0.15)]'
               : 'bg-[#0B0B0B] border border-white/[0.07] hover:border-white/15'
           }`}
         >
-          <div className="flex items-center justify-between mb-2">
-            <div className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center font-extrabold shadow-sm">
-              <Camera className="w-4 h-4 text-black" />
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center font-extrabold shadow-sm">
+                <Camera className="w-4 h-4 text-black" />
+              </div>
+              <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-[#101010] text-[#A8FF00] border border-white/[0.07]">
+                {receiverAccount.balanceSol.toFixed(2)} SOL
+              </span>
             </div>
-            <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-[#101010] text-[#A8FF00] border border-white/[0.07]">
-              {receiverAccount.balanceSol.toFixed(2)} SOL
-            </span>
+            <h3 className="text-sm font-bold text-[#F5F5F5]">2. Task Receiver Portal</h3>
+            <p className="text-[11px] text-[#858585] mt-0.5 leading-snug">
+              Field worker: walks into 200m geofence, captures hardware-verified photo proof.
+            </p>
           </div>
-          <h3 className="text-sm font-bold text-[#F5F5F5]">2. Task Receiver Portal</h3>
-          <p className="text-[11px] text-[#858585] mt-0.5 leading-snug">
-            Field worker: walks into 200m geofence, captures hardware-verified photo proof.
-          </p>
-          <div className="mt-2.5 pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-[10px] text-[#858585] font-mono">
+          <div className="mt-3 pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-[10px] text-[#858585] font-mono">
             <span>{receiverAccount.address}</span>
             {activeDemoAccount.id === receiverAccount.id ? (
               <span className="text-[#A8FF00] font-bold font-sans">Active Role ✓</span>
@@ -312,25 +316,27 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
         {/* Role 3: Escrow Vault Protocol */}
         <button
           onClick={() => setSelectedRoleView('escrow')}
-          className={`p-4 rounded-[18px] text-left transition-all relative overflow-hidden cursor-pointer ${
+          className={`p-4 sm:p-5 rounded-[20px] text-left transition-all relative overflow-hidden cursor-pointer flex flex-col justify-between h-full ${
             selectedRoleView === 'escrow'
               ? 'bg-[#0B0B0B] border border-[#A8FF00] shadow-[0_0_15px_rgba(168,255,0,0.15)]'
               : 'bg-[#0B0B0B] border border-white/[0.07] hover:border-white/15'
           }`}
         >
-          <div className="flex items-center justify-between mb-2">
-            <div className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center font-extrabold shadow-sm">
-              <Lock className="w-4 h-4 text-black" />
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center font-extrabold shadow-sm">
+                <Lock className="w-4 h-4 text-black" />
+              </div>
+              <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-[#101010] text-[#A8FF00] border border-white/[0.07]">
+                {escrowAccount.balanceSol.toFixed(2)} SOL
+              </span>
             </div>
-            <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-[#101010] text-[#A8FF00] border border-white/[0.07]">
-              {escrowAccount.balanceSol.toFixed(2)} SOL
-            </span>
+            <h3 className="text-sm font-bold text-[#F5F5F5]">3. Escrow Vault Protocol</h3>
+            <p className="text-[11px] text-[#858585] mt-0.5 leading-snug">
+              Autonomous Solana program: holds funds, validates blockhash nonces & settles.
+            </p>
           </div>
-          <h3 className="text-sm font-bold text-[#F5F5F5]">3. Escrow Vault Protocol</h3>
-          <p className="text-[11px] text-[#858585] mt-0.5 leading-snug">
-            Autonomous Solana program: holds funds, validates blockhash nonces & settles.
-          </p>
-          <div className="mt-2.5 pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-[10px] text-[#858585] font-mono">
+          <div className="mt-3 pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-[10px] text-[#858585] font-mono">
             <span title="Solana Devnet Program">{ESCROW_VAULT_ADDRESS.toBase58().slice(0, 8)}...</span>
             {activeDemoAccount.id === escrowAccount.id ? (
               <span className="text-[#A8FF00] font-bold font-sans">Active Role ✓</span>
@@ -399,7 +405,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
                 No worker submissions currently pending review. New reports will appear here in real-time.
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {bounties
                   .filter((b) => b.status === 'ANSWERED')
                   .map((b) => {
@@ -500,7 +506,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {bounties
                 .filter((b) => b.status === 'OPEN')
                 .slice(0, 6)
@@ -535,18 +541,18 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
       {selectedRoleView === 'escrow' && (
         <div className="space-y-4">
           <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full bg-[#101010] border border-white/[0.08] flex items-center justify-center text-[#A8FF00]">
+            <div className="flex items-center space-x-3 min-w-0">
+              <div className="w-10 h-10 rounded-full bg-[#101010] border border-white/[0.08] flex items-center justify-center text-[#A8FF00] shrink-0">
                 <Lock className="w-5 h-5" />
               </div>
-              <div>
-                <div className="flex items-center space-x-2">
+              <div className="min-w-0">
+                <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                   <h2 className="text-base font-bold text-[#F5F5F5]">Solana Devnet Escrow Vault</h2>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#A8FF00]/10 text-[#A8FF00] font-semibold border border-[#A8FF00]/30">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#A8FF00]/10 text-[#A8FF00] font-semibold border border-[#A8FF00]/30 shrink-0">
                     Smart Contract Vault
                   </span>
                 </div>
-                <div className="text-xs font-mono text-[#858585] mt-0.5">
+                <div className="text-xs font-mono text-[#858585] mt-0.5 truncate">
                   Program: <span className="text-[#A8FF00] font-bold">{ESCROW_VAULT_ADDRESS.toBase58()}</span>
                 </div>
               </div>
@@ -556,7 +562,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
               href={`https://explorer.solana.com/address/${ESCROW_VAULT_ADDRESS.toBase58()}?cluster=devnet`}
               target="_blank"
               rel="noreferrer"
-              className="bg-[#101010] border border-white/[0.07] hover:border-white/15 px-3.5 py-1.5 rounded-full text-[#A8FF00] hover:text-white text-xs font-semibold flex items-center space-x-1.5 transition-colors self-start sm:self-auto"
+              className="bg-[#101010] border border-white/[0.07] hover:border-white/15 px-3.5 py-1.5 rounded-full text-[#A8FF00] hover:text-white text-xs font-semibold flex items-center space-x-1.5 transition-colors shrink-0 self-start sm:self-auto"
             >
               <span>Solana Explorer</span>
               <ExternalLink className="w-3 h-3" />
@@ -564,28 +570,29 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
           </div>
 
           {/* Telemetry Strip */}
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[18px] p-4 text-center shadow-lg">
-              <span className="text-[10px] font-bold text-[#858585] uppercase block">Total Value Locked</span>
-              <span className="text-xl font-extrabold text-[#A8FF00] font-mono">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-4.5 text-center shadow-lg">
+              <span className="text-[10px] font-bold text-[#858585] uppercase tracking-wider block">Total Value Locked</span>
+              <span className="text-xl sm:text-2xl font-black text-[#A8FF00] font-mono mt-1 block">
                 {totalEscrowLockedSol.toFixed(2)} SOL
               </span>
             </div>
-            <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[18px] p-4 text-center shadow-lg">
-              <span className="text-[10px] font-bold text-[#858585] uppercase block">Devnet Slot</span>
-              <span className="text-xl font-extrabold text-[#F5F5F5] font-mono">
-                {solanaSlot ? solanaSlot.toLocaleString() : '284,792,410'}
+            <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-4.5 text-center shadow-lg">
+              <span className="text-[10px] font-bold text-[#858585] uppercase tracking-wider block">Devnet Slot</span>
+              <span className="text-xl sm:text-2xl font-black text-[#F5F5F5] font-mono mt-1 flex items-center justify-center gap-1">
+                <span className="text-[#A8FF00] font-bold text-sm">#</span>
+                {solanaSlot ? solanaSlot.toLocaleString() : '509,469,823'}
               </span>
             </div>
-            <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[18px] p-4 text-center shadow-lg">
-              <span className="text-[10px] font-bold text-[#858585] uppercase block">Network Latency</span>
-              <span className="text-xl font-extrabold text-[#A8FF00] font-mono">
+            <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-4.5 text-center shadow-lg">
+              <span className="text-[10px] font-bold text-[#858585] uppercase tracking-wider block">Network Latency</span>
+              <span className="text-xl sm:text-2xl font-black text-[#A8FF00] font-mono mt-1 block">
                 {rpcLatencyMs ? `${rpcLatencyMs} ms` : '320 ms'}
               </span>
             </div>
-            <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[18px] p-4 text-center shadow-lg">
-              <span className="text-[10px] font-bold text-[#858585] uppercase block">Settled Volume</span>
-              <span className="text-xl font-extrabold text-[#A8FF00] font-mono">
+            <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-4.5 text-center shadow-lg">
+              <span className="text-[10px] font-bold text-[#858585] uppercase tracking-wider block">Settled Volume</span>
+              <span className="text-xl sm:text-2xl font-black text-[#A8FF00] font-mono mt-1 block">
                 {totalSettledSol.toFixed(2)} SOL
               </span>
             </div>

@@ -261,29 +261,31 @@ const AppContent: React.FC = () => {
         setActiveTab={setActiveTab}
       />
 
-      {/* 2. Subheader Toolbar: Real Device GPS, Preset Jumper & Devnet +1 SOL Airdrop */}
-      <JudgeDeck
-        pageTitle={getPageTitle()}
-        currentLocationName={locationName}
-        isSimulated={isSimulated}
-        onSelectPreset={handleSelectJudgePreset}
-        onUseLiveGps={() => fetchDeviceGps(true)}
-        onRefreshData={() => {
-          showToast('Oracle Refreshed', 'Synced state with hybrid storage', 'info');
-        }}
-        onManualCoords={handleSetUserLocation}
-        onAirdropDemo={() => {
-          adjustBalance(1.0);
-          showToast(
-            'Devnet Airdrop',
-            `Added +1.00 SOL to ${activeDemoAccount.name.split(' ')[0]}`,
-            'reward'
-          );
-        }}
-      />
+      {/* 2. Subheader Toolbar: Real Device GPS, Preset Jumper & Devnet +1 SOL Airdrop (Only on location-based portals: Dashboard & Radar) */}
+      {(activeTab === 'dashboard' || activeTab === 'radar') && (
+        <JudgeDeck
+          pageTitle={getPageTitle()}
+          currentLocationName={locationName}
+          isSimulated={isSimulated}
+          onSelectPreset={handleSelectJudgePreset}
+          onUseLiveGps={() => fetchDeviceGps(true)}
+          onRefreshData={() => {
+            showToast('Oracle Refreshed', 'Synced state with hybrid storage', 'info');
+          }}
+          onManualCoords={handleSetUserLocation}
+          onAirdropDemo={() => {
+            adjustBalance(1.0);
+            showToast(
+              'Devnet Airdrop',
+              `Added +1.00 SOL to ${activeDemoAccount.name.split(' ')[0]}`,
+              'reward'
+            );
+          }}
+        />
+      )}
 
       {/* GPS Error Guidance Banner */}
-      {gpsError && (
+      {gpsError && (activeTab === 'dashboard' || activeTab === 'radar') && (
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2">
           <div className="bg-amber-950/40 border border-amber-500/30 rounded-2xl p-3 flex items-center justify-between text-xs text-amber-200">
             <div className="flex items-center space-x-2">

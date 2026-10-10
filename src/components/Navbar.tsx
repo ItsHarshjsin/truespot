@@ -127,11 +127,11 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Center: Structured CoinVex Navigation (Primary Workspaces + Protocol Tools) */}
-        <nav className="hidden md:flex items-center bg-[#0D0D0D] p-1 rounded-full border border-white/[0.08] shadow-inner space-x-1">
+        <nav className="hidden md:flex items-center bg-[#0D0D0D] p-1 rounded-full border border-white/[0.08] shadow-inner space-x-0.5 lg:space-x-1 shrink-0">
           {/* Primary Workspaces (from screenshots) */}
           <button
             onClick={() => handleNavigate('/dashboard', 'dashboard')}
-            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
               isHubActive('dashboard')
                 ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/60 shadow-sm shadow-[#A8FF00]/10'
                 : 'text-[#858585] hover:text-white'
@@ -143,14 +143,14 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={() => handleNavigate('/radar', 'radar')}
-            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
               isHubActive('radar')
                 ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/60 shadow-sm shadow-[#A8FF00]/10'
                 : 'text-[#858585] hover:text-white'
             }`}
           >
             <Compass className={`w-3.5 h-3.5 ${isHubActive('radar') ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
-            <span>Analytics &amp; Radar</span>
+            <span><span className="hidden xl:inline">Analytics & </span>Radar</span>
             {unverifiedCount > 0 && (
               <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00] animate-pulse" />
             )}
@@ -158,14 +158,14 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={() => handleNavigate('/vault', 'vault')}
-            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
               isHubActive('vault')
                 ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/60 shadow-sm shadow-[#A8FF00]/10'
                 : 'text-[#858585] hover:text-white'
             }`}
           >
             <Lock className={`w-3.5 h-3.5 ${isHubActive('vault') ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
-            <span>Escrow Vault</span>
+            <span><span className="hidden xl:inline">Escrow </span>Vault</span>
           </button>
 
           {/* Elegant Divider between Workspaces and Protocol Tools */}
@@ -174,7 +174,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Protocol Verification & Tools */}
           <button
             onClick={() => handleNavigate('/explorer', 'explorer')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
+            className={`flex items-center space-x-1.5 px-2.5 lg:px-3 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
               isHubActive('explorer')
                 ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/60 shadow-sm shadow-[#A8FF00]/10'
                 : 'text-[#858585] hover:text-white'
@@ -187,7 +187,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={() => handleNavigate('/developers', 'developers')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
+            className={`flex items-center space-x-1.5 px-2.5 lg:px-3 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
               isHubActive('developers')
                 ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/60 shadow-sm shadow-[#A8FF00]/10'
                 : 'text-[#858585] hover:text-white'
@@ -195,12 +195,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             title="Open API & Documentation"
           >
             <Code2 className={`w-3.5 h-3.5 ${isHubActive('developers') ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
-            <span>Developers</span>
+            <span><span className="hidden xl:inline">Developers</span><span className="xl:hidden">API</span></span>
           </button>
 
           <button
             onClick={() => handleNavigate('/admin', 'admin')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
+            className={`flex items-center space-x-1.5 px-2.5 lg:px-3 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
               isHubActive('admin')
                 ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/60 shadow-sm shadow-[#A8FF00]/10'
                 : 'text-[#858585] hover:text-white'
@@ -220,7 +220,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="flex items-center space-x-2 cursor-pointer hover:opacity-90 transition-opacity"
             title="Switch User / Persona"
           >
-            <span className="text-xs text-zinc-300 font-medium hidden xl:inline">
+            <span className="text-xs text-zinc-300 font-medium hidden 2xl:inline">
               Hi, {displayWalletName}
             </span>
             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 border border-purple-400/30 flex items-center justify-center text-xs font-bold text-white shadow-sm overflow-hidden">
