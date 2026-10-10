@@ -28,6 +28,11 @@ import { EvidenceExplorer } from './components/EvidenceExplorer';
 import { ProtocolExplorer } from './components/ProtocolExplorer';
 import { AdminVerificationPanel } from './components/AdminVerificationPanel';
 import { JudgeDeck } from './components/JudgeDeck';
+import { LiveRealityMap } from './components/LiveRealityMap';
+import { ReputationScreen } from './components/ReputationScreen';
+import { ProfileView } from './components/ProfileView';
+import { SettingsView } from './components/SettingsView';
+import { RoleGuard } from './components/RoleGuard';
 import { WalletModal, DEMO_ACCOUNTS, DemoAccount } from './components/WalletModal';
 import { HowItWorksModal } from './components/HowItWorksModal';
 import { SupabaseModal } from './components/SupabaseModal';
@@ -41,6 +46,13 @@ import {
   Code2,
   ShieldCheck,
   AlertCircle,
+  Camera,
+  Coins,
+  Award,
+  BarChart3,
+  MapPin,
+  User,
+  Settings,
 } from 'lucide-react';
 
 const AppContent: React.FC = () => {
@@ -51,6 +63,25 @@ const AppContent: React.FC = () => {
   const [walletModalOpen, setWalletModalOpen] = useState<boolean>(false);
   const [howItWorksOpen, setHowItWorksOpen] = useState<boolean>(false);
   const [supabaseModalOpen, setSupabaseModalOpen] = useState<boolean>(false);
+
+  // Active User Mode: 'maker' | 'spotter' (persisted to localStorage across page refreshes)
+  const savedModeStr =
+    typeof window !== 'undefined'
+      ? (localStorage.getItem('truespot_active_mode') as 'maker' | 'spotter') ||
+        (localStorage.getItem('truespot_default_mode') as 'maker' | 'spotter')
+      : null;
+  const [userMode, setUserMode] = useState<'maker' | 'spotter'>(savedModeStr || 'maker');
+
+  // Admin access state (persisted)
+  const [isAdmin, setIsAdmin] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return (
+        localStorage.getItem('truespot_admin_auth') === 'true' ||
+        sessionStorage.getItem('truespot_admin_auth') === 'true'
+      );
+    }
+    return false;
+  });
 
   // Dynamic Demo Accounts & Wallet State (persisted to localStorage)
   const savedAccountsStr =
@@ -64,23 +95,25 @@ const AppContent: React.FC = () => {
   const [isUsingDemo, setIsUsingDemo] = useState<boolean>(true);
 
   // Active Tab synchronized with routes
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [activeTab, setActiveTab] = useState<string>('bounties');
 
   useEffect(() => {
     const p = location.pathname;
-    if (p === '/' || p === '/dashboard' || p === '/maker' || p === '/studio') {
-      setActiveTab('dashboard');
-    } else if (p === '/radar' || p === '/nearby' || p === '/map' || p === '/spotter') {
-      setActiveTab('radar');
-    } else if (p === '/explorer') {
-      setActiveTab('explorer');
-    } else if (p === '/vault' || p === '/escrow' || p === '/wallets') {
-      setActiveTab('vault');
-    } else if (p === '/developers') {
-      setActiveTab('developers');
-    } else if (p === '/admin') {
-      setActiveTab('admin');
-    }
+    if (p === '/studio') setActiveTab('studio');
+    else if (p === '/bounties' || p === '/dashboard' || p === '/maker') setActiveTab('bounties');
+    else if (p === '/review' || p === '/explorer') setActiveTab('review');
+    else if (p === '/records' || p === '/developers') setActiveTab('records');
+    else if (p === '/analytics') setActiveTab('analytics');
+    else if (p === '/nearby' || p === '/radar' || p === '/spotter') setActiveTab('nearby');
+    else if (p === '/report') setActiveTab('report');
+    else if (p === '/submissions') setActiveTab('submissions');
+    else if (p === '/earnings') setActiveTab('earnings');
+    else if (p === '/reputation') setActiveTab('reputation');
+    else if (p === '/map') setActiveTab('map');
+    else if (p === '/vault' || p === '/escrow' || p === '/wallets') setActiveTab('vault');
+    else if (p === '/profile') setActiveTab('profile');
+    else if (p === '/settings') setActiveTab('settings');
+    else if (p === '/admin') setActiveTab('admin');
   }, [location.pathname]);
 
   // Toast Notifications State
@@ -103,12 +136,50 @@ const AppContent: React.FC = () => {
   };
 
   /**
+   * Mode Switcher Handler:
+   * Instantly changes active workspace without disconnecting wallet or changing account.
+   * Persists active mode to localStorage.
+   */
+  const handleSelectUserMode = (mode: 'maker' | 'spotter', redirect = true) => {
+    setUserMode(mode);
+    try {
+      localStorage.setItem('truespot_active_mode', mode);
+    } catch (e) {}
+
+    showToast(
+      `${mode === 'maker' ? 'Maker' : 'Spotter'} Mode Activated`,
+      mode === 'maker'
+        ? 'Switched to Maker workspace: Query Studio, Escrow Bounties & Review.'
+        : 'Switched to Spotter workspace: 200m Radar, Submissions & Earnings.',
+      'info'
+    );
+
+    if (redirect) {
+      if (mode === 'maker') {
+        navigate('/bounties');
+        setActiveTab('bounties');
+      } else {
+        navigate('/nearby');
+        setActiveTab('nearby');
+      }
+    }
+  };
+
+  const handleResetDemoState = () => {
+    try {
+      localStorage.removeItem('truespot_demo_accounts');
+      localStorage.removeItem('truespot_locked_coords');
+      localStorage.removeItem('truespot_admin_auth');
+    } catch (e) {}
+    setDemoAccounts(DEMO_ACCOUNTS);
+    setActiveDemoAccount(DEMO_ACCOUNTS[0]);
+    setIsAdmin(false);
+    hybridStore.reset();
+    showToast('Demo State Reset', 'Restored sample bounties, reset wallets and local storage', 'info');
+  };
+
+  /**
    * Universal Multi-Role Fund Ledger
-   * Handles:
-   * 1. Balance Subtractions (e.g. Maker locks escrow: -0.20 SOL from Maker, +0.20 SOL into Escrow)
-   * 2. Balance Additions (e.g. Settlement: +0.20 SOL to Spotter, -0.20 SOL from Escrow)
-   * 3. Balance Refunds (e.g. Expiry: +0.20 SOL to Maker, -0.20 SOL from Escrow)
-   * 4. Direct Airdrops (e.g. +1.00 SOL to active wallet)
    */
   const adjustBalance = (
     amountDelta: number,
@@ -142,7 +213,6 @@ const AppContent: React.FC = () => {
           return { ...acc, balanceSol: newBal };
         }
         if (isCounter) {
-          // Counterparty receives opposite delta (e.g., escrow decreases when spotter receives payout)
           const newBal = Math.max(0, parseFloat((acc.balanceSol - amountDelta).toFixed(3)));
           return { ...acc, balanceSol: newBal };
         }
@@ -226,29 +296,53 @@ const AppContent: React.FC = () => {
 
   const getPageTitle = () => {
     switch (activeTab) {
+      case 'studio':
+        return 'Query Studio';
+      case 'bounties':
       case 'dashboard':
-        return 'Dashboard';
+        return 'My Bounties';
+      case 'review':
+      case 'explorer':
+        return 'Evidence Review';
+      case 'records':
+      case 'developers':
+        return 'Truth Records';
+      case 'analytics':
+        return 'Maker Analytics';
+      case 'nearby':
       case 'radar':
-        return 'Analytics & Radar';
+        return 'Nearby Bounties';
+      case 'report':
+        return 'Submit Evidence';
+      case 'submissions':
+        return 'My Submissions';
+      case 'earnings':
+        return 'Spotter Earnings';
+      case 'reputation':
+        return 'Reputation & Honesty';
+      case 'map':
+        return 'Live Reality Map';
       case 'vault':
         return 'Escrow Vault';
-      case 'explorer':
-        return 'Evidence Explorer';
-      case 'developers':
-        return 'Protocol & API';
+      case 'profile':
+        return 'Account Profile';
+      case 'settings':
+        return 'Settings';
       case 'admin':
         return 'Admin Diagnostics';
       default:
-        return 'Dashboard';
+        return userMode === 'maker' ? 'My Bounties' : 'Nearby Bounties';
     }
   };
+
+  const isLocationView = ['studio', 'bounties', 'dashboard', 'nearby', 'radar', 'report', 'map'].includes(activeTab);
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#F5F5F5] font-sans flex flex-col relative selection:bg-[#A8FF00] selection:text-black">
       {/* Toast Notification Container */}
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
 
-      {/* 1. CoinVex Global Header with Navigation Pills */}
+      {/* 1. CoinVex Global Header with Mode-Restructured Navigation */}
       <Navbar
         unverifiedCount={1}
         onOpenWalletModal={() => setWalletModalOpen(true)}
@@ -259,10 +353,13 @@ const AppContent: React.FC = () => {
         isUsingDemo={isUsingDemo}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        userMode={userMode}
+        onSelectUserMode={handleSelectUserMode}
+        isAdmin={isAdmin}
       />
 
-      {/* 2. Subheader Toolbar: Real Device GPS, Preset Jumper & Devnet +1 SOL Airdrop (Only on location-based portals: Dashboard & Radar) */}
-      {(activeTab === 'dashboard' || activeTab === 'radar') && (
+      {/* 2. Subheader Toolbar: Real Device GPS, Preset Jumper & Devnet +1 SOL Airdrop */}
+      {isLocationView && (
         <JudgeDeck
           pageTitle={getPageTitle()}
           currentLocationName={locationName}
@@ -285,7 +382,7 @@ const AppContent: React.FC = () => {
       )}
 
       {/* GPS Error Guidance Banner */}
-      {gpsError && (activeTab === 'dashboard' || activeTab === 'radar') && (
+      {gpsError && isLocationView && (
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2">
           <div className="bg-amber-950/40 border border-amber-500/30 rounded-2xl p-3 flex items-center justify-between text-xs text-amber-200">
             <div className="flex items-center space-x-2">
@@ -316,53 +413,205 @@ const AppContent: React.FC = () => {
       {/* 3. Main Workspace Content */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Routes>
-          {/* Portal 1: Dashboard / Task Maker (Screenshot 1 Layout) */}
+          {/* ================= MAKER MODE ROUTES ================= */}
+          {/* 1. Query Studio */}
           <Route
-            path="/dashboard"
+            path="/studio"
             element={
-              <MakerPortal
-                userCoords={currentCoords}
-                activeAccount={activeDemoAccount}
-                onAdjustBalance={adjustBalance}
-                onShowToast={showToast}
-                onNavigateToRadar={() => {
-                  navigate('/radar');
-                  setActiveTab('radar');
-                }}
-              />
+              <RoleGuard requiredMode="maker" currentMode={userMode} onSwitchMode={handleSelectUserMode}>
+                <MakerPortal
+                  userCoords={currentCoords}
+                  activeAccount={activeDemoAccount}
+                  onAdjustBalance={adjustBalance}
+                  onShowToast={showToast}
+                  onNavigateToRadar={() => {
+                    handleSelectUserMode('spotter', false);
+                    navigate('/nearby');
+                    setActiveTab('nearby');
+                  }}
+                  initialSubTab="create"
+                />
+              </RoleGuard>
             }
           />
-          <Route path="/maker" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/studio" element={<Navigate to="/dashboard" replace />} />
 
-          {/* Portal 2: Analytics & Radar / Field Earner (Screenshot 2 & 3 Layout) */}
+          {/* 2. My Bounties (and legacy dashboard aliases) */}
           <Route
-            path="/radar"
+            path="/bounties"
             element={
-              <ReceiverPortal
+              <RoleGuard requiredMode="maker" currentMode={userMode} onSwitchMode={handleSelectUserMode}>
+                <MakerPortal
+                  userCoords={currentCoords}
+                  activeAccount={activeDemoAccount}
+                  onAdjustBalance={adjustBalance}
+                  onShowToast={showToast}
+                  onNavigateToRadar={() => {
+                    handleSelectUserMode('spotter', false);
+                    navigate('/nearby');
+                    setActiveTab('nearby');
+                  }}
+                  initialSubTab="dashboard"
+                />
+              </RoleGuard>
+            }
+          />
+          <Route path="/dashboard" element={<Navigate to="/bounties" replace />} />
+          <Route path="/maker" element={<Navigate to="/bounties" replace />} />
+
+          {/* 3. Evidence Review */}
+          <Route
+            path="/review"
+            element={
+              <RoleGuard requiredMode="maker" currentMode={userMode} onSwitchMode={handleSelectUserMode}>
+                <EvidenceExplorer
+                  onShowToast={showToast}
+                  onAdjustBalance={adjustBalance}
+                  activeAccount={activeDemoAccount}
+                />
+              </RoleGuard>
+            }
+          />
+          <Route path="/explorer" element={<Navigate to="/review" replace />} />
+
+          {/* 4. Truth Records */}
+          <Route
+            path="/records"
+            element={
+              <RoleGuard requiredMode="maker" currentMode={userMode} onSwitchMode={handleSelectUserMode}>
+                <ProtocolExplorer onShowToast={showToast} />
+              </RoleGuard>
+            }
+          />
+          <Route path="/developers" element={<Navigate to="/records" replace />} />
+
+          {/* 5. Maker Analytics */}
+          <Route
+            path="/analytics"
+            element={
+              <RoleGuard requiredMode="maker" currentMode={userMode} onSwitchMode={handleSelectUserMode}>
+                <ThreeWalletsHub
+                  activeDemoAccount={activeDemoAccount}
+                  onSelectDemoAccount={setActiveDemoAccount}
+                  demoAccounts={demoAccounts}
+                  onAdjustBalance={adjustBalance}
+                  onNavigateToReport={() => {
+                    handleSelectUserMode('spotter', false);
+                    navigate('/report');
+                    setActiveTab('report');
+                  }}
+                  onNavigateToAsk={() => {
+                    navigate('/studio');
+                    setActiveTab('studio');
+                  }}
+                  onShowToast={showToast}
+                  initialRoleView="maker"
+                />
+              </RoleGuard>
+            }
+          />
+
+          {/* ================= SPOTTER MODE ROUTES ================= */}
+          {/* 1. Nearby Bounties */}
+          <Route
+            path="/nearby"
+            element={
+              <RoleGuard requiredMode="spotter" currentMode={userMode} onSwitchMode={handleSelectUserMode}>
+                <ReceiverPortal
+                  userCoords={currentCoords}
+                  activeAccount={activeDemoAccount}
+                  onSetUserLocation={handleSetUserLocation}
+                  onShowToast={showToast}
+                  initialSubTab="radar"
+                />
+              </RoleGuard>
+            }
+          />
+          <Route path="/radar" element={<Navigate to="/nearby" replace />} />
+          <Route path="/spotter" element={<Navigate to="/nearby" replace />} />
+
+          {/* 2. Submit Evidence */}
+          <Route
+            path="/report"
+            element={
+              <RoleGuard requiredMode="spotter" currentMode={userMode} onSwitchMode={handleSelectUserMode}>
+                <ReceiverPortal
+                  userCoords={currentCoords}
+                  activeAccount={activeDemoAccount}
+                  onSetUserLocation={handleSetUserLocation}
+                  onShowToast={showToast}
+                  initialSubTab="report"
+                />
+              </RoleGuard>
+            }
+          />
+
+          {/* 3. My Submissions */}
+          <Route
+            path="/submissions"
+            element={
+              <RoleGuard requiredMode="spotter" currentMode={userMode} onSwitchMode={handleSelectUserMode}>
+                <ReceiverPortal
+                  userCoords={currentCoords}
+                  activeAccount={activeDemoAccount}
+                  onSetUserLocation={handleSetUserLocation}
+                  onShowToast={showToast}
+                  initialSubTab="earnings"
+                />
+              </RoleGuard>
+            }
+          />
+
+          {/* 4. Spotter Earnings */}
+          <Route
+            path="/earnings"
+            element={
+              <RoleGuard requiredMode="spotter" currentMode={userMode} onSwitchMode={handleSelectUserMode}>
+                <ReceiverPortal
+                  userCoords={currentCoords}
+                  activeAccount={activeDemoAccount}
+                  onSetUserLocation={handleSetUserLocation}
+                  onShowToast={showToast}
+                  initialSubTab="earnings"
+                />
+              </RoleGuard>
+            }
+          />
+
+          {/* 5. Spotter Reputation */}
+          <Route
+            path="/reputation"
+            element={
+              <RoleGuard requiredMode="spotter" currentMode={userMode} onSwitchMode={handleSelectUserMode}>
+                <ReputationScreen
+                  activeAccount={activeDemoAccount}
+                  onNavigateToNearby={() => {
+                    navigate('/nearby');
+                    setActiveTab('nearby');
+                  }}
+                  onNavigateToReport={() => {
+                    navigate('/report');
+                    setActiveTab('report');
+                  }}
+                />
+              </RoleGuard>
+            }
+          />
+
+          {/* ================= SHARED ROUTES ================= */}
+          {/* Live Reality Map */}
+          <Route
+            path="/map"
+            element={
+              <LiveRealityMap
                 userCoords={currentCoords}
-                activeAccount={activeDemoAccount}
                 onSetUserLocation={handleSetUserLocation}
                 onShowToast={showToast}
-              />
-            }
-          />
-          <Route path="/nearby" element={<Navigate to="/radar" replace />} />
-          <Route path="/map" element={<Navigate to="/radar" replace />} />
-          <Route path="/spotter" element={<Navigate to="/radar" replace />} />
-
-          {/* Portal 3: Evidence Explorer (Independent Review & Consensus Audit) */}
-          <Route
-            path="/explorer"
-            element={
-              <EvidenceExplorer
-                onShowToast={showToast}
-                onAdjustBalance={adjustBalance}
+                contributorWallet={activeDemoAccount.address}
               />
             }
           />
 
-          {/* Portal 4: Escrow Vault & Three Wallets Hub */}
+          {/* Escrow Vault */}
           <Route
             path="/vault"
             element={
@@ -372,41 +621,70 @@ const AppContent: React.FC = () => {
                 demoAccounts={demoAccounts}
                 onAdjustBalance={adjustBalance}
                 onNavigateToReport={() => {
-                  navigate('/radar');
-                  setActiveTab('radar');
+                  handleSelectUserMode('spotter', false);
+                  navigate('/report');
+                  setActiveTab('report');
                 }}
                 onNavigateToAsk={() => {
-                  navigate('/dashboard');
-                  setActiveTab('dashboard');
+                  handleSelectUserMode('maker', false);
+                  navigate('/studio');
+                  setActiveTab('studio');
                 }}
                 onShowToast={showToast}
+                initialRoleView="escrow"
               />
             }
           />
           <Route path="/escrow" element={<Navigate to="/vault" replace />} />
           <Route path="/wallets" element={<Navigate to="/vault" replace />} />
 
-          {/* Portal 5: Developers & Open Truth API */}
+          {/* Profile */}
           <Route
-            path="/developers"
+            path="/profile"
             element={
-              <ProtocolExplorer
+              <ProfileView
+                activeAccount={activeDemoAccount}
+                userMode={userMode}
+                onSwitchMode={handleSelectUserMode}
+                onOpenWalletModal={() => setWalletModalOpen(true)}
                 onShowToast={showToast}
               />
             }
           />
 
-          {/* Portal 6: Admin System Verification Panel */}
+          {/* Settings */}
           <Route
-            path="/admin"
+            path="/settings"
             element={
-              <AdminVerificationPanel />
+              <SettingsView
+                userMode={userMode}
+                onSwitchMode={handleSelectUserMode}
+                onResetDemoState={handleResetDemoState}
+                onShowToast={showToast}
+                onOpenSupabaseModal={() => setSupabaseModalOpen(true)}
+              />
             }
           />
 
-          {/* Fallback & Root -> defaults to Dashboard */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          {/* ================= ADMIN PROTECTED ROUTE ================= */}
+          <Route
+            path="/admin"
+            element={
+              <RoleGuard
+                requiredMode="admin"
+                currentMode={userMode}
+                onSwitchMode={handleSelectUserMode}
+                isAdmin={isAdmin}
+                onAuthorizeAdmin={() => setIsAdmin(true)}
+              >
+                <AdminVerificationPanel />
+              </RoleGuard>
+            }
+          />
+
+          {/* Root Fallback */}
+          <Route path="/" element={<Navigate to={userMode === 'maker' ? '/bounties' : '/nearby'} replace />} />
+          <Route path="*" element={<Navigate to={userMode === 'maker' ? '/bounties' : '/nearby'} replace />} />
         </Routes>
       </main>
 
@@ -419,28 +697,54 @@ const AppContent: React.FC = () => {
             </div>
             <span className="font-bold text-[#F5F5F5] tracking-tight">TrueSpot Protocol</span>
             <span>•</span>
-            <span className="text-[#858585]">Physical Verification Network on Solana Devnet</span>
+            <span className="text-[#858585]">
+              Active Workspace: <strong className="text-white capitalize">{userMode} Mode</strong>
+            </span>
           </div>
 
           <div className="flex items-center space-x-4 text-[11px] font-medium text-[#858585]">
-            <span>Decentralized Escrow</span>
+            <button
+              onClick={() => handleSelectUserMode(userMode === 'maker' ? 'spotter' : 'maker')}
+              className="text-[#A8FF00] hover:underline cursor-pointer"
+            >
+              Switch to {userMode === 'maker' ? 'Spotter' : 'Maker'} Mode
+            </button>
             <span>•</span>
-            <span>200m Proximity Geofence</span>
+            <button
+              onClick={() => {
+                navigate('/admin');
+                setActiveTab('admin');
+              }}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              Admin Access
+            </button>
             <span>•</span>
             <span className="font-mono text-[#A8FF00] font-semibold">Vault: TrUEspot...1111</span>
           </div>
         </div>
       </footer>
 
-      {/* 5. Mobile Bottom Floating Navigation Bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0B0B0B]/95 backdrop-blur-2xl border-t border-white/10 px-4 py-2 flex items-center justify-around select-none">
-        {[
-          { id: 'dashboard', path: '/dashboard', label: 'Dashboard', icon: PlusCircle },
-          { id: 'radar', path: '/radar', label: 'Radar', icon: Compass },
-          { id: 'explorer', path: '/explorer', label: 'Explorer', icon: FileCheck2 },
-          { id: 'vault', path: '/vault', label: 'Vault', icon: Lock },
-          { id: 'admin', path: '/admin', label: 'Admin', icon: ShieldCheck },
-        ].map((item) => {
+      {/* 5. Mobile Bottom Floating Navigation Bar - Mode Specific */}
+      <div className="xl:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0B0B0B]/95 backdrop-blur-2xl border-t border-white/10 px-2 py-1.5 flex items-center justify-around select-none">
+        {(userMode === 'maker'
+          ? [
+              { id: 'studio', path: '/studio', label: 'Studio', icon: PlusCircle },
+              { id: 'bounties', path: '/bounties', label: 'Bounties', icon: FileCheck2 },
+              { id: 'review', path: '/review', label: 'Review', icon: ShieldCheck },
+              { id: 'map', path: '/map', label: 'Map', icon: MapPin },
+              { id: 'vault', path: '/vault', label: 'Vault', icon: Lock },
+              { id: 'profile', path: '/profile', label: 'Profile', icon: User },
+            ]
+          : [
+              { id: 'nearby', path: '/nearby', label: 'Nearby', icon: Compass },
+              { id: 'report', path: '/report', label: 'Submit', icon: Camera },
+              { id: 'earnings', path: '/earnings', label: 'Earnings', icon: Coins },
+              { id: 'reputation', path: '/reputation', label: 'Reputation', icon: Award },
+              { id: 'map', path: '/map', label: 'Map', icon: MapPin },
+              { id: 'profile', path: '/profile', label: 'Profile', icon: User },
+            ]
+        ).map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
           return (
@@ -450,7 +754,7 @@ const AppContent: React.FC = () => {
                 navigate(item.path);
                 setActiveTab(item.id);
               }}
-              className={`relative flex flex-col items-center py-1 px-3 rounded-2xl text-[11px] font-semibold transition-all ${
+              className={`relative flex flex-col items-center py-1 px-2 rounded-2xl text-[10px] font-semibold transition-all ${
                 isActive ? 'text-[#A8FF00] font-bold' : 'text-zinc-400 hover:text-white'
               }`}
             >
@@ -461,7 +765,7 @@ const AppContent: React.FC = () => {
               >
                 <Icon className="w-4 h-4" />
               </div>
-              <span className="mt-0.5">{item.label}</span>
+              <span className="mt-0.5 truncate max-w-[50px]">{item.label}</span>
             </button>
           );
         })}
@@ -480,32 +784,28 @@ const AppContent: React.FC = () => {
           adjustBalance(1.0);
           showToast(
             'Devnet Airdrop',
-            `Added +1.00 SOL to ${activeDemoAccount.name.split(' ')[0]}`,
+            `Credited +1.00 SOL to ${activeDemoAccount.name.split(' ')[0]}`,
             'reward'
           );
         }}
       />
 
-      {/* How It Works Modal */}
+      {/* How It Works Protocol Guide Modal */}
       <HowItWorksModal
         isOpen={howItWorksOpen}
         onClose={() => setHowItWorksOpen(false)}
         onStartDemo={() => {
-          navigate('/radar');
-          setActiveTab('radar');
+          setHowItWorksOpen(false);
+          navigate(userMode === 'maker' ? '/studio' : '/nearby');
         }}
       />
 
-      {/* Supabase Modal */}
+      {/* Supabase PostGIS Credentials Configuration Modal */}
       <SupabaseModal
         isOpen={supabaseModalOpen}
         onClose={() => setSupabaseModalOpen(false)}
         onConfigSaved={() => {
-          showToast(
-            'Database Configured',
-            'Live PostgreSQL PostGIS connection verified',
-            'success'
-          );
+          showToast('Database Synchronized', 'Supabase credentials verified', 'success');
         }}
       />
     </div>
@@ -513,11 +813,13 @@ const AppContent: React.FC = () => {
 };
 
 export const App: React.FC = () => {
-  const endpoint = useMemo(() => clusterApiUrl('devnet'), []);
+  const network = 'devnet';
+  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+  const wallets = useMemo(() => [], []);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={[]} autoConnect>
+      <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
           <BrowserRouter>
             <AppContent />

@@ -17,6 +17,7 @@ interface ReceiverPortalProps {
   activeAccount: DemoAccount;
   onSetUserLocation: (lat: number, lng: number, name?: string) => void;
   onShowToast?: (title: string, message: string, type?: 'success' | 'info' | 'reward' | 'warning') => void;
+  initialSubTab?: 'radar' | 'report' | 'earnings';
 }
 
 export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
@@ -24,8 +25,16 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
   activeAccount,
   onSetUserLocation,
   onShowToast,
+  initialSubTab,
 }) => {
-  const [subTab, setSubTab] = useState<'radar' | 'report' | 'earnings'>('radar');
+  const [subTab, setSubTab] = useState<'radar' | 'report' | 'earnings'>(initialSubTab || 'radar');
+
+  useEffect(() => {
+    if (initialSubTab) {
+      setSubTab(initialSubTab);
+    }
+  }, [initialSubTab]);
+
   const [selectedBountyId, setSelectedBountyId] = useState<string | undefined>(undefined);
   const [reports, setReports] = useState<Report[]>([]);
   const [bounties, setBounties] = useState<Bounty[]>([]);

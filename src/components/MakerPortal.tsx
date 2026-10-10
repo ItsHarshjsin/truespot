@@ -23,6 +23,7 @@ interface MakerPortalProps {
   onAdjustBalance: (delta: number, targetRole?: any, counterRole?: any) => void;
   onShowToast?: (title: string, message: string, type?: 'success' | 'info' | 'reward' | 'warning') => void;
   onNavigateToRadar?: () => void;
+  initialSubTab?: 'create' | 'dashboard';
 }
 
 export const MakerPortal: React.FC<MakerPortalProps> = ({
@@ -31,9 +32,17 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
   onAdjustBalance,
   onShowToast,
   onNavigateToRadar,
+  initialSubTab,
 }) => {
   const { publicKey, sendTransaction } = useWallet();
-  const [subTab, setSubTab] = useState<'create' | 'dashboard'>('create');
+  const [subTab, setSubTab] = useState<'create' | 'dashboard'>(initialSubTab || 'create');
+
+  useEffect(() => {
+    if (initialSubTab) {
+      setSubTab(initialSubTab);
+    }
+  }, [initialSubTab]);
+
   const [bounties, setBounties] = useState<Bounty[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [approvingId, setApprovingId] = useState<string | null>(null);
@@ -87,8 +96,8 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
         attestationHashes,
       });
 
-      // Update Supabase and local state to PAID
-      await hybridStore.updateBountyPayout(bountyId, payoutTxSig);
+      // Update Supabase and local state to PAID with anti-self-verification
+      await hybridStore.updateBountyPayout(bountyId, payoutTxSig, activeAccount.address);
 
       // Distribute Devnet SOL to spotter and debit escrow vault
       onAdjustBalance(amount, 'receiver', 'escrow');
@@ -346,23 +355,42 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
                         </div>
                       </div>
 
-                      {/* Settlement Action Button */}
-                      <div className="pt-2">
-                        <button
-                          onClick={() => handleApproveAndRelease(b.id)}
-                          disabled={approvingId === b.id || (!isConsensusReached && requiredSpotters > 1 && bountyReports.length === 0)}
-                          className="w-full py-3.5 px-5 rounded-full bg-gradient-to-r from-[#A8FF00] to-[#34D399] hover:brightness-105 text-black font-extrabold text-xs tracking-wide shadow-md shadow-[#A8FF00]/20 flex items-center justify-center space-x-2 transition-all active:scale-[0.99] disabled:opacity-50 cursor-pointer"
-                        >
-                          <CheckCircle2 className="w-4 h-4 text-black" />
-                          <span>
-                            {approvingId === b.id
-                              ? 'Executing Solana Batched Settlement...'
-                              : requiredSpotters > 1
-                              ? `Confirm Truth & Release ${b.amount_sol} SOL Swarm Payout`
-                              : `Confirm Truth & Release ${b.amount_sol} SOL Payout`}
-                          </span>
-                        </button>
-                      </div>
+                      {/* Settlement Action Button with Self-Verification Guard */}
+                      {(() => {
+                        const hasSelfSubmission = bountyReports.some(
+                          (r) => r.reporter_wallet && r.reporter_wallet.trim().toLowerCase() === activeAccount.address.trim().toLowerCase()
+                        );
+
+                        return (
+                          <div className="pt-2 space-y-2">
+                            {hasSelfSubmission && (
+                              <div className="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/30 text-[11px] text-amber-300 flex items-center space-x-2">
+                                <span>⚠️ Self-verification prohibited: You cannot settle a bounty containing your own evidence submission ({activeAccount.address}). An independent verifier must settle.</span>
+                              </div>
+                            )}
+                            <button
+                              onClick={() => handleApproveAndRelease(b.id)}
+                              disabled={approvingId === b.id || hasSelfSubmission || (!isConsensusReached && requiredSpotters > 1 && bountyReports.length === 0)}
+                              className={`w-full py-3.5 px-5 rounded-full text-black font-extrabold text-xs tracking-wide shadow-md flex items-center justify-center space-x-2 transition-all active:scale-[0.99] ${
+                                hasSelfSubmission
+                                  ? 'bg-zinc-700 text-zinc-400 cursor-not-allowed opacity-50'
+                                  : 'bg-gradient-to-r from-[#A8FF00] to-[#34D399] hover:brightness-105 shadow-[#A8FF00]/20 cursor-pointer disabled:opacity-50'
+                              }`}
+                            >
+                              <CheckCircle2 className="w-4 h-4 text-black" />
+                              <span>
+                                {approvingId === b.id
+                                  ? 'Executing Solana Batched Settlement...'
+                                  : hasSelfSubmission
+                                  ? 'Self-Verification Prohibited'
+                                  : requiredSpotters > 1
+                                  ? `Confirm Truth & Release ${b.amount_sol} SOL Swarm Payout`
+                                  : `Confirm Truth & Release ${b.amount_sol} SOL Payout`}
+                              </span>
+                            </button>
+                          </div>
+                        );
+                      })()}
                     </div>
                   );
                 })}

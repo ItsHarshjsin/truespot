@@ -24,6 +24,7 @@ interface ThreeWalletsHubProps {
   onNavigateToReport: (bountyId: string) => void;
   onNavigateToAsk: () => void;
   onShowToast?: (title: string, message: string, type?: 'success' | 'info' | 'reward' | 'warning') => void;
+  initialRoleView?: 'maker' | 'receiver' | 'escrow';
 }
 
 export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
@@ -34,8 +35,9 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
   onNavigateToReport,
   onNavigateToAsk,
   onShowToast,
+  initialRoleView,
 }) => {
-  const [selectedRoleView, setSelectedRoleView] = useState<'maker' | 'receiver' | 'escrow'>('maker');
+  const [selectedRoleView, setSelectedRoleView] = useState<'maker' | 'receiver' | 'escrow'>(initialRoleView || 'maker');
   const [searchQuery, setSearchQuery] = useState('');
   const [bounties, setBounties] = useState<Bounty[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
@@ -46,6 +48,10 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
   const [rpcLatencyMs, setRpcLatencyMs] = useState<number | null>(null);
 
   useEffect(() => {
+    if (initialRoleView) {
+      setSelectedRoleView(initialRoleView);
+      return;
+    }
     if (activeDemoAccount.role === 'maker' || activeDemoAccount.role === 'asker') {
       setSelectedRoleView('maker');
     } else if (activeDemoAccount.role === 'receiver' || activeDemoAccount.role === 'spotter') {
@@ -53,7 +59,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
     } else if (activeDemoAccount.role === 'escrow' || activeDemoAccount.role === 'verifier') {
       setSelectedRoleView('escrow');
     }
-  }, []);
+  }, [initialRoleView, activeDemoAccount.role]);
 
   const loadAllData = async () => {
     try {

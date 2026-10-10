@@ -556,10 +556,18 @@ class HybridStore {
    */
   public async settleQuery(
     observationId: string,
-    settlementTx?: string
+    settlementTx?: string,
+    settlerWallet?: string
   ): Promise<{ query: Query; observation: Observation; answer: PublishedAnswer }> {
     const obs = this.observations.find((o) => o.id === observationId);
     if (!obs) throw new Error('Observation not found');
+
+    if (settlerWallet) {
+      const contributor = obs.contributor_wallet || (obs as any).reporter_wallet;
+      if (contributor && settlerWallet && contributor.trim().toLowerCase() === settlerWallet.trim().toLowerCase()) {
+        throw new Error('Self-verification prohibited: The evidence contributor cannot approve or settle their own submission.');
+      }
+    }
 
     let query: Query;
     const existing = this.queries.find(
@@ -811,7 +819,23 @@ class HybridStore {
     }
   }
 
-  public async updateBountyPayout(bountyId: string, payoutTx: string): Promise<void> {
+  public async updateBountyPayout(
+    bountyId: string,
+    payoutTx: string,
+    settlerWallet?: string
+  ): Promise<void> {
+    if (settlerWallet) {
+      const ownReport = this.reports.find(
+        (r) =>
+          (r.bounty_id === bountyId || (r as any).query_id_hex === bountyId) &&
+          r.reporter_wallet &&
+          r.reporter_wallet.trim().toLowerCase() === settlerWallet.trim().toLowerCase()
+      );
+      if (ownReport) {
+        throw new Error('Self-verification prohibited: Maker cannot approve bounties containing their own evidence submissions.');
+      }
+    }
+
     const target = this.queries.find((b) => b.id === bountyId || b.query_id_hex === bountyId);
     if (target) {
       target.status = 'PAID';
@@ -1070,6 +1094,10 @@ class HybridStore {
     this.bounties = this.queries as any;
     this.persist();
     this.notifyListeners();
+  }
+
+  public reset() {
+    this.resetToCoordinates(37.7785, -122.3999);
   }
 }
 
