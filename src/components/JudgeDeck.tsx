@@ -79,7 +79,7 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
             {pageTitle}
           </h1>
           <div className="flex items-center space-x-2 text-xs text-[#858585] mt-1 font-medium">
-            <span>25 January 2025</span>
+            <span>{new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}</span>
             <span>•</span>
             <span className="flex items-center space-x-1.5 text-zinc-300">
               <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00] animate-pulse" />

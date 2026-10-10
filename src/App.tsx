@@ -555,7 +555,7 @@ const AppContent: React.FC = () => {
                   activeAccount={activeDemoAccount}
                   onSetUserLocation={handleSetUserLocation}
                   onShowToast={showToast}
-                  initialSubTab="earnings"
+                  initialSubTab="submissions"
                 />
               </RoleGuard>
             }

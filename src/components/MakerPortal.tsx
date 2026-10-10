@@ -6,6 +6,7 @@ import { AskScreen } from './AskScreen';
 import { hybridStore } from '../utils/storage';
 import { settleOraclePayout } from '../utils/solana';
 import { DemoAccount } from './WalletModal';
+import { useNavigate } from 'react-router-dom';
 import {
   PlusCircle,
   FileCheck,
@@ -34,6 +35,7 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
   onNavigateToRadar,
   initialSubTab,
 }) => {
+  const navigate = useNavigate();
   const { publicKey, sendTransaction } = useWallet();
   const [subTab, setSubTab] = useState<'create' | 'dashboard'>(initialSubTab || 'create');
 
@@ -144,7 +146,10 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
         {/* Sub-navigation Switcher Pills */}
         <div className="flex items-center bg-[#0D0D0D] p-1 rounded-full border border-white/[0.08] shadow-inner space-x-1 shrink-0 self-start sm:self-auto">
           <button
-            onClick={() => setSubTab('create')}
+            onClick={() => {
+              setSubTab('create');
+              navigate('/studio');
+            }}
             className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
               subTab === 'create'
                 ? 'bg-[#A8FF00] text-black shadow-sm'
@@ -155,7 +160,10 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
             <span>New Task Query</span>
           </button>
           <button
-            onClick={() => setSubTab('dashboard')}
+            onClick={() => {
+              setSubTab('dashboard');
+              navigate('/bounties');
+            }}
             className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
               subTab === 'dashboard'
                 ? 'bg-[#A8FF00] text-black shadow-sm'
@@ -180,6 +188,7 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
           makerWallet={activeAccount.address}
           onBountyCreated={() => {
             setSubTab('dashboard');
+            navigate('/bounties');
             loadData();
           }}
           onAdjustBalance={onAdjustBalance}
@@ -450,14 +459,36 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
                           {b.status === 'ANSWERED' ? 'PENDING APPROVAL' : b.status}
                         </span>
                       </td>
-                      <td className="py-3 px-3 text-[#555555] truncate max-w-[130px]">
-                        {b.escrow_tx || '0x8f2a...locked'}
-                      </td>
-                      <td className="py-3 px-3 text-[#555555] truncate max-w-[130px]">
-                        {b.payout_tx ? (
-                          <span className="text-[#A8FF00] font-bold">{b.payout_tx.slice(0, 12)}...</span>
+                      <td className="py-3 px-3">
+                        {b.escrow_tx ? (
+                          <a
+                            href={`https://explorer.solana.com/tx/${b.escrow_tx}?cluster=devnet`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-zinc-300 hover:text-[#A8FF00] hover:underline flex items-center gap-1 font-mono text-[10px]"
+                            title="View Escrow Deposit on Solana Devnet Explorer"
+                          >
+                            <span>{b.escrow_tx.slice(0, 10)}...</span>
+                            <ExternalLink className="w-2.5 h-2.5 text-zinc-500 hover:text-[#A8FF00]" />
+                          </a>
                         ) : (
-                          <span className="text-zinc-600">Awaiting Settlement</span>
+                          <span className="text-zinc-500 font-mono text-[10px]">Vault PDA</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-3">
+                        {b.payout_tx ? (
+                          <a
+                            href={`https://explorer.solana.com/tx/${b.payout_tx}?cluster=devnet`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[#A8FF00] hover:underline flex items-center gap-1 font-mono text-[10px]"
+                            title="View Settlement Payout on Solana Devnet Explorer"
+                          >
+                            <span>{b.payout_tx.slice(0, 10)}...</span>
+                            <ExternalLink className="w-2.5 h-2.5 text-[#A8FF00]" />
+                          </a>
+                        ) : (
+                          <span className="text-zinc-600 font-mono text-[10px]">Awaiting Settlement</span>
                         )}
                       </td>
                     </tr>

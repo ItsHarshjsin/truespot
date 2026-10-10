@@ -144,7 +144,8 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
     try {
       await hybridStore.updateBountyPayout(
         bountyId,
-        'payout_' + Math.random().toString(36).substring(2, 10)
+        'payout_' + Math.random().toString(36).substring(2, 10),
+        activeDemoAccount.address
       );
       const targetBounty = bounties.find((b) => b.id === bountyId);
       const amount = targetBounty ? targetBounty.amount_sol : 0.25;
@@ -160,6 +161,9 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
       }
     } catch (err: any) {
       console.warn('Approval failed:', err);
+      if (onShowToast) {
+        onShowToast('Settlement Blocked', err.message || 'Approval failed', 'warning');
+      }
     }
   };
 
