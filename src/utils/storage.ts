@@ -13,8 +13,8 @@ import { computeHaversineDistance, buildQualityReport } from '../services/eviden
 import { buildOpenAnswerPayload } from '../services/openApi';
 import { getQueryPDA, PROTOCOL_TREASURY } from '../solana/truespotProgram';
 
-const DEFAULT_SUPABASE_URL = (import.meta.env as any).VITE_SUPABASE_URL || '';
-const DEFAULT_SUPABASE_ANON_KEY = (import.meta.env as any).VITE_SUPABASE_ANON_KEY || '';
+const DEFAULT_SUPABASE_URL = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_SUPABASE_URL) || '';
+const DEFAULT_SUPABASE_ANON_KEY = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_SUPABASE_ANON_KEY) || '';
 
 // Default high-grade physical queries seed
 const DEFAULT_SEED_QUERIES: Query[] = [
