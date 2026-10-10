@@ -26,25 +26,25 @@ export interface DemoAccount {
 
 export const DEMO_ACCOUNTS: DemoAccount[] = [
   {
-    id: 'receiver',
-    name: '1. Task Receiver (Field Earner)',
-    role: 'receiver',
-    address: 'Spot7r...9Xkl',
-    balanceSol: 3.45,
-  },
-  {
     id: 'maker',
-    name: '2. Task Maker (Escrow Depositor)',
+    name: '1. Task Maker (Escrow Depositor)',
     role: 'maker',
     address: 'Ask3r...4Wqz',
-    balanceSol: 5.50,
+    balanceSol: 1.00,
+  },
+  {
+    id: 'receiver',
+    name: '2. Spotter Earner (Worker)',
+    role: 'receiver',
+    address: 'Spot7r...9Xkl',
+    balanceSol: 1.00,
   },
   {
     id: 'escrow',
     name: '3. Escrow Vault Protocol',
     role: 'escrow',
     address: 'Vault9Wz...AWWM',
-    balanceSol: 14.80,
+    balanceSol: 0.00,
   },
 ];
 

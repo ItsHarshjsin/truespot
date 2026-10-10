@@ -23,7 +23,7 @@ import { CONSUMER_INTEGRATION_CODE } from '../solana/truespotProgram';
 interface StateScreenProps {
   bountyId?: string;
   onSelectBounty?: (bountyId: string) => void;
-  onAdjustBalance?: (delta: number, role?: 'asker' | 'spotter' | 'verifier') => void;
+  onAdjustBalance?: (delta: number, role?: any) => void;
   onShowToast?: (title: string, message: string, type?: 'success' | 'info' | 'reward' | 'warning') => void;
 }
 
@@ -130,18 +130,18 @@ export const StateScreen: React.FC<StateScreenProps> = ({
       setPayoutSig(mockPayoutSig);
       setSelectedBounty({ ...selectedBounty, status: 'PAID', payout_tx: mockPayoutSig });
 
-      const spotterReward = selectedBounty.amount_sol * 0.8;
-      const verifiersYield = selectedBounty.amount_sol * 0.2;
+      const spotterReward = selectedBounty.amount_sol * 0.975;
+      const protocolFee = selectedBounty.amount_sol * 0.025;
 
       if (onAdjustBalance) {
         onAdjustBalance(spotterReward, 'spotter');
-        onAdjustBalance(verifiersYield, 'verifier');
+        onAdjustBalance(-selectedBounty.amount_sol, 'escrow');
       }
 
       if (onShowToast) {
         onShowToast(
           '🎉 Payout Distributed on Solana Devnet',
-          `Credited +${spotterReward.toFixed(3)} SOL to Spotter and +${verifiersYield.toFixed(3)} SOL to Consensus Verifiers`,
+          `Credited 97.5% (+${spotterReward.toFixed(3)} SOL) to Spotter. Protocol fee (2.5%: ${protocolFee.toFixed(3)} SOL) sent to Treasury.`,
           'reward'
         );
       }

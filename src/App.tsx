@@ -116,6 +116,17 @@ const AppContent: React.FC = () => {
     else if (p === '/profile') setActiveTab('profile');
     else if (p === '/settings') setActiveTab('settings');
     else if (p === '/admin') setActiveTab('admin');
+
+    // Synchronize mode if user directly loads a role-specific route
+    const makerPaths = ['/studio', '/bounties', '/dashboard', '/maker', '/review', '/explorer', '/records', '/developers', '/analytics'];
+    const spotterPaths = ['/nearby', '/radar', '/spotter', '/report', '/submissions', '/earnings', '/reputation'];
+    if (makerPaths.includes(p) && userMode !== 'maker') {
+      setUserMode('maker');
+      try { localStorage.setItem('truespot_active_mode', 'maker'); } catch (e) {}
+    } else if (spotterPaths.includes(p) && userMode !== 'spotter') {
+      setUserMode('spotter');
+      try { localStorage.setItem('truespot_active_mode', 'spotter'); } catch (e) {}
+    }
   }, [location.pathname]);
 
   // Toast Notifications State
@@ -147,6 +158,15 @@ const AppContent: React.FC = () => {
     try {
       localStorage.setItem('truespot_active_mode', mode);
     } catch (e) {}
+
+    // Match active demo account with role
+    if (isUsingDemo) {
+      const targetRole = mode === 'maker' ? 'maker' : 'receiver';
+      const targetAcc = demoAccounts.find((a) => a.role === targetRole);
+      if (targetAcc) {
+        setActiveDemoAccount(targetAcc);
+      }
+    }
 
     showToast(
       `${mode === 'maker' ? 'Maker' : 'Spotter'} Mode Activated`,

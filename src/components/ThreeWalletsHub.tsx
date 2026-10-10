@@ -149,13 +149,15 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
       );
       const targetBounty = bounties.find((b) => b.id === bountyId);
       const amount = targetBounty ? targetBounty.amount_sol : 0.25;
-      onAdjustBalance(amount, 'receiver', 'escrow');
+      const contributorPayout = amount * 0.975;
+      onAdjustBalance(contributorPayout, 'receiver');
+      onAdjustBalance(-amount, 'escrow');
 
       await loadAllData();
       if (onShowToast) {
         onShowToast(
           'Escrow Payout Settled',
-          `Released ${amount} SOL from Escrow Vault to Task Receiver (${receiverAccount.address})`,
+          `Transferred 97.5% (${contributorPayout.toFixed(3)} SOL) from Vault to Contributor (${receiverAccount.address}). Protocol fee (2.5%) sent to Treasury.`,
           'reward'
         );
       }

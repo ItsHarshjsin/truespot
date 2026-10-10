@@ -55,8 +55,8 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
   const [bountiesList, setBountiesList] = useState<Bounty[]>([]);
   const [selectedBountyId, setSelectedBountyId] = useState<string>(bountyId || '');
 
-  // Mission Briefing Modal State (Requirement 4)
-  const [showMissionBriefing, setShowMissionBriefing] = useState<boolean>(true);
+  // Mission Briefing Modal State (Requirement 4) - only open if user clicks to view briefing
+  const [showMissionBriefing, setShowMissionBriefing] = useState<boolean>(false);
 
   // Evidence state
   const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
@@ -90,7 +90,6 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
       if (target) {
         setBounty(target);
         setSelectedBountyId(target.id);
-        setShowMissionBriefing(true);
       }
     });
   }, [bountyId]);
@@ -100,7 +99,6 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
     const target = bountiesList.find((b) => b.id === id);
     if (target) {
       setBounty(target);
-      setShowMissionBriefing(true);
       setPhotoDataUrl(null);
       setFingerprint(null);
       setAiConfidence(null);
@@ -519,10 +517,10 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({
             <div className="pt-2">
               <button
                 onClick={() => setShowMissionBriefing(false)}
-                className="w-full py-3.5 px-5 rounded-full bg-gradient-to-r from-[#A8FF00] to-[#34D399] hover:brightness-105 text-black font-extrabold text-xs tracking-wide shadow-xl shadow-[#A8FF00]/25 flex items-center justify-center space-x-2 transition-all cursor-pointer"
+                className="w-full py-3 px-4 rounded-xl bg-[#A8FF00] hover:bg-[#b8ff24] text-black font-bold text-xs tracking-wide shadow-none flex items-center justify-center space-x-2 transition-colors cursor-pointer"
               >
                 <span>Accept Mission & Open Sensor Capture</span>
-                <span className="text-base font-mono">→</span>
+                <span className="text-sm font-mono">→</span>
               </button>
             </div>
           </div>

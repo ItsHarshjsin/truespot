@@ -41,17 +41,20 @@ export async function evaluateEvidenceWithAI(
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 4000);
+    const timeout = setTimeout(() => controller.abort(), 15000);
 
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://truespot.io',
+        'X-Title': 'TrueSpot Physical Oracle',
       },
       signal: controller.signal,
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
+        max_tokens: 350,
         messages: [
           {
             role: 'user',
@@ -68,16 +71,22 @@ export async function evaluateEvidenceWithAI(
     });
     clearTimeout(timeout);
 
-    if (!res.ok) return fallback;
+    if (!res.ok) {
+      console.warn('OpenRouter API response status:', res.status);
+      return fallback;
+    }
     const json = await res.json();
-    const raw = json.choices[0].message.content.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(raw);
+    const rawContent = json.choices?.[0]?.message?.content || '';
+    const match = rawContent.match(/\{[\s\S]*\}/);
+    if (!match) return fallback;
+    const parsed = JSON.parse(match[0]);
     return {
       verified: Boolean(parsed.verified),
-      confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 90,
+      confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 92,
       summary: parsed.summary || fallback.summary
     };
-  } catch {
+  } catch (err) {
+    console.warn('OpenRouter evaluation error:', err);
     return fallback;
   }
 }

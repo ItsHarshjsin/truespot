@@ -101,8 +101,10 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
       // Update Supabase and local state to PAID with anti-self-verification
       await hybridStore.updateBountyPayout(bountyId, payoutTxSig, activeAccount.address);
 
-      // Distribute Devnet SOL to spotter and debit escrow vault
-      onAdjustBalance(amount, 'receiver', 'escrow');
+      // Distribute Devnet SOL to spotter (97.5%) and debit escrow vault (100%)
+      const contributorPayout = amount * 0.975;
+      onAdjustBalance(contributorPayout, 'receiver');
+      onAdjustBalance(-amount, 'escrow');
 
       // Trigger canvas-confetti animation (Requirement 5)
       try {

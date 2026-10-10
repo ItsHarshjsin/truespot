@@ -119,7 +119,8 @@ export const EvidenceExplorer: React.FC<EvidenceExplorerProps> = ({
       await hybridStore.settleQuery(obs.id, txSig, activeAccount?.address);
 
       if (onAdjustBalance) {
-        onAdjustBalance(payoutSol, 'receiver', 'escrow');
+        onAdjustBalance(payoutSol, 'receiver');
+        onAdjustBalance(-amountSol, 'escrow');
       }
 
       onShowToast(

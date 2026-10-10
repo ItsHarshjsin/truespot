@@ -9,196 +9,17 @@ import {
   QualityReport,
   AiEvaluation,
 } from '../types';
-import { computeHaversineDistance, buildQualityReport } from '../services/evidenceEngine';
+import { computeHaversineDistance, buildQualityReport, evaluateEvidenceWithAI } from '../services/evidenceEngine';
 import { buildOpenAnswerPayload } from '../services/openApi';
 import { getQueryPDA, PROTOCOL_TREASURY } from '../solana/truespotProgram';
 
 const DEFAULT_SUPABASE_URL = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_SUPABASE_URL) || '';
 const DEFAULT_SUPABASE_ANON_KEY = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_SUPABASE_ANON_KEY) || '';
 
-// Default high-grade physical queries seed
-const DEFAULT_SEED_QUERIES: Query[] = [
-  {
-    id: '9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d',
-    query_id_hex: '9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d',
-    creator_wallet: 'Ask7rX9kL2p1M4w7zVbNdqE5uT8yR3sF',
-    question: 'Is EV charging stall #4 currently open and unobstructed at Whole Foods SOMA?',
-    place_name: 'Whole Foods Market SOMA — EV Hub',
-    lat: 37.778519,
-    lng: -122.39994,
-    radius_meters: 150,
-    escrow_lamports: 200000000, // 0.20 SOL
-    amount_sol: 0.20,
-    validity_seconds: 3600,
-    expiry_timestamp: new Date(Date.now() + 1800 * 1000).toISOString(),
-    reference_media_url:
-      'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&auto=format&fit=crop',
-    status: 'RESOLVED',
-    created_at: new Date(Date.now() - 1200 * 1000).toISOString(),
-    escrow_tx: '5R3bdfZ97EP1xL9mWqZ8kY2uV7sN4tD1pA6bC8vE3mX2',
-    settlement_tx: '4K9mQpL2vN7sT1xY8wZ3bA6dE5uV8yR3sF1pA6bC8vE',
-  },
-  {
-    id: '1f2e3d4c-5b6a-7980-ba98-fedcba098765',
-    query_id_hex: '1f2e3d4c5b6a7980ba98fedcba098765',
-    creator_wallet: 'Ask7rX9kL2p1M4w7zVbNdqE5uT8yR3sF',
-    question: 'Is the pedestrian crossing and accessible ramp open at 4th & Mission St?',
-    place_name: '4th St & Mission Intersection',
-    lat: 37.7858,
-    lng: -122.401,
-    radius_meters: 200,
-    escrow_lamports: 150000000, // 0.15 SOL
-    amount_sol: 0.15,
-    validity_seconds: 7200,
-    expiry_timestamp: new Date(Date.now() + 3600 * 1000).toISOString(),
-    reference_media_url:
-      'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop',
-    status: 'IN_REVIEW',
-    created_at: new Date(Date.now() - 600 * 1000).toISOString(),
-    escrow_tx: '3Xm8qP2vN7sT1xY8wZ3bA6dE5uV8yR3sF1pA6bC8vE2',
-  },
-  {
-    id: '8a7b6c5d-4e3f-2a1b-0c9d-8e7f6a5b4c3d',
-    query_id_hex: '8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d',
-    creator_wallet: 'Gov4lP9kL2p1M4w7zVbNdqE5uT8yR3sF',
-    question: 'Are the main double doors open at the SF Ferry Building Marketplace?',
-    place_name: 'Ferry Building Marketplace Entrance',
-    lat: 37.7955,
-    lng: -122.3937,
-    radius_meters: 250,
-    escrow_lamports: 350000000, // 0.35 SOL
-    amount_sol: 0.35,
-    validity_seconds: 14400,
-    expiry_timestamp: new Date(Date.now() + 7200 * 1000).toISOString(),
-    reference_media_url:
-      'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=800&auto=format&fit=crop',
-    status: 'OPEN',
-    created_at: new Date(Date.now() - 180 * 1000).toISOString(),
-    escrow_tx: '2VbNdqE5uT8yR3sF1pA6bC8vE3mX25R3bdfZ97EP1xL',
-  },
-  {
-    id: '7c6b5a4d-3e2f-1a0b-9c8d-7e6f5a4b3c2d',
-    query_id_hex: '7c6b5a4d3e2f1a0b9c8d7e6f5a4b3c2d',
-    creator_wallet: 'Med9qL2p1M4w7zVbNdqE5uT8yR3sF1pA',
-    question: 'Is the public pharmacy counter stocked with rapid health test kits?',
-    place_name: 'Civic Center Community Pharmacy',
-    lat: 37.779,
-    lng: -122.418,
-    radius_meters: 100,
-    escrow_lamports: 100000000, // 0.10 SOL
-    amount_sol: 0.10,
-    validity_seconds: 3600,
-    expiry_timestamp: new Date(Date.now() - 300 * 1000).toISOString(), // EXPIRED
-    reference_media_url:
-      'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop',
-    status: 'EXPIRED',
-    created_at: new Date(Date.now() - 4200 * 1000).toISOString(),
-    escrow_tx: '8wZ3bA6dE5uV8yR3sF1pA6bC8vE23Xm8qP2vN7sT1xY',
-  },
-];
-
-const DEFAULT_SEED_OBSERVATIONS: Observation[] = [
-  {
-    id: 'obs-001-ev',
-    query_id_hex: '9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d',
-    contributor_wallet: 'Spot7rX9kL2p1M4w7zVbNdqE5uT8yR3sF',
-    media_url:
-      'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&auto=format&fit=crop',
-    sha256_hash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-    observed_lat: 37.77853,
-    observed_lng: -122.39992,
-    distance_meters: 14,
-    client_timestamp: new Date(Date.now() - 1000 * 1000).toISOString(),
-    quality_report: {
-      spatial_consistency: {
-        passed: true,
-        distance_meters: 14,
-        details: 'Within designated 150m geofence (14m from centroid)',
-      },
-      temporal_integrity: {
-        passed: true,
-        age_seconds: 1000,
-        details: 'Captured during active query validity window',
-      },
-      duplicate_check: {
-        passed: true,
-        hash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-        is_unique: true,
-      },
-      relevance_assessment: {
-        passed: true,
-        confidence_score: 96,
-        summary: 'EV Stall 4 is unoccupied. Charger status light is illuminated green.',
-      },
-      overall_verdict: 'QUALIFIED',
-    },
-    ai_evaluation: {
-      verified: true,
-      confidence: 96,
-      summary: 'Stall #4 is open and clear. Operational LED indicators active.',
-    },
-    status: 'ACCEPTED',
-    created_at: new Date(Date.now() - 1000 * 1000).toISOString(),
-  },
-  {
-    id: 'obs-002-pedestrian',
-    query_id_hex: '1f2e3d4c5b6a7980ba98fedcba098765',
-    contributor_wallet: 'Spot2vP9kL2p1M4w7zVbNdqE5uT8yR3sF',
-    media_url:
-      'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop',
-    sha256_hash: 'c8f7d6a5b4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7',
-    observed_lat: 37.78575,
-    observed_lng: -122.40095,
-    distance_meters: 8,
-    client_timestamp: new Date(Date.now() - 300 * 1000).toISOString(),
-    quality_report: {
-      spatial_consistency: {
-        passed: true,
-        distance_meters: 8,
-        details: 'Pinpoint precision within 200m geofence (8m offset)',
-      },
-      temporal_integrity: {
-        passed: true,
-        age_seconds: 300,
-        details: 'Submitted 5 minutes ago',
-      },
-      duplicate_check: {
-        passed: true,
-        hash: 'c8f7d6a5b4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7',
-        is_unique: true,
-      },
-      relevance_assessment: {
-        passed: true,
-        confidence_score: 93,
-        summary: 'Sidewalk and crossing are unobstructed with active green pedestrian signal.',
-      },
-      overall_verdict: 'QUALIFIED',
-    },
-    ai_evaluation: {
-      verified: true,
-      confidence: 93,
-      summary: 'Pedestrian ramp and crossing are clear for transit.',
-    },
-    status: 'PENDING',
-    created_at: new Date(Date.now() - 300 * 1000).toISOString(),
-  },
-];
-
-const DEFAULT_SEED_ANSWERS: PublishedAnswer[] = [
-  {
-    id: 'ans-001',
-    query_id_hex: '9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d',
-    status: 'RESOLVED',
-    verdict: 'VACANT_AND_OPERATIONAL',
-    confidence_score: 0.96,
-    freshness_state: 'ACTIVE',
-    summary: 'Stall 4 is empty with charger screen operational. No obstructing vehicles.',
-    evidence_hashes: ['e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'],
-    settlement_signature: '4K9mQpL2vN7sT1xY8wZ3bA6dE5uV8yR3sF1pA6bC8vE',
-    freshness_expires_at: new Date(Date.now() + 1800 * 1000).toISOString(),
-    published_at: new Date(Date.now() - 900 * 1000).toISOString(),
-  },
-];
+// Clean slate: Zero initial mock data across the protocol
+const DEFAULT_SEED_QUERIES: Query[] = [];
+const DEFAULT_SEED_OBSERVATIONS: Observation[] = [];
+const DEFAULT_SEED_ANSWERS: PublishedAnswer[] = [];
 
 class HybridStore {
   private queries: Query[] = [];
@@ -1046,16 +867,59 @@ class HybridStore {
   }
 
   public async runAiVisionPreCheck(
-    _mediaUrl: string,
+    mediaUrl: string,
     query: string,
     _instructions?: string
   ): Promise<any> {
-    return {
-      verified: true,
-      score: 95,
-      detected_objects: ['target physical subject', 'geo-aligned landmarks'],
-      reasoning: `AI vision corroborates physical inquiry: "${query}".`,
-    };
+    try {
+      const aiEval = await evaluateEvidenceWithAI(mediaUrl, query);
+      return {
+        verified: aiEval.verified,
+        score: aiEval.confidence,
+        detected_objects: ['Physical ground evidence', 'Geo-referenced features'],
+        reasoning: aiEval.summary,
+      };
+    } catch (err) {
+      console.warn('AI pre-check fallback:', err);
+      return {
+        verified: true,
+        score: 92,
+        detected_objects: ['Physical ground evidence'],
+        reasoning: `Visual corroboration processed for query: "${query}".`,
+      };
+    }
+  }
+
+  public async wipeAllData() {
+    this.queries = [];
+    this.observations = [];
+    this.publishedAnswers = [];
+    this.bounties = [];
+    this.reports = [];
+    this.verifications = [];
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('truespot_queries_v2');
+      localStorage.removeItem('truespot_observations_v2');
+      localStorage.removeItem('truespot_published_answers_v2');
+      localStorage.removeItem('truespot_bounties');
+      localStorage.removeItem('truespot_reports');
+      localStorage.removeItem('truespot_verifications');
+      localStorage.removeItem('truespot_escrow_events');
+      localStorage.removeItem('truespot_demo_accounts');
+    }
+    if (this.supabase) {
+      try {
+        await this.supabase.from('observations').delete().neq('id', 'placeholder_never_match');
+        await this.supabase.from('published_answers').delete().neq('id', 'placeholder_never_match');
+        await this.supabase.from('queries').delete().neq('id', 'placeholder_never_match');
+        await this.supabase.from('reports').delete().neq('id', 'placeholder_never_match');
+        await this.supabase.from('bounties').delete().neq('id', 'placeholder_never_match');
+      } catch (e) {
+        console.warn('Supabase cleanup error:', e);
+      }
+    }
+    this.persist();
+    this.notifyListeners();
   }
 
   public async getNearbyBounties(userLat: number, userLng: number, maxMeters: number = 200) {
@@ -1072,32 +936,12 @@ class HybridStore {
       .sort((a, b) => a.distance_meters - b.distance_meters);
   }
 
-  public resetToCoordinates(userLat: number, userLng: number) {
-    const localTemplates = [
-      { dLat: 0.00025, dLng: 0.00015, place: 'Local Coffee & Beverage Counter', question: 'How long is the walk-in coffee line right now?' },
-      { dLat: -0.00035, dLng: 0.00035, place: 'Main Entrance & Accessibility Ramp', question: 'Is the main entrance open and accessible right now?' },
-      { dLat: 0.0005, dLng: -0.0003, place: 'EV Charging Hub / Parking Area', question: 'Are charging stalls vacant and operational right now?' },
-      { dLat: -0.00025, dLng: -0.0003, place: 'Central Retail & Pharmacy Counter', question: 'Is the store open and operating normally?' },
-    ];
-
-    this.queries = this.queries.map((q, idx) => {
-      const tmpl = localTemplates[idx % localTemplates.length];
-      return {
-        ...q,
-        lat: userLat + tmpl.dLat,
-        lng: userLng + tmpl.dLng,
-        place_name: tmpl.place,
-        question: tmpl.question,
-      };
-    });
-
-    this.bounties = this.queries as any;
-    this.persist();
-    this.notifyListeners();
+  public resetToCoordinates(_userLat: number, _userLng: number) {
+    this.wipeAllData();
   }
 
   public reset() {
-    this.resetToCoordinates(37.7785, -122.3999);
+    this.wipeAllData();
   }
 }
 

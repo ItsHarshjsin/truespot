@@ -23,13 +23,7 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
   const [adminPasskey, setAdminPasskey] = useState('');
   const [adminError, setAdminError] = useState<string | null>(null);
 
-  // Seamlessly synchronize userMode if route requires a specific mode without blocking popups
-  useEffect(() => {
-    if (requiredMode && requiredMode !== 'admin' && requiredMode !== currentMode) {
-      onSwitchMode(requiredMode);
-    }
-  }, [requiredMode, currentMode, onSwitchMode]);
-
+  // Seamless rendering of role routes - role switching is explicitly controlled by top nav & router
   // If no mode or standard maker/spotter role, render children seamlessly without blocking popups
   if (!requiredMode || requiredMode !== 'admin') {
     return <>{children}</>;
