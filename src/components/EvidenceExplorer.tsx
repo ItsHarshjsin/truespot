@@ -23,7 +23,7 @@ import {
 
 interface EvidenceExplorerProps {
   onShowToast: (title: string, message: string, type?: 'success' | 'info' | 'reward' | 'warning') => void;
-  onAdjustBalance?: (delta: number) => void;
+  onAdjustBalance?: (delta: number, targetRole?: any, counterRole?: any) => void;
 }
 
 export const EvidenceExplorer: React.FC<EvidenceExplorerProps> = ({
@@ -98,6 +98,10 @@ export const EvidenceExplorer: React.FC<EvidenceExplorerProps> = ({
 
       await hybridStore.settleQuery(obs.id, txSig);
 
+      if (onAdjustBalance) {
+        onAdjustBalance(payoutSol, 'receiver', 'escrow');
+      }
+
       onShowToast(
         'Query Settled & Funds Released',
         `Transferred 97.5% (${payoutSol.toFixed(3)} SOL) to Contributor. Protocol fee (2.5%) sent to Treasury.`,
@@ -139,7 +143,7 @@ export const EvidenceExplorer: React.FC<EvidenceExplorerProps> = ({
       const refundSol = refundLamports / 1e9;
 
       if (onAdjustBalance) {
-        onAdjustBalance(refundSol);
+        onAdjustBalance(refundSol, 'maker', 'escrow');
       }
 
       onShowToast(

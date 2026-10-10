@@ -20,7 +20,7 @@ import {
 interface MakerPortalProps {
   userCoords: Coordinates;
   activeAccount: DemoAccount;
-  onAdjustBalance: (delta: number, role?: 'asker' | 'spotter' | 'verifier') => void;
+  onAdjustBalance: (delta: number, targetRole?: any, counterRole?: any) => void;
   onShowToast?: (title: string, message: string, type?: 'success' | 'info' | 'reward' | 'warning') => void;
   onNavigateToRadar?: () => void;
 }
@@ -90,8 +90,8 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
       // Update Supabase and local state to PAID
       await hybridStore.updateBountyPayout(bountyId, payoutTxSig);
 
-      // Distribute Devnet SOL proportionally to spotters
-      onAdjustBalance(amount, 'spotter');
+      // Distribute Devnet SOL to spotter and debit escrow vault
+      onAdjustBalance(amount, 'receiver', 'escrow');
 
       // Trigger canvas-confetti animation (Requirement 5)
       try {

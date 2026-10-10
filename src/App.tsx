@@ -21,17 +21,27 @@ import { getRealDeviceGps } from './utils/evidence';
 import { hybridStore } from './utils/storage';
 
 import { Navbar } from './components/Navbar';
-import { LiveRealityMap } from './components/LiveRealityMap';
-import { QueryStudio } from './components/QueryStudio';
+import { MakerPortal } from './components/MakerPortal';
+import { ReceiverPortal } from './components/ReceiverPortal';
+import { ThreeWalletsHub } from './components/ThreeWalletsHub';
 import { EvidenceExplorer } from './components/EvidenceExplorer';
 import { ProtocolExplorer } from './components/ProtocolExplorer';
+import { AdminVerificationPanel } from './components/AdminVerificationPanel';
 import { JudgeDeck } from './components/JudgeDeck';
 import { WalletModal, DEMO_ACCOUNTS, DemoAccount } from './components/WalletModal';
 import { HowItWorksModal } from './components/HowItWorksModal';
 import { SupabaseModal } from './components/SupabaseModal';
 import { ToastContainer, ToastMessage } from './components/Toast';
 
-import { Radio, PlusCircle, FileCheck2, Code2, AlertCircle } from 'lucide-react';
+import {
+  PlusCircle,
+  Compass,
+  FileCheck2,
+  Lock,
+  Code2,
+  ShieldCheck,
+  AlertCircle,
+} from 'lucide-react';
 
 const AppContent: React.FC = () => {
   const navigate = useNavigate();
@@ -53,6 +63,26 @@ const AppContent: React.FC = () => {
   const [activeDemoAccount, setActiveDemoAccount] = useState<DemoAccount>(initialAccounts[0]);
   const [isUsingDemo, setIsUsingDemo] = useState<boolean>(true);
 
+  // Active Tab synchronized with routes
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
+
+  useEffect(() => {
+    const p = location.pathname;
+    if (p === '/' || p === '/dashboard' || p === '/maker' || p === '/studio') {
+      setActiveTab('dashboard');
+    } else if (p === '/radar' || p === '/nearby' || p === '/map' || p === '/spotter') {
+      setActiveTab('radar');
+    } else if (p === '/explorer') {
+      setActiveTab('explorer');
+    } else if (p === '/vault' || p === '/escrow' || p === '/wallets') {
+      setActiveTab('vault');
+    } else if (p === '/developers') {
+      setActiveTab('developers');
+    } else if (p === '/admin') {
+      setActiveTab('admin');
+    }
+  }, [location.pathname]);
+
   // Toast Notifications State
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
@@ -72,12 +102,48 @@ const AppContent: React.FC = () => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  // Adjust Wallet Balance Dynamically
-  const adjustBalance = (amountDelta: number) => {
+  /**
+   * Universal Multi-Role Fund Ledger
+   * Handles:
+   * 1. Balance Subtractions (e.g. Maker locks escrow: -0.20 SOL from Maker, +0.20 SOL into Escrow)
+   * 2. Balance Additions (e.g. Settlement: +0.20 SOL to Spotter, -0.20 SOL from Escrow)
+   * 3. Balance Refunds (e.g. Expiry: +0.20 SOL to Maker, -0.20 SOL from Escrow)
+   * 4. Direct Airdrops (e.g. +1.00 SOL to active wallet)
+   */
+  const adjustBalance = (
+    amountDelta: number,
+    targetRole?: 'asker' | 'spotter' | 'verifier' | 'maker' | 'receiver' | 'escrow',
+    counterRole?: 'asker' | 'spotter' | 'verifier' | 'maker' | 'receiver' | 'escrow'
+  ) => {
     setDemoAccounts((prev) => {
+      const matchRole = (role: string, target?: string) => {
+        if (!target) return false;
+        if (role === target) return true;
+        if (target === 'maker' && (role === 'asker' || role === 'maker')) return true;
+        if (target === 'asker' && (role === 'maker' || role === 'asker')) return true;
+        if (target === 'receiver' && (role === 'spotter' || role === 'receiver')) return true;
+        if (target === 'spotter' && (role === 'receiver' || role === 'spotter')) return true;
+        if (target === 'escrow' && (role === 'verifier' || role === 'escrow')) return true;
+        if (target === 'verifier' && (role === 'escrow' || role === 'verifier')) return true;
+        return false;
+      };
+
       const updated = prev.map((acc) => {
-        if (acc.id === activeDemoAccount.id) {
+        const isTarget = targetRole
+          ? matchRole(acc.role, targetRole)
+          : acc.id === activeDemoAccount.id;
+
+        const isCounter = counterRole
+          ? matchRole(acc.role, counterRole)
+          : false;
+
+        if (isTarget) {
           const newBal = Math.max(0, parseFloat((acc.balanceSol + amountDelta).toFixed(3)));
+          return { ...acc, balanceSol: newBal };
+        }
+        if (isCounter) {
+          // Counterparty receives opposite delta (e.g., escrow decreases when spotter receives payout)
+          const newBal = Math.max(0, parseFloat((acc.balanceSol - amountDelta).toFixed(3)));
           return { ...acc, balanceSol: newBal };
         }
         return acc;
@@ -163,7 +229,7 @@ const AppContent: React.FC = () => {
       {/* Toast Notification Container */}
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
 
-      {/* 1. Header Navigation with 4 Core Protocol Hubs */}
+      {/* 1. CoinVex Global Header with Navigation Pills */}
       <Navbar
         unverifiedCount={1}
         onOpenWalletModal={() => setWalletModalOpen(true)}
@@ -172,18 +238,31 @@ const AppContent: React.FC = () => {
         isSupabaseConnected={hybridStore.isConnectedToSupabase}
         activeDemoAccount={activeDemoAccount}
         isUsingDemo={isUsingDemo}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
       />
 
-      {/* Judge Location Simulation Ribbon */}
+      {/* 2. Subheader Toolbar: Real Device GPS, Preset Jumper & Devnet +1 SOL Airdrop */}
       <JudgeDeck
         currentLocationName={locationName}
         isSimulated={isSimulated}
         onSelectPreset={handleSelectJudgePreset}
         onUseLiveGps={() => fetchDeviceGps(true)}
-        onRefreshData={() => {}}
+        onRefreshData={() => {
+          showToast('Oracle Refreshed', 'Synced state with hybrid storage', 'info');
+        }}
+        onManualCoords={handleSetUserLocation}
+        onAirdropDemo={() => {
+          adjustBalance(1.0);
+          showToast(
+            'Devnet Airdrop',
+            `Added +1.00 SOL to ${activeDemoAccount.name.split(' ')[0]}`,
+            'reward'
+          );
+        }}
       />
 
-      {/* GPS Error Alert */}
+      {/* GPS Error Guidance Banner */}
       {gpsError && (
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2">
           <div className="bg-amber-950/40 border border-amber-500/30 rounded-2xl p-3 flex items-center justify-between text-xs text-amber-200">
@@ -212,37 +291,45 @@ const AppContent: React.FC = () => {
         </div>
       )}
 
-      {/* 2. Main Protocol Content with the Four Dedicated Routes */}
+      {/* 3. Main Workspace Content */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Routes>
-          {/* Hub 1: /map — Live Reality Map */}
+          {/* Portal 1: Dashboard / Task Maker (Screenshot 1 Layout) */}
           <Route
-            path="/map"
+            path="/dashboard"
             element={
-              <LiveRealityMap
+              <MakerPortal
                 userCoords={currentCoords}
-                onSetUserLocation={handleSetUserLocation}
-                onShowToast={showToast}
-                contributorWallet={activeDemoAccount.address}
-              />
-            }
-          />
-
-          {/* Hub 2: /studio — Query Studio (Creation & Escrow) */}
-          <Route
-            path="/studio"
-            element={
-              <QueryStudio
-                userCoords={currentCoords}
-                creatorWallet={activeDemoAccount.address}
-                creatorBalanceSol={activeDemoAccount.balanceSol}
+                activeAccount={activeDemoAccount}
                 onAdjustBalance={adjustBalance}
                 onShowToast={showToast}
+                onNavigateToRadar={() => {
+                  navigate('/radar');
+                  setActiveTab('radar');
+                }}
               />
             }
           />
+          <Route path="/maker" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/studio" element={<Navigate to="/dashboard" replace />} />
 
-          {/* Hub 3: /explorer — Evidence Explorer (Maker Review & Audit Hub) */}
+          {/* Portal 2: Analytics & Radar / Field Earner (Screenshot 2 & 3 Layout) */}
+          <Route
+            path="/radar"
+            element={
+              <ReceiverPortal
+                userCoords={currentCoords}
+                activeAccount={activeDemoAccount}
+                onSetUserLocation={handleSetUserLocation}
+                onShowToast={showToast}
+              />
+            }
+          />
+          <Route path="/nearby" element={<Navigate to="/radar" replace />} />
+          <Route path="/map" element={<Navigate to="/radar" replace />} />
+          <Route path="/spotter" element={<Navigate to="/radar" replace />} />
+
+          {/* Portal 3: Evidence Explorer (Independent Review & Consensus Audit) */}
           <Route
             path="/explorer"
             element={
@@ -253,7 +340,31 @@ const AppContent: React.FC = () => {
             }
           />
 
-          {/* Hub 4: /developers — Protocol Explorer & Open API */}
+          {/* Portal 4: Escrow Vault & Three Wallets Hub */}
+          <Route
+            path="/vault"
+            element={
+              <ThreeWalletsHub
+                activeDemoAccount={activeDemoAccount}
+                onSelectDemoAccount={setActiveDemoAccount}
+                demoAccounts={demoAccounts}
+                onAdjustBalance={adjustBalance}
+                onNavigateToReport={() => {
+                  navigate('/radar');
+                  setActiveTab('radar');
+                }}
+                onNavigateToAsk={() => {
+                  navigate('/dashboard');
+                  setActiveTab('dashboard');
+                }}
+                onShowToast={showToast}
+              />
+            }
+          />
+          <Route path="/escrow" element={<Navigate to="/vault" replace />} />
+          <Route path="/wallets" element={<Navigate to="/vault" replace />} />
+
+          {/* Portal 5: Developers & Open Truth API */}
           <Route
             path="/developers"
             element={
@@ -263,58 +374,69 @@ const AppContent: React.FC = () => {
             }
           />
 
-          {/* Backward compatibility aliases */}
-          <Route path="/maker" element={<Navigate to="/studio" replace />} />
-          <Route path="/spotter" element={<Navigate to="/map" replace />} />
-          <Route path="/vault" element={<Navigate to="/developers" replace />} />
+          {/* Portal 6: Admin System Verification Panel */}
+          <Route
+            path="/admin"
+            element={
+              <AdminVerificationPanel />
+            }
+          />
 
-          {/* Fallback & Root */}
-          <Route path="/" element={<Navigate to="/map" replace />} />
-          <Route path="*" element={<Navigate to="/map" replace />} />
+          {/* Fallback & Root -> defaults to Dashboard */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </main>
 
-      {/* 3. Desktop Web Footer */}
+      {/* 4. Desktop Web Footer */}
       <footer className="w-full bg-[#0B0B0B] border-t border-white/[0.07] py-6 mt-12 text-xs text-[#858585] select-none relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center space-x-2.5">
             <div className="w-6 h-6 rounded-full bg-[#A8FF00] text-black flex items-center justify-center font-black text-xs shadow-sm">
               T
             </div>
-            <span className="font-bold text-[#F5F5F5] tracking-tight">TrueSpot V2 Protocol</span>
+            <span className="font-bold text-[#F5F5F5] tracking-tight">TrueSpot Protocol</span>
             <span>•</span>
-            <span className="text-[#858585]">Decentralized Physical Verification Oracle on Solana Devnet</span>
+            <span className="text-[#858585]">Physical Verification Network on Solana Devnet</span>
           </div>
 
           <div className="flex items-center space-x-4 text-[11px] font-medium text-[#858585]">
-            <span>97.5% Contributor / 2.5% Treasury</span>
+            <span>Decentralized Escrow</span>
             <span>•</span>
-            <span>Anchor PDA Escrow</span>
+            <span>200m Proximity Geofence</span>
             <span>•</span>
-            <span className="font-mono text-[#A8FF00] font-semibold">TrUEspot...1111</span>
+            <span className="font-mono text-[#A8FF00] font-semibold">Vault: TrUEspot...1111</span>
           </div>
         </div>
       </footer>
 
-      {/* 4. Mobile Bottom Floating Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0B0B0B]/95 backdrop-blur-2xl border-t border-white/10 px-4 py-2 flex items-center justify-around select-none">
+      {/* 5. Mobile Bottom Floating Navigation Bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0B0B0B]/95 backdrop-blur-2xl border-t border-white/10 px-4 py-2 flex items-center justify-around select-none">
         {[
-          { path: '/map', label: 'Map', icon: Radio },
-          { path: '/studio', label: 'Studio', icon: PlusCircle },
-          { path: '/explorer', label: 'Explorer', icon: FileCheck2 },
-          { path: '/developers', label: 'API', icon: Code2 },
+          { id: 'dashboard', path: '/dashboard', label: 'Dashboard', icon: PlusCircle },
+          { id: 'radar', path: '/radar', label: 'Radar', icon: Compass },
+          { id: 'explorer', path: '/explorer', label: 'Explorer', icon: FileCheck2 },
+          { id: 'vault', path: '/vault', label: 'Vault', icon: Lock },
+          { id: 'admin', path: '/admin', label: 'Admin', icon: ShieldCheck },
         ].map((item) => {
           const Icon = item.icon;
-          const isActive = location.pathname.startsWith(item.path);
+          const isActive = activeTab === item.id;
           return (
             <button
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              className={`relative flex flex-col items-center py-1 px-3 rounded-2xl text-[11px] font-semibold transition-all cursor-pointer ${
+              key={item.id}
+              onClick={() => {
+                navigate(item.path);
+                setActiveTab(item.id);
+              }}
+              className={`relative flex flex-col items-center py-1 px-3 rounded-2xl text-[11px] font-semibold transition-all ${
                 isActive ? 'text-[#A8FF00] font-bold' : 'text-zinc-400 hover:text-white'
               }`}
             >
-              <div className={`p-1.5 rounded-full ${isActive ? 'bg-[#A8FF00]/20 text-[#A8FF00] shadow-sm' : ''}`}>
+              <div
+                className={`p-1.5 rounded-full ${
+                  isActive ? 'bg-[#A8FF00]/20 text-[#A8FF00] shadow-sm' : ''
+                }`}
+              >
                 <Icon className="w-4 h-4" />
               </div>
               <span className="mt-0.5">{item.label}</span>
@@ -346,10 +468,13 @@ const AppContent: React.FC = () => {
       <HowItWorksModal
         isOpen={howItWorksOpen}
         onClose={() => setHowItWorksOpen(false)}
-        onStartDemo={() => navigate('/map')}
+        onStartDemo={() => {
+          navigate('/radar');
+          setActiveTab('radar');
+        }}
       />
 
-      {/* Supabase PostgreSQL + PostGIS Configuration Modal */}
+      {/* Supabase Modal */}
       <SupabaseModal
         isOpen={supabaseModalOpen}
         onClose={() => setSupabaseModalOpen(false)}
@@ -367,11 +492,10 @@ const AppContent: React.FC = () => {
 
 export const App: React.FC = () => {
   const endpoint = useMemo(() => clusterApiUrl('devnet'), []);
-  const wallets = useMemo(() => [], []);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
+      <WalletProvider wallets={[]} autoConnect>
         <WalletModalProvider>
           <BrowserRouter>
             <AppContent />

@@ -7,11 +7,13 @@ import {
   ChevronLeft,
   HelpCircle,
   Shield,
-  Radio,
   PlusCircle,
+  Compass,
   FileCheck2,
+  Lock,
   Code2,
   Database,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -80,13 +82,26 @@ export const Navbar: React.FC<NavbarProps> = ({
       : 'Loading...'
     : `${activeDemoAccount.balanceSol.toFixed(2)} SOL`;
 
-  // The 4 Core Protocol Hubs
+  // Protocol Navigation Portals (matching previous CoinVex UI + required additions)
   const hubs = [
-    { path: '/map', key: 'map', label: 'Live Map', icon: Radio, badge: 0 },
-    { path: '/studio', key: 'studio', label: 'Query Studio', icon: PlusCircle, badge: 0 },
+    { path: '/dashboard', key: 'dashboard', label: 'Dashboard', icon: PlusCircle, badge: 0 },
+    { path: '/radar', key: 'radar', label: 'Analytics & Radar', icon: Compass, badge: unverifiedCount },
     { path: '/explorer', key: 'explorer', label: 'Evidence Explorer', icon: FileCheck2, badge: unverifiedCount },
-    { path: '/developers', key: 'developers', label: 'Protocol & API', icon: Code2, badge: 0 },
+    { path: '/vault', key: 'vault', label: 'Escrow Vault', icon: Lock, badge: 0 },
+    { path: '/developers', key: 'developers', label: 'Developers', icon: Code2, badge: 0 },
+    { path: '/admin', key: 'admin', label: 'Admin', icon: ShieldCheck, badge: 0 },
   ];
+
+  const isHubActive = (hubKey: string) => {
+    const p = location.pathname;
+    if (hubKey === 'dashboard') return p === '/' || p === '/dashboard' || p === '/maker' || p === '/studio';
+    if (hubKey === 'radar') return p === '/radar' || p === '/nearby' || p === '/map' || p === '/spotter';
+    if (hubKey === 'explorer') return p === '/explorer';
+    if (hubKey === 'vault') return p === '/vault' || p === '/escrow' || p === '/wallets';
+    if (hubKey === 'developers') return p === '/developers';
+    if (hubKey === 'admin') return p === '/admin';
+    return false;
+  };
 
   const handleNavigate = (path: string, key: string) => {
     navigate(path);
@@ -109,44 +124,35 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
 
           <div
-            onClick={() => handleNavigate('/map', 'map')}
+            onClick={() => handleNavigate('/dashboard', 'dashboard')}
             className="flex items-center space-x-2.5 cursor-pointer group"
           >
             <div className="w-7 h-7 rounded-lg bg-[#A8FF00] text-black flex items-center justify-center shadow-md shadow-[#A8FF00]/25 group-hover:scale-105 transition-transform">
               <Shield className="w-4 h-4 text-black stroke-[2.5]" />
             </div>
-            <div className="flex items-center space-x-1.5">
-              <span className="text-lg font-bold text-white tracking-tight">
-                TrueSpot
-              </span>
-              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-[#A8FF00]/15 text-[#A8FF00] border border-[#A8FF00]/30 font-mono">
-                ORACLE V2
-              </span>
-            </div>
+            <span className="text-lg font-bold text-white tracking-tight">
+              TrueSpot
+            </span>
           </div>
         </div>
 
-        {/* Center: CoinVex Floating Pill Switcher for the 4 Core Protocol Hubs */}
-        <nav className="hidden md:flex items-center bg-[#0D0D0D] p-1 rounded-full border border-white/[0.08] shadow-inner">
+        {/* Center: CoinVex Floating Pill Switcher for Protocol Portals */}
+        <nav className="hidden lg:flex items-center bg-[#0D0D0D] p-1 rounded-full border border-white/[0.08] shadow-inner space-x-0.5">
           {hubs.map((hub) => {
-            const isActive =
-              location.pathname.startsWith(hub.path) ||
-              (hub.path === '/map' && (location.pathname === '/' || location.pathname === '/spotter')) ||
-              (hub.path === '/studio' && location.pathname === '/maker') ||
-              (hub.path === '/developers' && location.pathname === '/vault');
+            const active = isHubActive(hub.key);
             const Icon = hub.icon;
 
             return (
               <button
-                key={hub.path}
+                key={hub.key}
                 onClick={() => handleNavigate(hub.path, hub.key)}
-                className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
-                  isActive
-                    ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/60 shadow-sm shadow-[#A8FF00]/15 font-bold'
+                className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
+                  active
+                    ? 'border border-[#A8FF00] text-[#A8FF00] bg-black/50 shadow-sm shadow-[#A8FF00]/10'
                     : 'text-[#858585] hover:text-white'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
+                <Icon className={`w-3.5 h-3.5 ${active ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
                 <span>{hub.label}</span>
                 {hub.badge > 0 && (
                   <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00] animate-pulse" />
@@ -156,9 +162,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           })}
         </nav>
 
-        {/* Right: User Persona, Balance & Settings */}
+        {/* Right: User Greeting, Purple Avatar, Balance Pill & Modals */}
         <div className="flex items-center space-x-3">
-          {/* User Persona & Avatar */}
+          {/* User Greeting & Purple Avatar (CoinVex Signature) */}
           <div
             onClick={onOpenWalletModal}
             className="flex items-center space-x-2.5 cursor-pointer hover:opacity-90 transition-opacity"
@@ -167,7 +173,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="text-xs text-zinc-300 font-medium hidden sm:inline">
               Hi, {displayWalletName}
             </span>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#A8FF00]/40 to-emerald-500 border border-[#A8FF00]/40 flex items-center justify-center text-xs font-black text-black bg-[#A8FF00] shadow-sm overflow-hidden">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 border border-purple-400/30 flex items-center justify-center text-xs font-bold text-white shadow-sm overflow-hidden">
               <span>{displayWalletName.charAt(0)}</span>
             </div>
           </div>

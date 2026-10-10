@@ -20,7 +20,7 @@ interface ThreeWalletsHubProps {
   activeDemoAccount: DemoAccount;
   onSelectDemoAccount: (account: DemoAccount) => void;
   demoAccounts: DemoAccount[];
-  onAdjustBalance: (amountDelta: number, targetRole?: 'asker' | 'spotter' | 'verifier') => void;
+  onAdjustBalance: (amountDelta: number, targetRole?: any, counterRole?: any) => void;
   onNavigateToReport: (bountyId: string) => void;
   onNavigateToAsk: () => void;
   onShowToast?: (title: string, message: string, type?: 'success' | 'info' | 'reward' | 'warning') => void;
@@ -142,7 +142,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
       );
       const targetBounty = bounties.find((b) => b.id === bountyId);
       const amount = targetBounty ? targetBounty.amount_sol : 0.25;
-      onAdjustBalance(amount, 'spotter');
+      onAdjustBalance(amount, 'receiver', 'escrow');
 
       await loadAllData();
       if (onShowToast) {

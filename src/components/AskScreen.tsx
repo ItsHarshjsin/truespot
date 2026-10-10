@@ -29,7 +29,7 @@ interface AskScreenProps {
   userCoords: Coordinates;
   makerWallet?: string;
   onBountyCreated: (bountyId: string) => void;
-  onAdjustBalance?: (delta: number, role?: 'asker' | 'spotter' | 'verifier') => void;
+  onAdjustBalance?: (delta: number, targetRole?: any, counterRole?: any) => void;
   onShowToast?: (title: string, message: string, type?: 'success' | 'info' | 'reward' | 'warning') => void;
   onNavigateToRadar?: () => void;
 }
@@ -135,7 +135,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
       const txSig = await lockBountyOnChain(sendTransaction, publicKey, amountSol);
 
       if (onAdjustBalance) {
-        onAdjustBalance(-amountSol, 'asker');
+        onAdjustBalance(-amountSol, 'maker', 'escrow');
       }
 
       if (onShowToast) {

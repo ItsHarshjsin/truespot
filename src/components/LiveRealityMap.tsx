@@ -360,6 +360,20 @@ export const LiveRealityMap: React.FC<LiveRealityMapProps> = ({
         </button>
       </div>
 
+      {/* 3.5 Floating Protocol Thesis Pill (Bottom Left) */}
+      <div className="absolute bottom-4 left-4 z-20 pointer-events-auto max-w-sm hidden sm:block">
+        <div className="bg-[#0B0B0B]/90 backdrop-blur-md border border-white/10 rounded-[18px] p-3.5 shadow-xl space-y-1.5">
+          <div className="flex items-center space-x-2">
+            <span className="w-2 h-2 rounded-full bg-[#A8FF00] animate-pulse"></span>
+            <span className="text-xs font-bold text-white tracking-tight">People as the Sensor</span>
+            <span className="text-[10px] text-[#A8FF00] font-mono font-bold bg-[#A8FF00]/10 px-1.5 py-0.5 rounded border border-[#A8FF00]/20">SOLANA DEVNET</span>
+          </div>
+          <p className="text-[11px] text-zinc-400 leading-snug">
+            The internet knows where everything is, but not what's happening right now. Nearby spotters verify physical reality with GPS-timestamped proof — Solana settles instantly and truth stays open for AI agents.
+          </p>
+        </div>
+      </div>
+
       {/* 4. Interactive Pin Drawer (CoinVex Dark Card) */}
       {selectedQuery && (
         <div className="absolute bottom-4 right-4 z-30 w-full max-w-md bg-[#0B0B0B]/95 backdrop-blur-xl border border-white/10 rounded-[20px] p-5 shadow-2xl transition-all pointer-events-auto max-h-[85vh] overflow-y-auto">
