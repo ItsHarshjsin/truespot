@@ -109,11 +109,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3.5 pb-2 select-none relative z-40">
-      <div className="flex items-center justify-between gap-2.5">
+    <header className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-2 select-none relative z-40">
+      <div className="flex items-center justify-between gap-2 xl:gap-3 w-full">
         
-        {/* Left: Brand Identity + Mode Switcher Segment */}
-        <div className="flex items-center space-x-3 shrink-0">
+        {/* ================= 1. LEFT ZONE: BRAND & ROLE SWITCHER ================= */}
+        <div className="flex items-center space-x-2 sm:space-x-2.5 shrink-0">
           {canGoBack && onBack && (
             <button
               onClick={onBack}
@@ -127,22 +127,22 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Logo */}
           <div
             onClick={() => handleNavigate(userMode === 'maker' ? '/bounties' : '/nearby', userMode === 'maker' ? 'bounties' : 'nearby')}
-            className="flex items-center space-x-2 cursor-pointer group"
+            className="flex items-center space-x-2 cursor-pointer group shrink-0"
           >
             <div className="w-7 h-7 rounded-lg bg-[#A8FF00] text-black flex items-center justify-center shadow-md shadow-[#A8FF00]/25 group-hover:scale-105 transition-transform">
               <Shield className="w-4 h-4 text-black stroke-[2.5]" />
             </div>
-            <span className="text-base sm:text-lg font-bold text-white tracking-tight">
+            <span className="text-base font-bold text-white tracking-tight hidden sm:inline">
               TrueSpot
             </span>
           </div>
 
-          {/* Compact Segmented Role Switcher (Maker <-> Spotter) */}
-          <div className="flex items-center bg-[#101010] p-0.5 rounded-full border border-white/[0.08] shadow-inner">
+          {/* Segmented Role Switcher (Maker <-> Spotter) */}
+          <div className="flex items-center bg-[#101010] p-1 rounded-full border border-white/[0.08] shadow-inner h-9">
             <button
               type="button"
               onClick={() => onSelectUserMode('maker')}
-              className={`flex items-center space-x-1 px-2.5 sm:px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center space-x-1 px-2.5 sm:px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer h-7 ${
                 userMode === 'maker'
                   ? 'bg-[#A8FF00] text-black shadow-sm font-bold'
                   : 'text-zinc-400 hover:text-white'
@@ -156,7 +156,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={() => onSelectUserMode('spotter')}
-              className={`flex items-center space-x-1 px-2.5 sm:px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center space-x-1 px-2.5 sm:px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer h-7 ${
                 userMode === 'spotter'
                   ? 'bg-[#A8FF00] text-black shadow-sm font-bold'
                   : 'text-zinc-400 hover:text-white'
@@ -169,17 +169,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Center: Mode-Specific Navigation Links */}
-        <nav className="hidden lg:flex items-center bg-[#0D0D0D] px-1 py-1 rounded-full border border-white/[0.08] shadow-inner space-x-0.5 shrink-0">
+        {/* ================= 2. CENTER ZONE: ACTIVE MODE NAVIGATION ================= */}
+        <nav className="hidden lg:flex items-center bg-[#0D0D0D] p-1 rounded-full border border-white/[0.08] shadow-inner space-x-0.5 shrink-0 h-9">
           {userMode === 'maker' ? (
             /* ================= MAKER LINKS ================= */
             <>
               <button
                 type="button"
                 onClick={() => handleNavigate('/studio', 'studio')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                className={`flex items-center space-x-1.5 px-2.5 xl:px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer h-7 ${
                   isRouteActive(['/studio'])
-                    ? 'bg-white/[0.1] text-white font-semibold border border-white/10 shadow-sm'
+                    ? 'bg-white/[0.12] text-white font-semibold border border-white/10 shadow-sm'
                     : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
@@ -190,9 +190,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => handleNavigate('/bounties', 'bounties')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                className={`flex items-center space-x-1.5 px-2.5 xl:px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer h-7 ${
                   isRouteActive(['/bounties', '/dashboard', '/maker', '/'])
-                    ? 'bg-white/[0.1] text-white font-semibold border border-white/10 shadow-sm'
+                    ? 'bg-white/[0.12] text-white font-semibold border border-white/10 shadow-sm'
                     : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
@@ -203,9 +203,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => handleNavigate('/review', 'review')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer relative ${
+                className={`flex items-center space-x-1.5 px-2.5 xl:px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer relative h-7 ${
                   isRouteActive(['/review', '/explorer'])
-                    ? 'bg-white/[0.1] text-white font-semibold border border-white/10 shadow-sm'
+                    ? 'bg-white/[0.12] text-white font-semibold border border-white/10 shadow-sm'
                     : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
@@ -219,9 +219,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => handleNavigate('/records', 'records')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                className={`flex items-center space-x-1.5 px-2.5 xl:px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer h-7 ${
                   isRouteActive(['/records', '/developers'])
-                    ? 'bg-white/[0.1] text-white font-semibold border border-white/10 shadow-sm'
+                    ? 'bg-white/[0.12] text-white font-semibold border border-white/10 shadow-sm'
                     : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
@@ -232,9 +232,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => handleNavigate('/analytics', 'analytics')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                className={`flex items-center space-x-1.5 px-2.5 xl:px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer h-7 ${
                   isRouteActive(['/analytics'])
-                    ? 'bg-white/[0.1] text-white font-semibold border border-white/10 shadow-sm'
+                    ? 'bg-white/[0.12] text-white font-semibold border border-white/10 shadow-sm'
                     : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
@@ -248,9 +248,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => handleNavigate('/nearby', 'nearby')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer relative ${
+                className={`flex items-center space-x-1.5 px-2.5 xl:px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer relative h-7 ${
                   isRouteActive(['/nearby', '/radar', '/spotter', '/'])
-                    ? 'bg-white/[0.1] text-white font-semibold border border-white/10 shadow-sm'
+                    ? 'bg-white/[0.12] text-white font-semibold border border-white/10 shadow-sm'
                     : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
@@ -264,9 +264,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => handleNavigate('/report', 'report')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                className={`flex items-center space-x-1.5 px-2.5 xl:px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer h-7 ${
                   isRouteActive(['/report'])
-                    ? 'bg-white/[0.1] text-white font-semibold border border-white/10 shadow-sm'
+                    ? 'bg-white/[0.12] text-white font-semibold border border-white/10 shadow-sm'
                     : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
@@ -277,9 +277,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => handleNavigate('/submissions', 'submissions')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                className={`flex items-center space-x-1.5 px-2.5 xl:px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer h-7 ${
                   isRouteActive(['/submissions'])
-                    ? 'bg-white/[0.1] text-white font-semibold border border-white/10 shadow-sm'
+                    ? 'bg-white/[0.12] text-white font-semibold border border-white/10 shadow-sm'
                     : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
@@ -290,9 +290,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => handleNavigate('/earnings', 'earnings')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                className={`flex items-center space-x-1.5 px-2.5 xl:px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer h-7 ${
                   isRouteActive(['/earnings'])
-                    ? 'bg-white/[0.1] text-white font-semibold border border-white/10 shadow-sm'
+                    ? 'bg-white/[0.12] text-white font-semibold border border-white/10 shadow-sm'
                     : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
@@ -303,9 +303,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => handleNavigate('/reputation', 'reputation')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                className={`flex items-center space-x-1.5 px-2.5 xl:px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer h-7 ${
                   isRouteActive(['/reputation'])
-                    ? 'bg-white/[0.1] text-white font-semibold border border-white/10 shadow-sm'
+                    ? 'bg-white/[0.12] text-white font-semibold border border-white/10 shadow-sm'
                     : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
@@ -316,85 +316,82 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
         </nav>
 
-        {/* Right Section: Shared Nav Links + Unified Web3 Wallet Chip + Utility Icons */}
+        {/* ================= 3. RIGHT ZONE: SHARED VIEWS + WALLET + UTILITIES ================= */}
         <div className="flex items-center space-x-2 shrink-0">
           
-          {/* Shared Links (Reality Map & Vault) */}
-          <div className="hidden md:flex items-center space-x-1">
+          {/* Shared Views Pill (Map & Vault & Admin) */}
+          <div className="hidden md:flex items-center bg-[#101010] p-1 rounded-full border border-white/[0.08] shadow-inner space-x-0.5 h-9">
             <button
               type="button"
               onClick={() => handleNavigate('/map', 'map')}
-              className={`flex items-center space-x-1 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+              className={`flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer h-7 ${
                 isRouteActive(['/map'])
-                  ? 'bg-white/[0.1] text-white font-semibold border border-white/10'
+                  ? 'bg-white/[0.12] text-white font-semibold border border-white/10 shadow-sm'
                   : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
               }`}
               title="Live Reality Map"
             >
               <MapPin className="w-3.5 h-3.5" />
-              <span>Map</span>
+              <span className="hidden xl:inline">Map</span>
             </button>
 
             <button
               type="button"
               onClick={() => handleNavigate('/vault', 'vault')}
-              className={`flex items-center space-x-1 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+              className={`flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer h-7 ${
                 isRouteActive(['/vault', '/escrow', '/wallets'])
-                  ? 'bg-white/[0.1] text-white font-semibold border border-white/10'
+                  ? 'bg-white/[0.12] text-white font-semibold border border-white/10 shadow-sm'
                   : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
               }`}
-              title="Escrow Vault & Ledger"
+              title="Escrow Vault & Multi-Party Ledger"
             >
               <Lock className="w-3.5 h-3.5" />
-              <span>Vault</span>
+              <span className="hidden xl:inline">Vault</span>
             </button>
 
             {(isAdmin || isRouteActive(['/admin'])) && (
               <button
                 type="button"
                 onClick={() => handleNavigate('/admin', 'admin')}
-                className={`flex items-center space-x-1 px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                className={`flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer h-7 ${
                   isRouteActive(['/admin'])
                     ? 'bg-amber-950/60 text-amber-300 border border-amber-500/40'
                     : 'text-amber-400/80 hover:text-amber-300 hover:bg-amber-950/30'
                 }`}
-                title="Protected Admin Diagnostics"
+                title="Admin Diagnostics Panel"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                <span>Admin</span>
+                <span className="hidden xl:inline">Admin</span>
               </button>
             )}
           </div>
 
-          {/* Elegant Divider */}
-          <div className="h-4 w-px bg-white/[0.1] hidden md:block" />
-
-          {/* Single Unified Web3 Wallet Badge */}
+          {/* Unified Web3 Wallet Badge */}
           <div
             onClick={onOpenWalletModal}
-            className="flex items-center space-x-2 bg-[#101010] hover:bg-[#161616] border border-white/[0.08] hover:border-white/20 px-2.5 py-1 rounded-full cursor-pointer transition-all shadow-sm"
+            className="flex items-center space-x-2 bg-[#101010] hover:bg-[#161616] border border-white/[0.08] hover:border-white/20 px-2.5 sm:px-3 py-1 rounded-full cursor-pointer transition-all shadow-inner h-9"
             title="Wallet Account & Switcher"
           >
             <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
               {displayWalletName.charAt(0)}
             </div>
-            <span className="text-xs font-mono text-zinc-300 font-medium hidden sm:inline">
+            <span className="text-xs font-mono text-zinc-300 font-medium hidden xl:inline">
               {displayShortAddress}
             </span>
-            <span className="w-1 h-1 rounded-full bg-white/20 hidden sm:inline" />
+            <span className="w-1 h-1 rounded-full bg-white/20 hidden xl:inline" />
             <span className="text-xs font-mono font-bold text-[#A8FF00]">
               {displayBalance}
             </span>
           </div>
 
-          {/* Quick Utility Icon Group (Profile, Settings, Help) */}
-          <div className="flex items-center space-x-0.5">
+          {/* Unified Utilities Capsule (Profile, Settings, Help, DB Sync) */}
+          <div className="flex items-center bg-[#101010] p-1 rounded-full border border-white/[0.08] shadow-inner space-x-0.5 h-9">
             <button
               type="button"
               onClick={() => handleNavigate('/profile', 'profile')}
-              className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
+              className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${
                 isRouteActive(['/profile'])
-                  ? 'bg-white/[0.1] text-[#A8FF00] border border-[#A8FF00]/40'
+                  ? 'bg-white/[0.12] text-[#A8FF00]'
                   : 'text-zinc-400 hover:text-white hover:bg-white/[0.05]'
               }`}
               title="Identity & Profile"
@@ -405,12 +402,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={() => handleNavigate('/settings', 'settings')}
-              className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
+              className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${
                 isRouteActive(['/settings'])
-                  ? 'bg-white/[0.1] text-[#A8FF00] border border-[#A8FF00]/40'
+                  ? 'bg-white/[0.12] text-[#A8FF00]'
                   : 'text-zinc-400 hover:text-white hover:bg-white/[0.05]'
               }`}
-              title="Settings"
+              title="Settings & RPC Configuration"
             >
               <Settings className="w-3.5 h-3.5" />
             </button>
@@ -418,7 +415,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={onOpenHowItWorks}
-              className="w-7 h-7 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-colors cursor-pointer hidden md:flex"
+              className="w-7 h-7 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-all cursor-pointer hidden md:flex"
               title="Protocol Guide"
             >
               <HelpCircle className="w-3.5 h-3.5" />
@@ -428,8 +425,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={onOpenSupabaseModal}
-                className="w-7 h-7 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-colors cursor-pointer hidden md:flex"
-                title="PostgreSQL / PostGIS Sync"
+                className="w-7 h-7 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-all cursor-pointer hidden md:flex"
+                title="PostgreSQL / PostGIS Sync Status"
               >
                 <Database className="w-3.5 h-3.5" />
               </button>
