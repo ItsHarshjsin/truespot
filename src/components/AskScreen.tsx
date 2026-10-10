@@ -362,9 +362,13 @@ export const AskScreen: React.FC<AskScreenProps> = ({
               <div className="text-2xl font-black text-[#F5F5F5] tracking-tight">
                 {totalEscrowedSol.toFixed(2)} SOL <span className="text-xs font-normal text-[#858585]">/ ${(totalEscrowedSol * 192).toFixed(0)}</span>
               </div>
-              <div className="flex items-center space-x-1.5 text-[11px] text-[#A8FF00] font-semibold mt-0.5">
-                <span>↗ Live Metrics</span>
-                <span className="text-[#858585] font-normal">Escrow PDA verified on Devnet</span>
+              <div className="flex items-center space-x-1.5 text-[11px] font-semibold mt-0.5">
+                <span className={totalEscrowedSol > 0 ? "text-[#A8FF00]" : "text-[#71717a]"}>
+                  {totalEscrowedSol > 0 ? "↗ Live Metrics" : "— Zero Activity"}
+                </span>
+                <span className="text-[#858585] font-normal">
+                  {totalEscrowedSol > 0 ? "Escrow PDA verified on Devnet" : "Awaiting first query lock"}
+                </span>
               </div>
             </div>
 
@@ -384,33 +388,61 @@ export const AskScreen: React.FC<AskScreenProps> = ({
 
                 <line x1="0" y1="30" x2="400" y2="30" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
                 <line x1="0" y1="70" x2="400" y2="70" stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
-                <line x1="0" y1="110" x2="400" y2="110" stroke="rgba(255,255,255,0.04)" />
+                <line x1="0" y1="110" x2="400" y2="110" stroke="rgba(255,255,255,0.06)" />
 
-                <path
-                  d="M 0 95 C 60 115, 120 40, 200 65 C 280 90, 330 35, 400 50 L 400 110 L 0 110 Z"
-                  fill="url(#blueRibbon)"
-                />
-                <path
-                  d="M 0 95 C 60 115, 120 40, 200 65 C 280 90, 330 35, 400 50"
-                  fill="none"
-                  stroke="#4285FF"
-                  strokeWidth="2"
-                  strokeOpacity="0.7"
-                />
+                {totalEscrowedSol > 0 ? (
+                  <>
+                    <path
+                      d="M 0 95 C 60 115, 120 40, 200 65 C 280 90, 330 35, 400 50 L 400 110 L 0 110 Z"
+                      fill="url(#blueRibbon)"
+                    />
+                    <path
+                      d="M 0 95 C 60 115, 120 40, 200 65 C 280 90, 330 35, 400 50"
+                      fill="none"
+                      stroke="#4285FF"
+                      strokeWidth="2"
+                      strokeOpacity="0.7"
+                    />
 
-                <path
-                  d="M 0 80 C 70 50, 130 100, 210 45 C 280 15, 340 70, 400 30 L 400 110 L 0 110 Z"
-                  fill="url(#limeRibbon)"
-                />
-                <path
-                  d="M 0 80 C 70 50, 130 100, 210 45 C 280 15, 340 70, 400 30"
-                  fill="none"
-                  stroke="#A8FF00"
-                  strokeWidth="2.5"
-                />
+                    <path
+                      d="M 0 80 C 70 50, 130 100, 210 45 C 280 15, 340 70, 400 30 L 400 110 L 0 110 Z"
+                      fill="url(#limeRibbon)"
+                    />
+                    <path
+                      d="M 0 80 C 70 50, 130 100, 210 45 C 280 15, 340 70, 400 30"
+                      fill="none"
+                      stroke="#A8FF00"
+                      strokeWidth="2.5"
+                    />
 
-                <circle cx="210" cy="45" r="4.5" fill="#A8FF00" />
-                <circle cx="210" cy="45" r="8" fill="#A8FF00" fillOpacity="0.25" />
+                    <circle cx="210" cy="45" r="4.5" fill="#A8FF00" />
+                    <circle cx="210" cy="45" r="8" fill="#A8FF00" fillOpacity="0.25" />
+                  </>
+                ) : (
+                  <>
+                    {/* Clean Zero Baseline */}
+                    <line
+                      x1="0"
+                      y1="110"
+                      x2="400"
+                      y2="110"
+                      stroke="rgba(255,255,255,0.18)"
+                      strokeWidth="1.5"
+                    />
+                    <circle cx="200" cy="110" r="3" fill="#52525b" />
+                    <text
+                      x="200"
+                      y="68"
+                      textAnchor="middle"
+                      fill="#52525b"
+                      fontSize="10"
+                      fontFamily="monospace"
+                      letterSpacing="0.06em"
+                    >
+                      Awaiting Escrow Volume • 0.00 SOL Baseline
+                    </text>
+                  </>
+                )}
               </svg>
 
               <div className="flex justify-between text-[10px] text-[#858585] font-mono px-1 pt-1">
@@ -441,43 +473,54 @@ export const AskScreen: React.FC<AskScreenProps> = ({
           <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 space-y-3 shadow-none">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <TrendingUp className="w-4 h-4 text-[#A8FF00]" />
+                <TrendingUp className={`w-4 h-4 ${liveQueries.length > 0 ? 'text-[#A8FF00]' : 'text-[#71717a]'}`} />
                 <h3 className="text-[15px] font-bold text-[#F5F5F5] tracking-tight">Verification Velocity</h3>
               </div>
-              <span className="text-[10px] font-mono text-[#A8FF00] bg-[#101010] px-2 py-0.5 rounded-full border border-white/[0.07]">
-                Live Feed
+              <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
+                liveQueries.length > 0
+                  ? 'text-[#A8FF00] bg-[#101010] border-white/[0.07]'
+                  : 'text-[#71717a] bg-[#101010] border-white/[0.04]'
+              }`}>
+                {liveQueries.length > 0 ? 'Live Feed' : 'Idle Feed'}
               </span>
             </div>
 
             <div className="grid grid-cols-7 gap-1.5 pt-2">
               {[
-                { day: 'Mon', caps: ['bg-[#4285FF]', 'bg-[#A8FF00]', 'bg-[#18181b]'] },
-                { day: 'Tue', caps: ['bg-[#A8FF00]', 'bg-[#8B4DFF]', 'bg-[#4285FF]'] },
-                { day: 'Wed', caps: ['bg-[#8B4DFF]', 'bg-[#A8FF00]', 'bg-[#A8FF00]'] },
-                { day: 'Thu', caps: ['bg-[#A8FF00]', 'bg-[#4285FF]', 'bg-[#8B4DFF]'] },
-                { day: 'Fri', caps: ['bg-[#34D399]', 'bg-[#A8FF00]', 'bg-[#4285FF]'] },
-                { day: 'Sat', caps: ['bg-[#A8FF00]', 'bg-[#A8FF00]', 'bg-[#34D399]'] },
-                { day: 'Sun', caps: ['bg-[#4285FF]', 'bg-[#A8FF00]', 'bg-[#18181b]'] },
-              ].map((item, idx) => (
-                <div key={idx} className="flex flex-col items-center space-y-1.5">
-                  <div className="w-full flex flex-col space-y-1 items-center bg-[#101010] p-1 rounded-xl border border-white/[0.04]">
-                    {item.caps.map((color, cIdx) => (
-                      <div
-                        key={cIdx}
-                        className={`w-full ${color} rounded-full transition-all ${
-                          cIdx === 1 ? 'h-5' : cIdx === 0 ? 'h-3.5' : 'h-4'
-                        }`}
-                      />
-                    ))}
+                { day: 'Mon', activeCaps: ['bg-[#4285FF]', 'bg-[#A8FF00]', 'bg-[#18181b]'] },
+                { day: 'Tue', activeCaps: ['bg-[#A8FF00]', 'bg-[#8B4DFF]', 'bg-[#4285FF]'] },
+                { day: 'Wed', activeCaps: ['bg-[#8B4DFF]', 'bg-[#A8FF00]', 'bg-[#A8FF00]'] },
+                { day: 'Thu', activeCaps: ['bg-[#A8FF00]', 'bg-[#4285FF]', 'bg-[#8B4DFF]'] },
+                { day: 'Fri', activeCaps: ['bg-[#34D399]', 'bg-[#A8FF00]', 'bg-[#4285FF]'] },
+                { day: 'Sat', activeCaps: ['bg-[#A8FF00]', 'bg-[#A8FF00]', 'bg-[#34D399]'] },
+                { day: 'Sun', activeCaps: ['bg-[#4285FF]', 'bg-[#A8FF00]', 'bg-[#18181b]'] },
+              ].map((item, idx) => {
+                const isZero = liveQueries.length === 0;
+                const caps = isZero
+                  ? ['bg-white/[0.03]', 'bg-white/[0.03]', 'bg-white/[0.03]']
+                  : item.activeCaps;
+
+                return (
+                  <div key={idx} className="flex flex-col items-center space-y-1.5">
+                    <div className="w-full flex flex-col space-y-1 items-center bg-[#101010] p-1 rounded-xl border border-white/[0.04]">
+                      {caps.map((color, cIdx) => (
+                        <div
+                          key={cIdx}
+                          className={`w-full ${color} rounded-full transition-all ${
+                            cIdx === 1 ? 'h-5' : cIdx === 0 ? 'h-3.5' : 'h-4'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-[10px] text-[#858585] font-mono">{item.day}</span>
                   </div>
-                  <span className="text-[10px] text-[#858585] font-mono">{item.day}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="flex items-center justify-between text-[11px] text-[#858585] pt-1 border-t border-white/[0.06]">
-              <span>Avg Settle: <strong className="text-[#F5F5F5]">~2.0 min</strong></span>
-              <span>Consensus: <strong className="text-[#A8FF00]">100%</strong></span>
+              <span>Avg Settle: <strong className="text-[#F5F5F5]">{liveQueries.length > 0 ? '~2.0 min' : '--'}</strong></span>
+              <span>Consensus: <strong className={liveQueries.length > 0 ? "text-[#A8FF00]" : "text-[#71717a]"}>{liveQueries.length > 0 ? '100%' : '--'}</strong></span>
               <span>Active: <strong className="text-[#F5F5F5]">{activeNodesCount} Nodes</strong></span>
             </div>
           </div>
@@ -492,22 +535,32 @@ export const AskScreen: React.FC<AskScreenProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2.5">
                 <div className="flex -space-x-2 overflow-hidden">
-                  <div className="w-7 h-7 rounded-full bg-[#8B4DFF] text-white flex items-center justify-center text-[10px] font-bold border-2 border-[#0B0B0B]">
-                    S1
-                  </div>
-                  <div className="w-7 h-7 rounded-full bg-[#4285FF] text-white flex items-center justify-center text-[10px] font-bold border-2 border-[#0B0B0B]">
-                    S2
-                  </div>
-                  <div className="w-7 h-7 rounded-full bg-[#A8FF00] text-black flex items-center justify-center text-[10px] font-bold border-2 border-[#0B0B0B]">
-                    S3
-                  </div>
-                  <div className="w-7 h-7 rounded-full bg-[#EC4899] text-white flex items-center justify-center text-[10px] font-bold border-2 border-[#0B0B0B]">
-                    +142
-                  </div>
+                  {activeNodesCount > 0 ? (
+                    <>
+                      <div className="w-7 h-7 rounded-full bg-[#8B4DFF] text-white flex items-center justify-center text-[10px] font-bold border-2 border-[#0B0B0B]">
+                        S1
+                      </div>
+                      <div className="w-7 h-7 rounded-full bg-[#4285FF] text-white flex items-center justify-center text-[10px] font-bold border-2 border-[#0B0B0B]">
+                        S2
+                      </div>
+                      <div className="w-7 h-7 rounded-full bg-[#A8FF00] text-black flex items-center justify-center text-[10px] font-bold border-2 border-[#0B0B0B]">
+                        S3
+                      </div>
+                      <div className="w-7 h-7 rounded-full bg-[#EC4899] text-white flex items-center justify-center text-[10px] font-bold border-2 border-[#0B0B0B]">
+                        +{activeNodesCount}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-[#18181b] text-[#71717a] flex items-center justify-center text-[10px] font-bold border-2 border-[#0B0B0B]">
+                      0
+                    </div>
+                  )}
                 </div>
                 <div>
                   <div className="text-xs font-bold text-[#F5F5F5] leading-tight">Field Network</div>
-                  <div className="text-[10px] text-[#858585]">142 active in 200m range</div>
+                  <div className="text-[10px] text-[#858585]">
+                    {activeNodesCount > 0 ? `${activeNodesCount} active in 200m range` : '0 active in range'}
+                  </div>
                 </div>
               </div>
 
@@ -523,6 +576,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
               )}
             </div>
           </div>
+
 
           {/* Roomy, Clean Task Dispatch Form Card */}
           <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 space-y-4 shadow-none">
