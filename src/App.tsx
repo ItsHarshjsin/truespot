@@ -359,73 +359,74 @@ const AppContent: React.FC = () => {
         onToggleMobileSidebar={() => setMobileSidebarOpen(!mobileSidebarOpen)}
       />
 
-      {/* 2. Global Layout Container with Vertical Left Sidebar */}
-      <div className="pt-16 flex flex-1 w-full min-h-screen">
-        {/* Left Vertical Sidebar */}
-        <SidebarNav
-          userMode={userMode}
-          unverifiedCount={1}
-          mobileOpen={mobileSidebarOpen}
-          onCloseMobile={() => setMobileSidebarOpen(false)}
-        />
+      {/* 2. Global Layout Container with Vertical Left Sidebar & Content */}
+      <div className="pt-16 min-h-screen bg-[#050505] flex flex-col">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex-1 flex">
+          {/* Left Vertical Sidebar */}
+          <SidebarNav
+            userMode={userMode}
+            unverifiedCount={1}
+            mobileOpen={mobileSidebarOpen}
+            onCloseMobile={() => setMobileSidebarOpen(false)}
+          />
 
-        {/* Content Area offset by sidebar width on lg+ displays */}
-        <div className="flex-1 min-w-0 lg:pl-60 xl:pl-64 flex flex-col">
+          {/* Content Area aligned with sidebar and top navbar */}
+          <div className="flex-1 min-w-0 pl-0 lg:pl-6 py-6 flex flex-col justify-between">
+            <div>
+              {/* 2. Subheader Toolbar: Real Device GPS, Preset Jumper & Devnet +1 SOL Airdrop */}
+              {isLocationView && (
+                <JudgeDeck
+                  pageTitle={getPageTitle()}
+                  currentLocationName={locationName}
+                  isSimulated={isSimulated}
+                  onSelectPreset={handleSelectJudgePreset}
+                  onUseLiveGps={() => fetchDeviceGps(true)}
+                  onRefreshData={() => {
+                    showToast('Oracle Refreshed', 'Synced state with hybrid storage', 'info');
+                  }}
+                  onManualCoords={handleSetUserLocation}
+                  onAirdropDemo={() => {
+                    adjustBalance(1.0);
+                    showToast(
+                      'Devnet Airdrop',
+                      `Added +1.00 SOL to ${activeDemoAccount.name.split(' ')[0]}`,
+                      'reward'
+                    );
+                  }}
+                />
+              )}
 
-      {/* 2. Subheader Toolbar: Real Device GPS, Preset Jumper & Devnet +1 SOL Airdrop */}
-      {isLocationView && (
-        <JudgeDeck
-          pageTitle={getPageTitle()}
-          currentLocationName={locationName}
-          isSimulated={isSimulated}
-          onSelectPreset={handleSelectJudgePreset}
-          onUseLiveGps={() => fetchDeviceGps(true)}
-          onRefreshData={() => {
-            showToast('Oracle Refreshed', 'Synced state with hybrid storage', 'info');
-          }}
-          onManualCoords={handleSetUserLocation}
-          onAirdropDemo={() => {
-            adjustBalance(1.0);
-            showToast(
-              'Devnet Airdrop',
-              `Added +1.00 SOL to ${activeDemoAccount.name.split(' ')[0]}`,
-              'reward'
-            );
-          }}
-        />
-      )}
+              {/* GPS Error Guidance Banner */}
+              {gpsError && isLocationView && (
+                <div className="w-full mb-4">
+                  <div className="bg-amber-950/40 border border-amber-500/30 rounded-2xl p-4 flex items-center justify-between text-xs text-amber-200">
+                    <div className="flex items-center space-x-2">
+                      <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span className="font-medium leading-tight">
+                        Device location: Click the 🔒 lock icon in your address bar → Allow Location.
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2 shrink-0 ml-3">
+                      <button
+                        onClick={() => fetchDeviceGps(true)}
+                        className="px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 text-xs font-bold hover:bg-amber-400/30 transition-colors shrink-0 cursor-pointer"
+                      >
+                        Retry GPS
+                      </button>
+                      <button
+                        onClick={() => setGpsError(null)}
+                        className="w-6 h-6 rounded-full hover:bg-amber-400/20 flex items-center justify-center text-amber-300 transition-colors cursor-pointer"
+                        title="Dismiss"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-      {/* GPS Error Guidance Banner */}
-      {gpsError && isLocationView && (
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2">
-          <div className="bg-amber-950/40 border border-amber-500/30 rounded-2xl p-3 flex items-center justify-between text-xs text-amber-200">
-            <div className="flex items-center space-x-2">
-              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
-              <span className="font-medium leading-tight">
-                Device location: Click the 🔒 lock icon in your address bar → Allow Location.
-              </span>
-            </div>
-            <div className="flex items-center space-x-2 shrink-0 ml-3">
-              <button
-                onClick={() => fetchDeviceGps(true)}
-                className="px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 text-xs font-bold hover:bg-amber-400/30 transition-colors shrink-0 cursor-pointer"
-              >
-                Retry GPS
-              </button>
-              <button
-                onClick={() => setGpsError(null)}
-                className="w-6 h-6 rounded-full hover:bg-amber-400/20 flex items-center justify-center text-amber-300 transition-colors cursor-pointer"
-                title="Dismiss"
-              >
-                ✕
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 3. Main Workspace Content */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+              {/* 3. Main Workspace Content */}
+              <main className="flex-1 w-full">
         <Routes>
           {/* ================= MAKER MODE ROUTES ================= */}
           {/* 1. Query Studio */}
@@ -700,46 +701,48 @@ const AppContent: React.FC = () => {
           <Route path="/" element={<Navigate to={userMode === 'maker' ? '/bounties' : '/nearby'} replace />} />
           <Route path="*" element={<Navigate to={userMode === 'maker' ? '/bounties' : '/nearby'} replace />} />
         </Routes>
-      </main>
-
-      {/* 4. Desktop Web Footer */}
-      <footer className="w-full bg-[#0B0B0B] border-t border-white/[0.07] py-6 mt-12 text-xs text-[#858585] select-none relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center space-x-2.5">
-            <div className="w-6 h-6 rounded-full bg-[#A8FF00] text-black flex items-center justify-center font-black text-xs shadow-sm">
-              T
+              </main>
             </div>
-            <span className="font-bold text-[#F5F5F5] tracking-tight">TrueSpot Protocol</span>
-            <span>•</span>
-            <span className="text-[#858585]">
-              Active Workspace: <strong className="text-white capitalize">{userMode} Mode</strong>
-            </span>
-          </div>
 
-          <div className="flex items-center space-x-4 text-[11px] font-medium text-[#858585]">
-            <button
-              onClick={() => handleSelectUserMode(userMode === 'maker' ? 'spotter' : 'maker')}
-              className="text-[#A8FF00] hover:underline cursor-pointer"
-            >
-              Switch to {userMode === 'maker' ? 'Spotter' : 'Maker'} Mode
-            </button>
-            <span>•</span>
-            <button
-              onClick={() => {
-                navigate('/admin');
-                setActiveTab('admin');
-              }}
-              className="hover:text-white transition-colors cursor-pointer"
-            >
-              Admin Access
-            </button>
-            <span>•</span>
-            <span className="font-mono text-[#A8FF00] font-semibold">Vault: TrUEspot...1111</span>
+            {/* 4. Desktop Web Footer */}
+            <footer className="w-full bg-[#0B0B0B] border border-white/[0.07] rounded-2xl p-5 mt-12 text-xs text-[#858585] select-none">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="flex items-center space-x-2.5">
+                  <div className="w-6 h-6 rounded-full bg-[#A8FF00] text-black flex items-center justify-center font-black text-xs">
+                    T
+                  </div>
+                  <span className="font-bold text-[#F5F5F5] tracking-tight">TrueSpot Protocol</span>
+                  <span>•</span>
+                  <span className="text-[#858585]">
+                    Active Workspace: <strong className="text-white capitalize">{userMode} Mode</strong>
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-4 text-[11px] font-medium text-[#858585]">
+                  <button
+                    onClick={() => handleSelectUserMode(userMode === 'maker' ? 'spotter' : 'maker')}
+                    className="text-[#A8FF00] hover:underline cursor-pointer"
+                  >
+                    Switch to {userMode === 'maker' ? 'Spotter' : 'Maker'} Mode
+                  </button>
+                  <span>•</span>
+                  <button
+                    onClick={() => {
+                      navigate('/admin');
+                      setActiveTab('admin');
+                    }}
+                    className="hover:text-white transition-colors cursor-pointer"
+                  >
+                    Admin Access
+                  </button>
+                  <span>•</span>
+                  <span className="font-mono text-[#A8FF00] font-semibold">Vault: TrUEspot...1111</span>
+                </div>
+              </div>
+            </footer>
           </div>
         </div>
-      </footer>
-    </div>
-  </div>
+      </div>
 
       {/* 5. Mobile Bottom Floating Navigation Bar - Mode Specific */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0B0B0B]/95 backdrop-blur-2xl border-t border-white/10 px-2 py-1.5 flex items-center justify-around select-none">

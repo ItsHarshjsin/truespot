@@ -78,19 +78,11 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
   });
 
   return (
-    <div className="space-y-5 max-w-7xl mx-auto">
-      {/* Clean Status & Workspace Header */}
-      <div className="flex items-center justify-between gap-3 pb-2 border-b border-white/[0.06]">
-        <div className="flex items-center space-x-2 text-xs text-[#858585] flex-wrap">
-          <span className="text-[#F5F5F5] font-semibold">Field Spotter Workspace</span>
-          <span>•</span>
-          <span>Wallet: <strong className="font-mono text-zinc-300">{activeAccount.address}</strong></span>
-          <span>•</span>
-          <span>Available: <strong className="text-[#A8FF00] font-mono">{activeAccount.balanceSol.toFixed(2)} SOL</strong></span>
-        </div>
-
+    <div className="space-y-5 w-full">
+      {/* Clean Radar Status Indicator Header */}
+      <div className="flex items-center justify-end pb-3 border-b border-white/[0.06]">
         <div className="flex items-center space-x-2 text-xs text-zinc-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00] animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00]" />
           <span className="font-medium text-zinc-300">200m Verification Radar Active</span>
         </div>
       </div>
@@ -138,7 +130,7 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
       {/* Sub-tab 3: Spotter Submissions Gallery */}
       {subTab === 'submissions' && (
         <div className="space-y-5">
-          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 sm:p-6 space-y-4 shadow-xl">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 space-y-4 shadow-none">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.06] pb-3">
               <div className="flex items-center space-x-2">
                 <FileCheck2 className="w-4 h-4 text-[#A8FF00]" />

@@ -109,67 +109,68 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-[#050505]/95 backdrop-blur-2xl border-b border-white/[0.08] px-4 sm:px-6 select-none flex items-center justify-between">
-      {/* Left: Mobile Menu Toggle + Brand Identity + Role Switcher */}
-      <div className="flex items-center space-x-3 sm:space-x-4">
-        {/* Mobile Sidebar Hamburger Toggle */}
-        <button
-          onClick={onToggleMobileSidebar}
-          className="lg:hidden w-9 h-9 rounded-xl bg-[#111111] border border-white/10 flex items-center justify-center text-zinc-300 hover:text-white hover:border-[#A8FF00]/40 transition-colors cursor-pointer"
-          title="Toggle Navigation Menu"
-        >
-          <Menu className="w-4 h-4" />
-        </button>
-
-        {/* Brand Logo */}
-        <div
-          onClick={() => navigate(userMode === 'maker' ? '/bounties' : '/nearby')}
-          className="flex items-center space-x-2.5 cursor-pointer group shrink-0"
-        >
-          <div className="w-8 h-8 rounded-xl bg-[#A8FF00] text-black flex items-center justify-center shadow-md shadow-[#A8FF00]/25 group-hover:scale-105 transition-transform">
-            <Shield className="w-4.5 h-4.5 text-black stroke-[2.5]" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-base font-extrabold text-white tracking-tight leading-tight">
-              TrueSpot
-            </span>
-            <span className="text-[10px] text-zinc-500 font-mono tracking-wider uppercase leading-none hidden sm:block">
-              DePIN Oracle
-            </span>
-          </div>
-        </div>
-
-        {/* Role Switcher Toggle (Maker <-> Spotter) */}
-        <div className="flex items-center bg-[#111111] p-1 rounded-full border border-white/[0.08] shadow-inner h-9 ml-1 sm:ml-2">
+    <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-[#050505]/95 backdrop-blur-2xl border-b border-white/[0.08] select-none">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full h-full flex items-center justify-between">
+        {/* Left: Mobile Menu Toggle + Brand Identity + Role Switcher */}
+        <div className="flex items-center space-x-3 sm:space-x-4">
+          {/* Mobile Sidebar Hamburger Toggle */}
           <button
-            type="button"
-            onClick={() => onSelectUserMode('maker')}
-            className={`flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer h-7 ${
-              userMode === 'maker'
-                ? 'bg-[#A8FF00] text-black shadow-sm font-bold'
-                : 'text-zinc-400 hover:text-white'
-            }`}
-            title="Maker Mode: Create queries, review evidence & settle payouts"
+            onClick={onToggleMobileSidebar}
+            className="lg:hidden w-9 h-9 rounded-xl bg-[#111111] border border-white/10 flex items-center justify-center text-zinc-300 hover:text-white hover:border-[#A8FF00]/40 transition-colors cursor-pointer"
+            title="Toggle Navigation Menu"
           >
-            <PlusCircle className={`w-3.5 h-3.5 ${userMode === 'maker' ? 'text-black' : 'text-zinc-400'}`} />
-            <span>Maker</span>
+            <Menu className="w-4 h-4" />
           </button>
 
-          <button
-            type="button"
-            onClick={() => onSelectUserMode('spotter')}
-            className={`flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer h-7 ${
-              userMode === 'spotter'
-                ? 'bg-[#A8FF00] text-black shadow-sm font-bold'
-                : 'text-zinc-400 hover:text-white'
-            }`}
-            title="Spotter Mode: Explore 200m radar, submit proofs & earn SOL"
+          {/* Brand Logo */}
+          <div
+            onClick={() => navigate(userMode === 'maker' ? '/bounties' : '/nearby')}
+            className="flex items-center space-x-2.5 cursor-pointer group shrink-0"
           >
-            <Compass className={`w-3.5 h-3.5 ${userMode === 'spotter' ? 'text-black' : 'text-zinc-400'}`} />
-            <span>Spotter</span>
-          </button>
+            <div className="w-8 h-8 rounded-xl bg-[#A8FF00] text-black flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+              <Shield className="w-4.5 h-4.5 text-black stroke-[2.5]" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-base font-extrabold text-white tracking-tight leading-tight">
+                TrueSpot
+              </span>
+              <span className="text-[10px] text-zinc-500 font-mono tracking-wider uppercase leading-none hidden sm:block">
+                DePIN Oracle
+              </span>
+            </div>
+          </div>
+
+          {/* Role Switcher Toggle (Maker <-> Spotter) - Refined Flat Dark Style */}
+          <div className="flex items-center bg-[#111111] p-1 rounded-full border border-white/[0.08] shadow-inner h-9 ml-1 sm:ml-2">
+            <button
+              type="button"
+              onClick={() => onSelectUserMode('maker')}
+              className={`flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer h-7 ${
+                userMode === 'maker'
+                  ? 'bg-[#181818] text-[#A8FF00] border border-[#A8FF00]/40 shadow-none'
+                  : 'text-zinc-400 hover:text-white border border-transparent'
+              }`}
+              title="Maker Mode: Create queries, review evidence & settle payouts"
+            >
+              <PlusCircle className={`w-3.5 h-3.5 ${userMode === 'maker' ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
+              <span>Maker</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onSelectUserMode('spotter')}
+              className={`flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer h-7 ${
+                userMode === 'spotter'
+                  ? 'bg-[#181818] text-[#A8FF00] border border-[#A8FF00]/40 shadow-none'
+                  : 'text-zinc-400 hover:text-white border border-transparent'
+              }`}
+              title="Spotter Mode: Explore 200m radar, submit proofs & earn SOL"
+            >
+              <Compass className={`w-3.5 h-3.5 ${userMode === 'spotter' ? 'text-[#A8FF00]' : 'text-zinc-400'}`} />
+              <span>Spotter</span>
+            </button>
+          </div>
         </div>
-      </div>
 
       {/* Right: Shared Nav Links (Map & Vault) + Wallet Button + Utilities Dropdown */}
       <div className="flex items-center space-x-2 sm:space-x-3">
@@ -362,7 +363,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
             </div>
           )}
         </div>
-
+      </div>
       </div>
     </header>
   );

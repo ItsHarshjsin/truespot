@@ -132,28 +132,20 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
   };
 
   return (
-    <div className="space-y-5 max-w-7xl mx-auto">
-      {/* Clean Status & Action Bar */}
-      <div className="flex items-center justify-between gap-3 pb-2 border-b border-white/[0.06]">
-        <div className="flex items-center space-x-2 text-xs text-[#858585] flex-wrap">
-          <span className="text-[#F5F5F5] font-semibold">Maker Escrow Desk</span>
-          <span>•</span>
-          <span>Wallet: <strong className="font-mono text-zinc-300">{activeAccount.address}</strong></span>
-          <span>•</span>
-          <span>Active Escrow: <strong className="text-[#A8FF00] font-mono">{totalEscrowLocked.toFixed(2)} SOL</strong></span>
-        </div>
-
-        {subTab === 'dashboard' && (
+    <div className="space-y-5 w-full">
+      {/* Action Header for Dashboard: Keep Create Query button, omit redundant globally-persistent status row */}
+      {subTab === 'dashboard' && (
+        <div className="flex items-center justify-end pb-3 border-b border-white/[0.06]">
           <button
             onClick={() => navigate('/studio')}
-            className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-[#A8FF00] hover:bg-[#b8ff33] text-black text-xs font-bold transition-all shadow-md shadow-[#A8FF00]/15 cursor-pointer shrink-0"
+            className="flex items-center space-x-1.5 px-4 py-2 rounded-full bg-[#A8FF00] hover:bg-[#b8ff33] text-black text-xs font-bold transition-all shadow-none cursor-pointer shrink-0"
             title="Create New Physical Bounty"
           >
             <PlusCircle className="w-3.5 h-3.5" />
             <span>Create Query</span>
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Sub-tab 1: Create Task */}
       {subTab === 'create' && (
@@ -175,7 +167,7 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
       {subTab === 'dashboard' && (
         <div className="space-y-5">
           {/* Incoming Submissions Awaiting Approval Bento Card */}
-          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 sm:p-6 space-y-4 shadow-xl">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 space-y-4 shadow-none">
             <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
               <div className="flex items-center space-x-2">
                 <FileCheck className="w-4 h-4 text-[#A8FF00]" />
@@ -244,7 +236,7 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
                               <div
                                 className={`h-full rounded-full transition-all duration-500 ${
                                   isConsensusReached
-                                    ? 'bg-[#A8FF00] shadow-[0_0_10px_rgba(168,255,0,0.5)]'
+                                    ? 'bg-[#A8FF00]'
                                     : 'bg-[#4285FF]'
                                 }`}
                                 style={{ width: `${Math.round(progressRatio * 100)}%` }}
@@ -354,10 +346,10 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
                             <button
                               onClick={() => handleApproveAndRelease(b.id)}
                               disabled={approvingId === b.id || hasSelfSubmission || (!isConsensusReached && requiredSpotters > 1 && bountyReports.length === 0)}
-                              className={`w-full py-3.5 px-5 rounded-full text-black font-extrabold text-xs tracking-wide shadow-md flex items-center justify-center space-x-2 transition-all active:scale-[0.99] ${
+                              className={`w-full py-3.5 px-5 rounded-full text-black font-extrabold text-xs tracking-wide shadow-none flex items-center justify-center space-x-2 transition-all active:scale-[0.99] ${
                                 hasSelfSubmission
                                   ? 'bg-zinc-700 text-zinc-400 cursor-not-allowed opacity-50'
-                                  : 'bg-gradient-to-r from-[#A8FF00] to-[#34D399] hover:brightness-105 shadow-[#A8FF00]/20 cursor-pointer disabled:opacity-50'
+                                  : 'bg-[#A8FF00] hover:bg-[#b8ff24] text-black shadow-none cursor-pointer disabled:opacity-50'
                               }`}
                             >
                               <CheckCircle2 className="w-4 h-4 text-black" />
@@ -382,7 +374,7 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
           </div>
 
           {/* All Created Tasks History Table */}
-          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 sm:p-6 space-y-4 shadow-xl">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 space-y-4 shadow-none">
             <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
               <h2 className="text-[15px] font-bold text-[#F5F5F5] tracking-tight">
                 All Created Tasks & Escrow Ledger ({bounties.length})

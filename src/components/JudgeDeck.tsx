@@ -71,7 +71,7 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2 select-none">
+    <div className="w-full pb-4 select-none">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
         {/* Left: Clean Telemetry Title & Location */}
         <div>

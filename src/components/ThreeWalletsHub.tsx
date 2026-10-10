@@ -242,16 +242,16 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
         {/* Role 1: Maker / Asker Tab */}
         <button
           onClick={() => setSelectedRoleView('maker')}
-          className={`p-4 sm:p-5 rounded-[20px] text-left transition-all relative overflow-hidden cursor-pointer flex flex-col justify-between h-full ${
+          className={`p-6 rounded-[20px] text-left transition-all relative overflow-hidden cursor-pointer flex flex-col justify-between h-full ${
             selectedRoleView === 'maker'
-              ? 'bg-[#0B0B0B] border border-[#A8FF00] shadow-[0_0_15px_rgba(168,255,0,0.15)]'
-              : 'bg-[#0B0B0B] border border-white/[0.07] hover:border-white/15'
+              ? 'bg-[#101010] border-l-2 border-[#A8FF00] border-y border-r border-white/[0.08] shadow-none'
+              : 'bg-[#0B0B0B] border-l-2 border-transparent border-y border-r border-white/[0.07] hover:border-white/15'
           }`}
         >
           <div>
             <div className="flex items-center justify-between mb-2">
-              <div className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center font-extrabold shadow-sm">
-                <Coins className="w-4 h-4 text-black" />
+              <div className="w-9 h-9 rounded-xl bg-[#161616] border border-white/10 text-[#A8FF00] flex items-center justify-center font-extrabold">
+                <Coins className="w-4 h-4 text-[#A8FF00]" />
               </div>
               <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-[#101010] text-[#A8FF00] border border-white/[0.07]">
                 {makerAccount.balanceSol.toFixed(2)} SOL
@@ -284,16 +284,16 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
         {/* Role 2: Receiver / Worker Tab */}
         <button
           onClick={() => setSelectedRoleView('receiver')}
-          className={`p-4 sm:p-5 rounded-[20px] text-left transition-all relative overflow-hidden cursor-pointer flex flex-col justify-between h-full ${
+          className={`p-6 rounded-[20px] text-left transition-all relative overflow-hidden cursor-pointer flex flex-col justify-between h-full ${
             selectedRoleView === 'receiver'
-              ? 'bg-[#0B0B0B] border border-[#A8FF00] shadow-[0_0_15px_rgba(168,255,0,0.15)]'
-              : 'bg-[#0B0B0B] border border-white/[0.07] hover:border-white/15'
+              ? 'bg-[#101010] border-l-2 border-[#A8FF00] border-y border-r border-white/[0.08] shadow-none'
+              : 'bg-[#0B0B0B] border-l-2 border-transparent border-y border-r border-white/[0.07] hover:border-white/15'
           }`}
         >
           <div>
             <div className="flex items-center justify-between mb-2">
-              <div className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center font-extrabold shadow-sm">
-                <Camera className="w-4 h-4 text-black" />
+              <div className="w-9 h-9 rounded-xl bg-[#161616] border border-white/10 text-[#A8FF00] flex items-center justify-center font-extrabold">
+                <Camera className="w-4 h-4 text-[#A8FF00]" />
               </div>
               <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-[#101010] text-[#A8FF00] border border-white/[0.07]">
                 {receiverAccount.balanceSol.toFixed(2)} SOL
@@ -326,16 +326,16 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
         {/* Role 3: Escrow Vault Protocol */}
         <button
           onClick={() => setSelectedRoleView('escrow')}
-          className={`p-4 sm:p-5 rounded-[20px] text-left transition-all relative overflow-hidden cursor-pointer flex flex-col justify-between h-full ${
+          className={`p-6 rounded-[20px] text-left transition-all relative overflow-hidden cursor-pointer flex flex-col justify-between h-full ${
             selectedRoleView === 'escrow'
-              ? 'bg-[#0B0B0B] border border-[#A8FF00] shadow-[0_0_15px_rgba(168,255,0,0.15)]'
-              : 'bg-[#0B0B0B] border border-white/[0.07] hover:border-white/15'
+              ? 'bg-[#101010] border-l-2 border-[#A8FF00] border-y border-r border-white/[0.08] shadow-none'
+              : 'bg-[#0B0B0B] border-l-2 border-transparent border-y border-r border-white/[0.07] hover:border-white/15'
           }`}
         >
           <div>
             <div className="flex items-center justify-between mb-2">
-              <div className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center font-extrabold shadow-sm">
-                <Lock className="w-4 h-4 text-black" />
+              <div className="w-9 h-9 rounded-xl bg-[#161616] border border-white/10 text-[#A8FF00] flex items-center justify-center font-extrabold">
+                <Lock className="w-4 h-4 text-[#A8FF00]" />
               </div>
               <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-[#101010] text-[#A8FF00] border border-white/[0.07]">
                 {escrowAccount.balanceSol.toFixed(2)} SOL
@@ -369,7 +369,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
       {/* VIEW 1: TASK MAKER DASHBOARD */}
       {selectedRoleView === 'maker' && (
         <div className="space-y-4">
-          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-none">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-full bg-[#101010] border border-white/[0.08] flex items-center justify-center text-[#A8FF00]">
                 <Coins className="w-5 h-5" />
@@ -389,7 +389,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
 
             <button
               onClick={onNavigateToAsk}
-              className="px-5 py-2.5 rounded-full bg-[#A8FF00] hover:bg-[#b8ff24] text-black font-black text-xs shadow-lg shadow-[#A8FF00]/25 flex items-center space-x-1.5 transition-all cursor-pointer self-start sm:self-auto"
+              className="px-5 py-2.5 rounded-full bg-[#A8FF00] hover:bg-[#b8ff24] text-black font-extrabold text-xs shadow-none flex items-center space-x-1.5 transition-all cursor-pointer self-start sm:self-auto"
             >
               <span>+ Create & Fund Task</span>
               <ArrowRight className="w-3.5 h-3.5 text-black" />
@@ -397,7 +397,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
           </div>
 
           {/* Pending Submissions */}
-          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-3.5 shadow-xl">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 space-y-3.5 shadow-none">
             <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
               <div className="flex items-center space-x-2">
                 <FileCheck className="w-4 h-4 text-[#A8FF00]" />
@@ -461,7 +461,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
                         <div className="pt-1">
                           <button
                             onClick={() => handleApproveReport(b.id)}
-                            className="w-full py-3 px-4 rounded-full bg-[#A8FF00] hover:bg-[#b8ff24] text-black font-black text-xs shadow-lg shadow-[#A8FF00]/25 flex items-center justify-center space-x-2 transition-all cursor-pointer"
+                            className="w-full py-3 px-4 rounded-full bg-[#A8FF00] hover:bg-[#b8ff24] text-black font-extrabold text-xs shadow-none flex items-center justify-center space-x-2 transition-all cursor-pointer"
                           >
                             <CheckCircle2 className="w-4 h-4 text-black" />
                             <span>Confirm Truth & Release {b.amount_sol} SOL Payout</span>
@@ -479,7 +479,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
       {/* VIEW 2: TASK RECEIVER DASHBOARD */}
       {selectedRoleView === 'receiver' && (
         <div className="space-y-4">
-          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-none">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-full bg-[#101010] border border-white/[0.08] flex items-center justify-center text-[#A8FF00]">
                 <Camera className="w-5 h-5" />
@@ -506,7 +506,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
           </div>
 
           {/* Open Missions Ready to Earn */}
-          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-3.5 shadow-xl">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 space-y-3.5 shadow-none">
             <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
               <h3 className="text-sm font-bold text-[#F5F5F5]">
                 Open Field Missions (Walk & Earn)
@@ -535,7 +535,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
 
                     <button
                       onClick={() => onNavigateToReport(b.id)}
-                      className="mt-3 w-full py-2.5 px-3 rounded-full bg-[#A8FF00] hover:bg-[#b8ff24] text-black text-xs font-black flex items-center justify-center space-x-1.5 transition-all shadow-md shadow-[#A8FF00]/25 cursor-pointer"
+                      className="mt-3 w-full py-2.5 px-3 rounded-full bg-[#A8FF00] hover:bg-[#b8ff24] text-black text-xs font-extrabold flex items-center justify-center space-x-1.5 transition-all shadow-none cursor-pointer"
                     >
                       <Camera className="w-3.5 h-3.5 text-black" />
                       <span>Snap Photo & Earn</span>
@@ -550,7 +550,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
       {/* VIEW 3: ESCROW VAULT PROTOCOL DASHBOARD */}
       {selectedRoleView === 'escrow' && (
         <div className="space-y-4">
-          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-none">
             <div className="flex items-center space-x-3 min-w-0">
               <div className="w-10 h-10 rounded-full bg-[#101010] border border-white/[0.08] flex items-center justify-center text-[#A8FF00] shrink-0">
                 <Lock className="w-5 h-5" />
@@ -609,7 +609,7 @@ export const ThreeWalletsHub: React.FC<ThreeWalletsHubProps> = ({
           </div>
 
           {/* Ledger Table */}
-          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-3.5 shadow-xl">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 space-y-3.5 shadow-none">
             <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
               <h3 className="text-sm font-bold text-[#F5F5F5]">
                 Escrow Settlement Ledger

@@ -188,7 +188,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
         {/* ========================================================= */}
         <div className="lg:col-span-4 space-y-4">
           {/* Main Portfolio Panel */}
-          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-4 shadow-xl">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 space-y-4 shadow-none">
             {/* Header */}
             <div className="flex items-center justify-between">
               <h2 className="text-[16px] font-bold text-[#F5F5F5] tracking-tight">Your Escrow Vault</h2>
@@ -198,25 +198,25 @@ export const AskScreen: React.FC<AskScreenProps> = ({
               </div>
             </div>
 
-            {/* Quick Action Circles Row (CoinVex Signature: 3 White Circular Pucks) */}
+            {/* Quick Action Circles Row */}
             <div className="grid grid-cols-3 gap-2.5 pt-1 text-center">
               <div className="flex flex-col items-center space-y-1.5 group cursor-pointer">
-                <div className="w-11 h-11 rounded-full bg-white text-black flex items-center justify-center font-extrabold shadow-md group-hover:scale-105 transition-transform">
-                  <Coins className="w-4 h-4 text-black" />
+                <div className="w-11 h-11 rounded-full bg-[#161616] border border-white/10 text-[#A8FF00] flex items-center justify-center font-extrabold group-hover:border-[#A8FF00]/40 transition-colors">
+                  <Coins className="w-4 h-4 text-[#A8FF00]" />
                 </div>
                 <span className="text-[11px] font-semibold text-[#858585] group-hover:text-white transition-colors">Deposit</span>
               </div>
 
               <div className="flex flex-col items-center space-y-1.5 group cursor-pointer">
-                <div className="w-11 h-11 rounded-full bg-white text-black flex items-center justify-center font-extrabold shadow-md group-hover:scale-105 transition-transform">
-                  <MapPin className="w-4 h-4 text-black" />
+                <div className="w-11 h-11 rounded-full bg-[#161616] border border-white/10 text-white flex items-center justify-center font-extrabold group-hover:border-[#A8FF00]/40 transition-colors">
+                  <MapPin className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-[11px] font-semibold text-[#858585] group-hover:text-white transition-colors">200m Range</span>
               </div>
 
               <div className="flex flex-col items-center space-y-1.5 group cursor-pointer">
-                <div className="w-11 h-11 rounded-full bg-white text-black flex items-center justify-center font-extrabold shadow-md group-hover:scale-105 transition-transform">
-                  <ShieldCheck className="w-4 h-4 text-black" />
+                <div className="w-11 h-11 rounded-full bg-[#161616] border border-white/10 text-[#A8FF00] flex items-center justify-center font-extrabold group-hover:border-[#A8FF00]/40 transition-colors">
+                  <ShieldCheck className="w-4 h-4 text-[#A8FF00]" />
                 </div>
                 <span className="text-[11px] font-semibold text-[#858585] group-hover:text-white transition-colors">Biometric</span>
               </div>
@@ -229,54 +229,54 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                 <span className="font-mono text-[#858585]">Target: <strong className="text-[#F5F5F5] font-bold">{amountSol.toFixed(2)} SOL</strong></span>
               </div>
               <div className="w-full bg-[#141414] h-2 rounded-full overflow-hidden flex">
-                <div className="bg-[#A8FF00] h-full w-3/4 rounded-full shadow-[0_0_10px_rgba(168,255,0,0.5)]" />
+                <div className="bg-[#A8FF00] h-full w-3/4 rounded-full" />
                 <div className="bg-zinc-800 h-full w-1/4" />
               </div>
             </div>
 
-            {/* Stacked Featured Cards */}
+            {/* Stacked Featured Cards - Minimal Flat Dark Surfaces */}
             <div className="space-y-2.5 pt-1">
-              {/* 1. Neon Green Gradient Card (Worker Payout) */}
-              <div className="fintech-card-green p-4 relative overflow-hidden">
+              {/* 1. Minimal Flat Dark Card (Worker Payout) */}
+              <div className="bg-[#101010] border-l-2 border-[#A8FF00] border-y border-r border-white/[0.08] rounded-2xl p-4 relative overflow-hidden">
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center space-x-1.5">
-                    <div className="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center font-bold text-[10px]">
+                    <div className="w-5 h-5 rounded-full bg-[#181818] border border-white/10 flex items-center justify-center font-bold text-[10px] text-[#A8FF00]">
                       ⚡
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-black/90">Worker Payout</span>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">Worker Payout</span>
                   </div>
-                  <span className="text-[10px] font-mono font-extrabold bg-black/15 px-2 py-0.5 rounded-full text-black">
+                  <span className="text-[10px] font-mono font-bold bg-[#181818] border border-[#A8FF00]/30 px-2 py-0.5 rounded-full text-[#A8FF00]">
                     {maxSpotters > 1 ? `Swarm (${maxSpotters})` : '100%'}
                   </span>
                 </div>
-                <div className="text-2xl font-black tracking-tight my-0.5 text-black">
+                <div className="text-2xl font-black tracking-tight my-0.5 text-white font-mono">
                   {amountSol.toFixed(2)} SOL
                 </div>
                 <div className="flex items-center justify-between text-[10px] font-semibold pt-1">
-                  <span className="bg-black text-[#A8FF00] px-2 py-0.5 rounded-full font-mono font-bold">
+                  <span className="bg-[#181818] text-[#A8FF00] border border-[#A8FF00]/30 px-2 py-0.5 rounded-full font-mono font-bold">
                     ↗ {maxSpotters > 1 ? `${(amountSol / maxSpotters).toFixed(3)} SOL each` : 'Instant Release'}
                   </span>
-                  <span className="text-black/75">Upon Consensus</span>
+                  <span className="text-zinc-400">Upon Consensus</span>
                 </div>
               </div>
 
-              {/* 2. Vibrant Purple Gradient Card (Hardware & Biometrics) */}
-              <div className="fintech-card-purple p-4 relative overflow-hidden">
+              {/* 2. Minimal Flat Dark Card (Hardware & Biometrics) */}
+              <div className="bg-[#101010] border-l-2 border-[#8B4DFF] border-y border-r border-white/[0.08] rounded-2xl p-4 relative overflow-hidden">
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center space-x-1.5">
-                    <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center font-bold text-[10px]">
+                    <div className="w-5 h-5 rounded-full bg-[#181818] border border-white/10 flex items-center justify-center font-bold text-[10px] text-purple-400">
                       🛡️
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-purple-100">Type: {bountyType}</span>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">Type: {bountyType}</span>
                   </div>
-                  <span className="text-[10px] font-mono font-bold bg-white/20 px-2 py-0.5 rounded-full text-white">
+                  <span className="text-[10px] font-mono font-bold bg-[#181818] border border-purple-500/30 px-2 py-0.5 rounded-full text-purple-300">
                     SHA-256
                   </span>
                 </div>
                 <div className="text-xl font-black tracking-tight my-0.5 text-white">
                   {bountyType === 'AI_VISION' ? 'AI Pre-Check' : bountyType === 'DATA_COLLECTION' ? 'Heavy Media' : 'Boolean Oracle'}
                 </div>
-                <div className="text-[10px] text-purple-200 truncate">
+                <div className="text-[10px] text-zinc-400 truncate">
                   Physical tremor + Solana devnet blockhash
                 </div>
               </div>
@@ -284,7 +284,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
           </div>
 
           {/* Quick Idea Prompts Card */}
-          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-2.5 shadow-xl">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 space-y-3 shadow-none">
             <div className="flex items-center space-x-2 text-[11px] font-bold text-[#858585] uppercase tracking-wider">
               <Sparkles className="w-3.5 h-3.5 text-[#A8FF00]" />
               <span>1-Click Verification Ideas</span>
@@ -316,7 +316,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
         {/* ========================================================= */}
         <div className="lg:col-span-4 space-y-4">
           {/* Card 1: Flowing Dual Wave Ribbon Chart */}
-          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-3 shadow-xl">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 space-y-3 shadow-none">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Activity className="w-4 h-4 text-[#A8FF00]" />
@@ -425,7 +425,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
           </div>
 
           {/* Card 2: 7-Day Matrix Heatmap */}
-          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-3 shadow-xl">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 space-y-3 shadow-none">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <TrendingUp className="w-4 h-4 text-[#A8FF00]" />
@@ -475,7 +475,7 @@ export const AskScreen: React.FC<AskScreenProps> = ({
         {/* ========================================================= */}
         <div className="lg:col-span-4 space-y-4">
           {/* Promo Card: Active Field Network */}
-          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-4 shadow-xl">
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 shadow-none">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2.5">
                 <div className="flex -space-x-2 overflow-hidden">
@@ -511,8 +511,8 @@ export const AskScreen: React.FC<AskScreenProps> = ({
             </div>
           </div>
 
-          {/* Roomy, Clean CoinVex Task Dispatch Form Card */}
-          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-5 space-y-4 shadow-xl">
+          {/* Roomy, Clean Task Dispatch Form Card */}
+          <div className="bg-[#0B0B0B] border border-white/[0.07] rounded-[20px] p-6 space-y-4 shadow-none">
             <div>
               <div className="flex items-center justify-between">
                 <h2 className="text-[16px] font-bold text-[#F5F5F5] tracking-tight">
@@ -824,12 +824,12 @@ export const AskScreen: React.FC<AskScreenProps> = ({
                 <p className="text-xs text-rose-400 font-medium">{errorMsg}</p>
               )}
 
-              {/* Signature CoinVex Wide Neon Pill Button */}
+              {/* Signature Wide Solid Neon Lime Button */}
               <div className="pt-1">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3.5 px-5 rounded-full bg-gradient-to-r from-[#A8FF00] to-[#34D399] hover:brightness-105 text-black font-extrabold text-xs tracking-wide shadow-xl shadow-[#A8FF00]/25 flex items-center justify-center space-x-2 transition-all active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+                  className="w-full py-3.5 px-5 rounded-full bg-[#A8FF00] hover:bg-[#b8ff24] text-black font-extrabold text-xs tracking-wide shadow-none flex items-center justify-center space-x-2 transition-all active:scale-[0.99] disabled:opacity-50 cursor-pointer"
                 >
                   <span className="text-base">⇄</span>
                   <span>
