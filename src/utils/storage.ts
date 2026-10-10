@@ -301,6 +301,58 @@ class HybridStore {
         this.publishedAnswers = [...DEFAULT_SEED_ANSWERS];
       }
 
+      // Merge legacy bounties from localStorage that are not yet in this.queries
+      try {
+        const legacyBountiesStr = localStorage.getItem('truespot_bounties');
+        if (legacyBountiesStr) {
+          const legacyBounties: any[] = JSON.parse(legacyBountiesStr);
+          legacyBounties.forEach((lb) => {
+            if (!this.queries.some((q) => q.id === lb.id || q.query_id_hex === lb.query_id_hex)) {
+              this.queries.push(lb);
+            }
+          });
+        }
+      } catch (e) {}
+
+      // Self-heal and link: Ensure every observation maps to a valid query
+      this.observations.forEach((obs) => {
+        let matchingQuery = this.queries.find(
+          (q) =>
+            q.query_id_hex === obs.query_id_hex ||
+            q.id === obs.query_id_hex ||
+            q.id === (obs as any).bounty_id ||
+            q.query_id_hex === (obs as any).bounty_id
+        );
+
+        if (!matchingQuery) {
+          // Recover or synthesize parent query so observation is never orphaned
+          const synthQuery: Query = {
+            id: obs.query_id_hex || 'query-recovered',
+            query_id_hex: obs.query_id_hex || 'recovered_hex',
+            creator_wallet: 'Ask3rX9kL2p1M4w7zVbNdqE5uT8yR3sF',
+            question: (obs as any).answer_text || 'Physical Verification Query',
+            place_name: 'San Francisco Ground Station',
+            lat: obs.observed_lat || 37.7785,
+            lng: obs.observed_lng || -122.3999,
+            radius_meters: 200,
+            escrow_lamports: 200000000,
+            amount_sol: (obs as any).amount_sol || 0.20,
+            validity_seconds: 3600,
+            expiry_timestamp: new Date(Date.now() + 3600000).toISOString(),
+            status: obs.status === 'ACCEPTED' ? 'RESOLVED' : 'IN_REVIEW',
+            created_at: obs.client_timestamp || new Date().toISOString(),
+            settlement_tx: '',
+          };
+          this.queries.unshift(synthQuery);
+        } else {
+          // If query has a pending answer, ensure status is answered / in review
+          if (obs.status === 'PENDING' && matchingQuery.status === 'OPEN') {
+            matchingQuery.status = 'IN_REVIEW';
+            (matchingQuery as any).status = 'ANSWERED';
+          }
+        }
+      });
+
       // Sync legacy mirrors
       this.bounties = this.queries as any;
       this.reports = this.observations.map((o) => ({
@@ -309,7 +361,7 @@ class HybridStore {
         photo_url: o.media_url,
         fingerprint: o.sha256_hash,
         reporter_wallet: o.contributor_wallet,
-        answer_text: o.ai_evaluation?.summary || 'Observed Ground Truth',
+        answer_text: o.ai_evaluation?.summary || (o as any).answer_text || 'Observed Ground Truth',
         observed_at: o.client_timestamp,
         gps_lat: o.observed_lat,
         gps_lng: o.observed_lng,
@@ -509,8 +561,49 @@ class HybridStore {
     const obs = this.observations.find((o) => o.id === observationId);
     if (!obs) throw new Error('Observation not found');
 
-    const query = this.queries.find((q) => q.query_id_hex === obs.query_id_hex);
-    if (!query) throw new Error('Associated query not found');
+    let query: Query;
+    const existing = this.queries.find(
+      (q) =>
+        q.query_id_hex === obs.query_id_hex ||
+        q.id === obs.query_id_hex ||
+        q.id === (obs as any).bounty_id ||
+        q.query_id_hex === (obs as any).bounty_id
+    );
+
+    if (existing) {
+      query = existing;
+    } else {
+      const foundInBounties = (this.bounties as any[]).find(
+        (b) =>
+          b.id === obs.query_id_hex ||
+          b.query_id_hex === obs.query_id_hex ||
+          b.id === (obs as any).bounty_id ||
+          b.query_id_hex === (obs as any).bounty_id
+      );
+      if (foundInBounties) {
+        query = foundInBounties;
+        this.queries.unshift(foundInBounties);
+      } else {
+        query = {
+          id: obs.query_id_hex || 'query-recovered',
+          query_id_hex: obs.query_id_hex || 'recovered_hex',
+          creator_wallet: 'Ask7rX9kL2p1M4w7zVbNdqE5uT8yR3sF',
+          question: (obs as any).answer_text || 'Physical Query Verification',
+          place_name: 'Designated Coordinates',
+          lat: obs.observed_lat || 37.7785,
+          lng: obs.observed_lng || -122.3999,
+          radius_meters: 200,
+          escrow_lamports: 200000000,
+          amount_sol: (obs as any).amount_sol || 0.20,
+          validity_seconds: 3600,
+          expiry_timestamp: new Date(Date.now() + 3600000).toISOString(),
+          status: 'OPEN',
+          created_at: new Date().toISOString(),
+          settlement_tx: '',
+        };
+        this.queries.unshift(query);
+      }
+    }
 
     const txSig =
       settlementTx ||
@@ -518,17 +611,37 @@ class HybridStore {
 
     obs.status = 'ACCEPTED';
     query.status = 'RESOLVED';
-    query.settlement_tx = txSig;
+    (query as any).settlement_tx = txSig;
+    (query as any).payout_tx = txSig;
+    (query as any).status = 'PAID';
+
+    // Synchronize legacy reports and bounties
+    this.reports.forEach((r) => {
+      if (
+        r.id === obs.id ||
+        r.bounty_id === query.id ||
+        r.bounty_id === query.query_id_hex ||
+        (r as any).query_id_hex === query.query_id_hex
+      ) {
+        r.status = 'ACCEPTED';
+      }
+    });
+    this.bounties.forEach((b) => {
+      if (b.id === query.id || b.query_id_hex === query.query_id_hex) {
+        b.status = 'PAID';
+        b.payout_tx = txSig;
+      }
+    });
 
     // Create / Publish Official Answer
     const newAnswer: PublishedAnswer = {
       id: 'ans-' + Math.random().toString(36).substring(2, 9),
       query_id_hex: query.query_id_hex,
       status: 'RESOLVED',
-      verdict: obs.ai_evaluation?.summary || 'VERIFIED_PHYSICAL_GROUND_TRUTH',
-      confidence_score: obs.quality_report.relevance_assessment.confidence_score / 100 || 0.95,
+      verdict: obs.ai_evaluation?.summary || (obs as any).answer_text || 'VERIFIED_PHYSICAL_GROUND_TRUTH',
+      confidence_score: obs.quality_report?.relevance_assessment?.confidence_score / 100 || 0.95,
       freshness_state: 'ACTIVE',
-      summary: obs.quality_report.relevance_assessment.summary || 'Scene corroborated by ground contributor.',
+      summary: obs.quality_report?.relevance_assessment?.summary || (obs as any).answer_text || 'Scene corroborated by ground contributor.',
       evidence_hashes: [obs.sha256_hash],
       settlement_signature: txSig,
       freshness_expires_at: query.expiry_timestamp,
@@ -581,12 +694,22 @@ class HybridStore {
     obs.rejection_reason = reason;
 
     const remainingPending = this.observations.filter(
-      (o) => o.query_id_hex === obs.query_id_hex && o.id !== observationId && o.status === 'PENDING'
+      (o) =>
+        (o.query_id_hex === obs.query_id_hex || (o as any).bounty_id === (obs as any).bounty_id) &&
+        o.id !== observationId &&
+        o.status === 'PENDING'
     );
 
-    const query = this.queries.find((q) => q.query_id_hex === obs.query_id_hex);
-    if (query && remainingPending.length === 0 && query.status === 'IN_REVIEW') {
+    const query = this.queries.find(
+      (q) =>
+        q.query_id_hex === obs.query_id_hex ||
+        q.id === obs.query_id_hex ||
+        q.id === (obs as any).bounty_id ||
+        q.query_id_hex === (obs as any).bounty_id
+    );
+    if (query && remainingPending.length === 0 && (query.status === 'IN_REVIEW' || (query as any).status === 'ANSWERED')) {
       query.status = 'OPEN';
+      (query as any).status = 'OPEN';
     }
 
     this.persist();
@@ -622,6 +745,12 @@ class HybridStore {
 
     query.status = 'CANCELLED';
     query.settlement_tx = refundTx;
+    (query as any).status = 'CANCELLED';
+    this.bounties.forEach((b) => {
+      if (b.id === query.id || b.query_id_hex === query.query_id_hex) {
+        b.status = 'CANCELLED';
+      }
+    });
 
     this.persist();
     this.notifyListeners();
@@ -638,7 +767,7 @@ class HybridStore {
     }
 
     return {
-      refundLamports: query.escrow_lamports,
+      refundLamports: query.escrow_lamports || Math.round((query.amount_sol || 0.20) * 1e9),
       tx: refundTx,
     };
   }
@@ -688,9 +817,38 @@ class HybridStore {
       target.status = 'PAID';
       target.payout_tx = payoutTx;
       target.settlement_tx = payoutTx;
-      this.persist();
-      this.notifyListeners();
     }
+
+    this.bounties.forEach((b) => {
+      if (b.id === bountyId || b.query_id_hex === bountyId) {
+        b.status = 'PAID';
+        b.payout_tx = payoutTx;
+        b.settlement_tx = payoutTx;
+      }
+    });
+
+    // Also mark related observations and reports as ACCEPTED
+    this.observations.forEach((o) => {
+      if (
+        o.query_id_hex === bountyId ||
+        (o as any).bounty_id === bountyId ||
+        (target && (o.query_id_hex === target.query_id_hex || (o as any).bounty_id === target.id))
+      ) {
+        o.status = 'ACCEPTED';
+      }
+    });
+    this.reports.forEach((r) => {
+      if (
+        r.bounty_id === bountyId ||
+        (r as any).query_id_hex === bountyId ||
+        (target && (r.bounty_id === target.id || (r as any).query_id_hex === target.query_id_hex))
+      ) {
+        r.status = 'ACCEPTED';
+      }
+    });
+
+    this.persist();
+    this.notifyListeners();
   }
 
   public async submitVerification(ver: any): Promise<Verification> {
@@ -758,9 +916,28 @@ class HybridStore {
   }
 
   public async submitReport(report: any): Promise<Report> {
+    // 1. Locate the parent bounty / query
+    const targetBounty =
+      this.queries.find((q) => q.id === report.bounty_id || q.query_id_hex === report.bounty_id) ||
+      (this.bounties as any[]).find((b) => b.id === report.bounty_id || b.query_id_hex === report.bounty_id);
+
+    const actualQueryIdHex = targetBounty?.query_id_hex || report.query_id_hex || report.bounty_id;
+    const actualBountyId = targetBounty?.id || report.bounty_id;
+
+    // 2. Mark the parent bounty/query as ANSWERED so Maker sees it!
+    if (targetBounty) {
+      targetBounty.status = 'ANSWERED';
+    }
+    this.bounties.forEach((b) => {
+      if (b.id === actualBountyId || b.query_id_hex === actualQueryIdHex) {
+        b.status = 'ANSWERED';
+      }
+    });
+
     const newObs: Report = {
       id: 'obs-' + Math.random().toString(36).substring(2, 9),
-      query_id_hex: report.bounty_id,
+      query_id_hex: actualQueryIdHex,
+      bounty_id: actualBountyId,
       contributor_wallet: report.reporter_wallet || 'Spot7rX9kL2p1M4w7zVbNdqE5uT8yR3sF',
       media_url: report.photo_url || '',
       sha256_hash: report.fingerprint || 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
@@ -777,7 +954,6 @@ class HybridStore {
       },
       status: 'PENDING',
       created_at: new Date().toISOString(),
-      bounty_id: report.bounty_id,
       reporter_wallet: report.reporter_wallet || 'Spot7rX9kL2p1M4w7zVbNdqE5uT8yR3sF',
       photo_url: report.photo_url || '',
       fingerprint: report.fingerprint || 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',

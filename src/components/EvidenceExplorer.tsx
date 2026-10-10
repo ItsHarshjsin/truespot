@@ -78,11 +78,28 @@ export const EvidenceExplorer: React.FC<EvidenceExplorerProps> = ({
   const handleApproveAndSettle = async (obs: Observation) => {
     try {
       setSettlingObsId(obs.id);
-      const query = queries.find((q) => q.query_id_hex === obs.query_id_hex);
-      if (!query) throw new Error('Query not found');
+      let query = queries.find(
+        (q) =>
+          q.query_id_hex === obs.query_id_hex ||
+          q.id === obs.query_id_hex ||
+          q.id === (obs as any).bounty_id ||
+          q.query_id_hex === (obs as any).bounty_id
+      );
 
-      const feeSol = (query.amount_sol * 0.025);
-      const payoutSol = (query.amount_sol * 0.975);
+      if (!query) {
+        const bList = await hybridStore.getBounties();
+        query = bList.find(
+          (b) =>
+            b.id === obs.query_id_hex ||
+            b.query_id_hex === obs.query_id_hex ||
+            b.id === (obs as any).bounty_id ||
+            b.query_id_hex === (obs as any).bounty_id
+        );
+      }
+
+      const amountSol = query ? query.amount_sol : ((obs as any).amount_sol || 0.20);
+      const feeSol = amountSol * 0.025;
+      const payoutSol = amountSol * 0.975;
 
       onShowToast(
         'Anchor Settle Invocation',
@@ -91,7 +108,7 @@ export const EvidenceExplorer: React.FC<EvidenceExplorerProps> = ({
       );
 
       // Simulate on-chain confirmation latency
-      await new Promise((r) => setTimeout(r, 1200));
+      await new Promise((r) => setTimeout(r, 800));
 
       const txSig =
         '5R3bdfZ' + Array.from({ length: 36 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
@@ -275,7 +292,15 @@ export const EvidenceExplorer: React.FC<EvidenceExplorerProps> = ({
             </div>
           ) : (
             filteredObservations.map((obs) => {
-              const query = queries.find((q) => q.query_id_hex === obs.query_id_hex);
+              const query = queries.find(
+                (q) =>
+                  q.query_id_hex === obs.query_id_hex ||
+                  q.id === obs.query_id_hex ||
+                  q.id === (obs as any).bounty_id ||
+                  q.query_id_hex === (obs as any).bounty_id
+              );
+              const bountyAmount = query ? query.amount_sol : ((obs as any).amount_sol || 0.20);
+              const netPayoutSol = (bountyAmount * 0.975).toFixed(3);
               const isSettling = settlingObsId === obs.id;
 
               return (
@@ -296,7 +321,7 @@ export const EvidenceExplorer: React.FC<EvidenceExplorerProps> = ({
                         </span>
                       </div>
                       <h2 className="text-base sm:text-lg font-bold text-white">
-                        {query?.question || 'Physical Query Inquiry'}
+                        {query?.question || (obs as any).answer_text || 'Physical Query Inquiry'}
                       </h2>
                       <p className="text-xs text-zinc-400 flex items-center gap-1 mt-0.5">
                         <MapPin className="w-3.5 h-3.5 text-[#A8FF00]" />
@@ -311,7 +336,7 @@ export const EvidenceExplorer: React.FC<EvidenceExplorerProps> = ({
                           Bounty Value
                         </span>
                         <div className="text-sm font-mono font-bold text-[#A8FF00]">
-                          {query ? (query.amount_sol * 0.975).toFixed(3) : '0.000'} SOL
+                          {netPayoutSol} SOL
                         </div>
                         <span className="text-[10px] text-zinc-500 font-mono">Net 97.5%</span>
                       </div>
