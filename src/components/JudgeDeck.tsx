@@ -73,12 +73,12 @@ export const JudgeDeck: React.FC<JudgeDeckProps> = ({
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2 select-none">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
-        {/* Left: CoinVex Large Dashboard Title & Date */}
+        {/* Left: Clean Telemetry Title & Location */}
         <div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#F5F5F5] tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#F5F5F5] tracking-tight">
             {pageTitle}
           </h1>
-          <div className="flex items-center space-x-2 text-xs text-[#858585] mt-1 font-medium">
+          <div className="flex items-center space-x-2 text-xs text-[#858585] mt-0.5 font-medium">
             <span>{new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}</span>
             <span>•</span>
             <span className="flex items-center space-x-1.5 text-zinc-300">

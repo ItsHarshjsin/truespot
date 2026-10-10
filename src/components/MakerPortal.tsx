@@ -133,52 +133,26 @@ export const MakerPortal: React.FC<MakerPortalProps> = ({
 
   return (
     <div className="space-y-5 max-w-7xl mx-auto">
-      {/* Compact Mode Switcher Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-white/[0.06]">
+      {/* Clean Status & Action Bar */}
+      <div className="flex items-center justify-between gap-3 pb-2 border-b border-white/[0.06]">
         <div className="flex items-center space-x-2 text-xs text-[#858585] flex-wrap">
-          <span className="text-[#F5F5F5] font-semibold">Verification Dispatch</span>
+          <span className="text-[#F5F5F5] font-semibold">Maker Escrow Desk</span>
           <span>•</span>
           <span>Wallet: <strong className="font-mono text-zinc-300">{activeAccount.address}</strong></span>
           <span>•</span>
-          <span>Available: <strong className="text-[#A8FF00] font-mono">{activeAccount.balanceSol.toFixed(2)} SOL</strong></span>
+          <span>Active Escrow: <strong className="text-[#A8FF00] font-mono">{totalEscrowLocked.toFixed(2)} SOL</strong></span>
         </div>
 
-        {/* Sub-navigation Switcher Pills */}
-        <div className="flex items-center bg-[#0D0D0D] p-1 rounded-full border border-white/[0.08] shadow-inner space-x-1 shrink-0 self-start sm:self-auto">
+        {subTab === 'dashboard' && (
           <button
-            onClick={() => {
-              setSubTab('create');
-              navigate('/studio');
-            }}
-            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-              subTab === 'create'
-                ? 'bg-[#A8FF00] text-black shadow-sm'
-                : 'text-[#858585] hover:text-white'
-            }`}
+            onClick={() => navigate('/studio')}
+            className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-[#A8FF00] hover:bg-[#b8ff33] text-black text-xs font-bold transition-all shadow-md shadow-[#A8FF00]/15 cursor-pointer shrink-0"
+            title="Create New Physical Bounty"
           >
             <PlusCircle className="w-3.5 h-3.5" />
-            <span>New Task Query</span>
+            <span>Create Query</span>
           </button>
-          <button
-            onClick={() => {
-              setSubTab('dashboard');
-              navigate('/bounties');
-            }}
-            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all relative cursor-pointer ${
-              subTab === 'dashboard'
-                ? 'bg-[#A8FF00] text-black shadow-sm'
-                : 'text-[#858585] hover:text-white'
-            }`}
-          >
-            <FileCheck className="w-3.5 h-3.5" />
-            <span>My Tasks ({bounties.length})</span>
-            {pendingApprovalBounties.length > 0 && (
-              <span className="ml-1 px-1.5 py-0.2 rounded-full bg-black text-[#A8FF00] text-[10px] font-black border border-[#A8FF00] animate-pulse">
-                {pendingApprovalBounties.length}
-              </span>
-            )}
-          </button>
-        </div>
+        )}
       </div>
 
       {/* Sub-tab 1: Create Task */}

@@ -335,7 +335,7 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const isLocationView = ['studio', 'bounties', 'dashboard', 'nearby', 'radar', 'report', 'map'].includes(activeTab);
+  const isLocationView = ['studio', 'nearby', 'radar', 'map'].includes(activeTab);
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#F5F5F5] font-sans flex flex-col relative selection:bg-[#A8FF00] selection:text-black">
@@ -726,7 +726,7 @@ const AppContent: React.FC = () => {
       </footer>
 
       {/* 5. Mobile Bottom Floating Navigation Bar - Mode Specific */}
-      <div className="xl:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0B0B0B]/95 backdrop-blur-2xl border-t border-white/10 px-2 py-1.5 flex items-center justify-around select-none">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0B0B0B]/95 backdrop-blur-2xl border-t border-white/10 px-2 py-1.5 flex items-center justify-around select-none">
         {(userMode === 'maker'
           ? [
               { id: 'studio', path: '/studio', label: 'Studio', icon: PlusCircle },

@@ -79,8 +79,8 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
 
   return (
     <div className="space-y-5 max-w-7xl mx-auto">
-      {/* Compact Mode Switcher Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-white/[0.06]">
+      {/* Clean Status & Workspace Header */}
+      <div className="flex items-center justify-between gap-3 pb-2 border-b border-white/[0.06]">
         <div className="flex items-center space-x-2 text-xs text-[#858585] flex-wrap">
           <span className="text-[#F5F5F5] font-semibold">Field Spotter Workspace</span>
           <span>•</span>
@@ -89,67 +89,9 @@ export const ReceiverPortal: React.FC<ReceiverPortalProps> = ({
           <span>Available: <strong className="text-[#A8FF00] font-mono">{activeAccount.balanceSol.toFixed(2)} SOL</strong></span>
         </div>
 
-        {/* Sub-navigation Switcher Pills */}
-        <div className="flex items-center bg-[#0D0D0D] p-1 rounded-full border border-white/[0.08] shadow-inner space-x-1 shrink-0 self-start sm:self-auto flex-wrap">
-          <button
-            onClick={() => {
-              setSubTab('radar');
-              navigate('/nearby');
-            }}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-              subTab === 'radar'
-                ? 'bg-[#A8FF00] text-black shadow-sm'
-                : 'text-[#858585] hover:text-white'
-            }`}
-          >
-            <Compass className="w-3.5 h-3.5" />
-            <span>200m Radar</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setSubTab('report');
-              navigate('/report');
-            }}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-              subTab === 'report'
-                ? 'bg-[#A8FF00] text-black shadow-sm'
-                : 'text-[#858585] hover:text-white'
-            }`}
-          >
-            <Camera className="w-3.5 h-3.5" />
-            <span>Submit Evidence</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setSubTab('submissions');
-              navigate('/submissions');
-            }}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-              subTab === 'submissions'
-                ? 'bg-[#A8FF00] text-black shadow-sm'
-                : 'text-[#858585] hover:text-white'
-            }`}
-          >
-            <FileCheck2 className="w-3.5 h-3.5" />
-            <span>My Submissions ({reports.length})</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setSubTab('earnings');
-              navigate('/earnings');
-            }}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-              subTab === 'earnings'
-                ? 'bg-[#A8FF00] text-black shadow-sm'
-                : 'text-[#858585] hover:text-white'
-            }`}
-          >
-            <Coins className="w-3.5 h-3.5" />
-            <span>Earnings</span>
-          </button>
+        <div className="flex items-center space-x-2 text-xs text-zinc-400">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#A8FF00] animate-pulse" />
+          <span className="font-medium text-zinc-300">200m Verification Radar Active</span>
         </div>
       </div>
 
