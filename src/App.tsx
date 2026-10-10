@@ -20,7 +20,8 @@ import { JUDGE_PRESETS } from './utils/mockLocations';
 import { getRealDeviceGps } from './utils/evidence';
 import { hybridStore } from './utils/storage';
 
-import { Navbar } from './components/Navbar';
+import { TopNavbar } from './components/TopNavbar';
+import { SidebarNav } from './components/SidebarNav';
 import { MakerPortal } from './components/MakerPortal';
 import { ReceiverPortal } from './components/ReceiverPortal';
 import { ThreeWalletsHub } from './components/ThreeWalletsHub';
@@ -63,6 +64,7 @@ const AppContent: React.FC = () => {
   const [walletModalOpen, setWalletModalOpen] = useState<boolean>(false);
   const [howItWorksOpen, setHowItWorksOpen] = useState<boolean>(false);
   const [supabaseModalOpen, setSupabaseModalOpen] = useState<boolean>(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
 
   // Active User Mode: 'maker' | 'spotter' (persisted to localStorage across page refreshes)
   const savedModeStr =
@@ -342,21 +344,33 @@ const AppContent: React.FC = () => {
       {/* Toast Notification Container */}
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
 
-      {/* 1. CoinVex Global Header with Mode-Restructured Navigation */}
-      <Navbar
-        unverifiedCount={1}
+      {/* 1. Fixed Global Top Header */}
+      <TopNavbar
+        userMode={userMode}
+        onSelectUserMode={handleSelectUserMode}
         onOpenWalletModal={() => setWalletModalOpen(true)}
         onOpenHowItWorks={() => setHowItWorksOpen(true)}
         onOpenSupabaseModal={() => setSupabaseModalOpen(true)}
         isSupabaseConnected={hybridStore.isConnectedToSupabase}
         activeDemoAccount={activeDemoAccount}
         isUsingDemo={isUsingDemo}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        userMode={userMode}
-        onSelectUserMode={handleSelectUserMode}
+        onResetDemoState={handleResetDemoState}
         isAdmin={isAdmin}
+        onToggleMobileSidebar={() => setMobileSidebarOpen(!mobileSidebarOpen)}
       />
+
+      {/* 2. Global Layout Container with Vertical Left Sidebar */}
+      <div className="pt-16 flex flex-1 w-full min-h-screen">
+        {/* Left Vertical Sidebar */}
+        <SidebarNav
+          userMode={userMode}
+          unverifiedCount={1}
+          mobileOpen={mobileSidebarOpen}
+          onCloseMobile={() => setMobileSidebarOpen(false)}
+        />
+
+        {/* Content Area offset by sidebar width on lg+ displays */}
+        <div className="flex-1 min-w-0 lg:pl-60 xl:pl-64 flex flex-col">
 
       {/* 2. Subheader Toolbar: Real Device GPS, Preset Jumper & Devnet +1 SOL Airdrop */}
       {isLocationView && (
@@ -724,6 +738,8 @@ const AppContent: React.FC = () => {
           </div>
         </div>
       </footer>
+    </div>
+  </div>
 
       {/* 5. Mobile Bottom Floating Navigation Bar - Mode Specific */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0B0B0B]/95 backdrop-blur-2xl border-t border-white/10 px-2 py-1.5 flex items-center justify-around select-none">
